@@ -1,0 +1,867 @@
+{
+  "permissions": {
+    "use": {
+      "title": "Gunakan asisten",
+      "description": "Buka asisten dan ajukan pertanyaan."
+    },
+    "manage_providers": {
+      "title": "Kelola penyedia",
+      "description": "Tambah, edit, dan hapus penyedia AI serta kunci API-nya."
+    },
+    "apply_proposals": {
+      "title": "Terapkan usulan",
+      "description": "Biarkan asisten melaksanakan perubahan yang diusulkannya."
+    },
+    "services": {
+      "use": {
+        "title": "Gunakan AI dari fitur lain",
+        "description": "Fitur lain mungkin memanggil asisten atas nama Anda."
+      }
+    },
+    "secrets": {
+      "share": {
+        "title": "Bagikan kunci API",
+        "description": "Fitur lain mungkin menggunakan kunci API AI yang disimpan tanpa menampilkannya."
+      }
+    },
+    "ops": {
+      "use": {
+        "title": "Jalankan perintah pada host dengan asisten AI",
+        "description": "Izinkan asisten menjalankan perintah shell apa pun pada host yang Anda pilih. Hanya untuk admin secara default."
+      }
+    },
+    "usage": {
+      "view_all": {
+        "title": "Lihat penggunaan AI semua orang",
+        "description": "Lihat token yang digunakan oleh panggilan AI setiap pengguna, bukan hanya milik Anda. Hanya untuk admin secara default."
+      }
+    },
+    "assets": {
+      "view": {
+        "title": "Lihat inventaris aset",
+        "description": "Lihat host, tamu, container, zona, dan koneksi yang dikumpulkan. Hanya untuk admin secara default."
+      },
+      "manage": {
+        "title": "Kelola inventaris aset",
+        "description": "Mulai pengumpulan, edit aturan zona, pin zona, dan ubah jadwal. Pengumpulan hanya membaca host. Hanya untuk admin secara default."
+      }
+    }
+  },
+  "settings": {
+    "assistantUnavailable": "Asisten AI dimatikan di server ini.",
+    "providersNeedOptIn": "Nyalakan asisten AI di atas untuk menambahkan penyedia.",
+    "providers": {
+      "label": "Penyedia",
+      "description": "Layanan AI yang dapat digunakan oleh asisten dan agen."
+    },
+    "admin": {
+      "globallyEnabled": {
+        "label": "Asisten AI",
+        "description": "Izinkan pengguna menyalakan asisten AI. Saat ini dimatikan, asisten disembunyikan dan diblokir untuk semua orang."
+      },
+      "privateEndpoints": {
+        "label": "Host AI pribadi yang diizinkan",
+        "description": "Host di jaringan pribadi Anda yang dapat dituju oleh penyedia, seperti Ollama yang di-host sendiri. Masukkan satu host per baris."
+      },
+      "opsConcurrency": {
+        "label": "Host paralel asisten AI",
+        "description": "Berapa banyak host tempat perintah asisten dijalankan secara bersamaan."
+      },
+      "opsCommandTimeout": {
+        "label": "Batas waktu perintah asisten AI (detik)",
+        "description": "Seberapa lama perintah dapat berjalan pada host sebelum dihentikan. Asisten dapat meminta hingga 600 detik."
+      },
+      "opsOutputLimit": {
+        "label": "Output asisten AI per host (karakter)",
+        "description": "Seberapa banyak output dari setiap host yang disimpan. Output yang lebih panjang akan mempertahankan bagian awal dan akhirnya."
+      },
+      "autoOpsPaused": {
+        "label": "Jeda auto-ops AI",
+        "description": "Menghentikan setiap tugas AI dan rencana yang disetujui yang sedang berjalan serta menolak yang baru, hingga diaktifkan kembali."
+      },
+      "autoOpsRunsPerHour": {
+        "label": "Tugas AI per otomatisasi per jam",
+        "description": "Pemicu tambahan dalam jam yang sama akan dilewati."
+      },
+      "autoOpsRunTokens": {
+        "label": "Anggaran token per tugas AI",
+        "description": "Tugas yang menggunakan jumlah token ini akan dihentikan dan melaporkan apa yang ditemukan."
+      },
+      "autoOpsDailyTokens": {
+        "label": "Anggaran token AI harian per pengguna",
+        "description": "Setelah pengguna menggunakan jumlah token ini hari ini (UTC), tugas AI mereka akan dilewati atau dihentikan."
+      },
+      "assetsDailyCollect": {
+        "label": "Kumpulkan inventaris aset setiap hari",
+        "description": "Membaca setiap host yang dapat dihubungi oleh pengumpul sekali sehari dengan satu skrip baca-saja."
+      },
+      "assetsCollectTime": {
+        "label": "Waktu pengumpulan aset (UTC)",
+        "description": "JJ:MM, misalnya 03:00."
+      },
+      "assetsCollector": {
+        "label": "Pengumpul aset"
+      },
+      "assetsAnnotateAfterCollect": {
+        "label": "Anotasi aset setelah setiap pengumpulan",
+        "description": "Model menulis peran, kepentingan, dan sistem bisnis setiap aset yang berubah, serta dependensi yang ditunjukkan oleh fakta."
+      },
+      "assetsAnnotateRunTokens": {
+        "label": "Anggaran token per eksekusi anotasi aset",
+        "description": "Eksekusi berhenti setelah panggilan modelnya menggunakan jumlah token ini; apa yang ditulis tetap tersimpan."
+      },
+      "assetsAnnotateProvider": {
+        "label": "Penyedia anotasi aset"
+      },
+      "assetsAnnotateModel": {
+        "label": "Model anotasi aset"
+      },
+      "exposureRetentionDays": {
+        "label": "Retensi riwayat paparan (hari)",
+        "description": "Menyimpan pemberitahuan yang tertunda dan bukti yang dirujuk oleh entri saat ini, terlepas dari usianya."
+      }
+    },
+    "host": {
+      "enableAiAssistant": {
+        "label": "Aktifkan Asisten AI",
+        "description": "Izinkan asisten AI membantu di terminal host ini. Dimatikan secara default, dan masih memerlukan AI diaktifkan untuk akun Anda."
+      },
+      "showPanel": {
+        "label": "Panel di samping terminal",
+        "description": "Tampilkan panel asisten di sebelah terminal SSH host ini."
+      }
+    },
+    "user": {
+      "autoOpsPreferences": {
+        "label": "Preferensi auto-ops"
+      },
+      "companionAutoOpen": {
+        "label": "Buka panel asisten bersama terminal",
+        "description": "Tampilkan panel asisten saat terminal terbuka pada host yang mendukungnya."
+      },
+      "companionSide": {
+        "label": "Posisi panel asisten",
+        "description": "Di mana panel berada di samping terminal.",
+        "right": "Kanan",
+        "left": "Kiri",
+        "bottom": "Bawah"
+      },
+      "companionSize": {
+        "label": "Ukuran panel asisten",
+        "description": "Lebar, atau tinggi di bagian bawah, dalam piksel."
+      },
+      "companionEdgeButton": {
+        "label": "Tombol tepi panel asisten",
+        "description": "Tampilkan tombol kecil di tepi terminal untuk membuka panel."
+      }
+    }
+  },
+  "ai": {
+    "send": "Kirim",
+    "stop": "Berhenti",
+    "save": "Simpan",
+    "cancel": "Batal",
+    "running": "sedang berjalan",
+    "approve": "Setujui",
+    "reject": "Tolak",
+    "selectProvider": "Pilih penyedia",
+    "addProvider": "Tambah penyedia",
+    "manageModels": "Kelola model",
+    "editProvider": "Edit penyedia",
+    "removeProvider": "Hapus penyedia",
+    "providerType": "Penyedia",
+    "providerLabel": "Nama",
+    "providerLabelPlaceholder": "Contoh: Ollama Lokal",
+    "baseUrl": "Alamat server",
+    "apiKey": "Kunci API",
+    "defaultModel": "Model default",
+    "defaultModelPlaceholder": "Contoh: llama3.1 atau claude-opus-5",
+    "labelRequired": "Berikan nama untuk penyedia ini",
+    "providerSaveFailed": "Gagal menyimpan penyedia",
+    "providerUpdated": "Penyedia diperbarui",
+    "providerDeleteFailed": "Gagal menghapus penyedia",
+    "privateEndpointHint": "Alamat di jaringan pribadi Anda memerlukan administrator untuk mengizinkan host terlebih dahulu.",
+    "providerOllama": "Ollama",
+    "providerAnthropic": "Anthropic",
+    "providerOpenai": "OpenAI",
+    "providerGemini": "Google Gemini",
+    "providerOpenaiCompatible": "Kompatibel OpenAI",
+    "toolArguments": "Masukan",
+    "toolResult": "Hasil",
+    "statusApplied": "Diterapkan",
+    "statusRejected": "Ditolak",
+    "proposalApplyFailed": "Gagal menerapkan perubahan",
+    "proposalRejectFailed": "Gagal menolak perubahan",
+    "enableTitle": "Aktifkan asisten AI",
+    "enableDescription": "Biarkan asisten membaca konfigurasi Anda dan menyarankan perubahan untuk Anda setujui.",
+    "readOnlyCommands": "Izinkan perintah diagnostik baca-saja",
+    "readOnlyCommandsDescription": "Asisten dapat menjalankan daftar perintah aman yang singkat seperti df dan uptime tanpa meminta izin setiap kali. Perintah apa pun yang mengubah server akan selalu diusulkan terlebih dahulu.",
+    "modelDetectFailed": "Tidak dapat menghubungi penyedia, jadi ini adalah daftar umum. Anda dapat mengetik nama model apa pun.",
+    "modelCustom": "Masukkan nama model",
+    "modelRefresh": "Segarkan daftar",
+    "modelPlaceholder": "Pilih atau ketik model",
+    "runCommandTitle": "Jalankan perintah",
+    "assistant": "Asisten AI",
+    "terminalPanelEmpty": "Tanyakan pada asisten tentang host ini. Perubahan apa pun yang mengubah status memerlukan persetujuan Anda terlebih dahulu.",
+    "terminalPanelPlaceholder": "Tanyakan tentang host ini...",
+    "noProvidersConfigured": "Belum ada penyedia AI yang dikonfigurasi. Tambahkan satu di Pengaturan.",
+    "runsInOpenTerminal": "Berjalan di sesi terminal terbuka Anda.",
+    "runInTerminal": "Jalankan",
+    "terminalContextPrefill": "Berikut adalah output terminal saya:\n\n{{output}}\n\n",
+    "secrets": {
+      "shareApiKey": "Biarkan fitur lain menggunakan kunci API penyedia AI Anda untuk permintaan mereka sendiri. Kunci tidak pernah disalin, dan Anda dapat mencabutnya kapan saja."
+    },
+    "removeProviderConfirm": "Hapus penyedia {{name}}?",
+    "contextWindows": "Jendela konteks per model",
+    "contextWindowsHint": "Baca dari penyedia yang melaporkannya. Masukkan jumlah token untuk menimpanya untuk model tertentu, atau biarkan kosong untuk menggunakan laporan penyedia. Segarkan untuk meminta penyedia lagi.",
+    "contextWindowValue": "Jendela konteks: {{tokens}} ({{source}})",
+    "contextOverride": "Penimpaan jendela konteks untuk {{model}}",
+    "contextSourceOverride": "diatur oleh Anda",
+    "contextSourceProvider": "dilaporkan oleh penyedia",
+    "contextSourceGuess": "ditebak dari nama model",
+    "contextSourceDefault": "default untuk model yang tidak dikenal",
+    "contextLoadFailed": "Tidak dapat membaca jendela konteks",
+    "contextRefresh": "Segarkan",
+    "contextWindowInvalid": "Masukkan jendela konteks sebagai bilangan bulat token, minimal 1024.",
+    "advanced": "Lanjutan",
+    "advancedHint": "Biarkan pengaturan pada Default untuk menggunakan pengaturan bawaan model.",
+    "advancedDefault": "Default",
+    "advancedDefaultAuto": "Default (otomatis)",
+    "advancedAuto": "Otomatis",
+    "advancedEndpoint": "Endpoint",
+    "advancedEndpointResponses": "API Respons",
+    "advancedEndpointChat": "Pelengkapan Chat",
+    "advancedReasoningEffort": "Usaha penalaran",
+    "advancedReasoningSummary": "Ringkasan penalaran",
+    "advancedReasoningSummaryHint": "Hanya API Respons.",
+    "advancedVerbosity": "Tingkat detail",
+    "advancedNone": "Tidak ada",
+    "advancedMinimal": "Minimal",
+    "advancedLow": "Rendah",
+    "advancedMedium": "Sedang",
+    "advancedHigh": "Tinggi",
+    "advancedXhigh": "Sangat tinggi",
+    "advancedMax": "Maks",
+    "advancedConcise": "Ringkas",
+    "advancedDetailed": "Terperinci",
+    "advancedOff": "Mati",
+    "advancedMaxOutputTokens": "Token keluaran maks",
+    "advancedMaxOutputTokensInvalid": "Masukkan bilangan bulat dari 1 hingga 1.000.000.",
+    "advancedTemperature": "Temperatur",
+    "advancedTemperatureHint": "Model penalaran OpenAI hanya menerima ini dengan upaya penalaran None, sehingga dengan upaya lain tidak akan dikirim.",
+    "advancedTemperatureInvalid": "Masukkan angka dari 0 hingga 2."
+  },
+  "nav": {
+    "ai": "Asisten AI"
+  },
+  "onboarding": {
+    "aiTitle": "Asisten AI",
+    "aiIntro": "Termix dapat menyertakan asisten AI. Anda dapat mengubahnya nanti di pengaturan Anda.",
+    "aiSkipTitle": "Biarkan mati",
+    "aiSkipDesc": "Termix berfungsi seperti sekarang. Asisten tetap tersembunyi.",
+    "aiEnableTitle": "Nyalakan",
+    "aiEnableDesc": "Menambahkan asisten yang membaca konfigurasi Anda dan menyarankan perubahan yang Anda setujui. Membutuhkan penyedia yang Anda sediakan, seperti Ollama lokal.",
+    "aiNote": "Tidak ada yang dikirim ke mana pun sampai Anda menambahkan penyedia dan mengirim pesan."
+  },
+  "agents": {
+    "working": "Bekerja...",
+    "startingIndicator": "Memulai agen...",
+    "noCompatibleProvider": "Tidak ada penyedia AI Anda yang kompatibel dengan {{agent}}. Claude Code membutuhkan Anthropic dan Codex membutuhkan OpenAI.",
+    "noProviders": "Tambahkan penyedia AI di Pengaturan terlebih dahulu.",
+    "title": "Agen AI",
+    "permissionTitle": "Jalankan agen AI jarak jauh",
+    "permissionDescription": "Mulai agen coding pada host SSH menggunakan penyedia AI yang dikonfigurasi. Agen dapat mengeksekusi perintah dan mengubah file sebagai pengguna SSH.",
+    "new": "Sesi baru",
+    "description": "Jalankan agen di direktori pada host ini menggunakan penyedia AI Termix.",
+    "runtime": "Agen",
+    "provider": "Penyedia Termix",
+    "chooseProvider": "Pilih penyedia yang kompatibel",
+    "model": "Model",
+    "directory": "Direktori kerja",
+    "executable": "Eksekusi (opsional, jalur absolut)",
+    "requirements": "Host memerlukan Node.js 22.19+ dan agen yang dipilih terinstal. Pengalihan loopback jarak jauh SSH harus diizinkan. Konfigurasi agen yang ada tidak ditimpa.",
+    "responsesRequired": "Codex memerlukan titik akhir API Responses. Titik akhir hanya Chat Completions tidak dapat menjalankan Codex.",
+    "piPermissions": "Alat Pi berjalan dengan izin akun SSH ini. Hanya luncurkan di direktori yang Anda izinkan agen untuk memodifikasi.",
+    "start": "Mulai agen",
+    "resume": "Lanjutkan",
+    "stop": "Hentikan sesi",
+    "interrupt": "Putuskan giliran",
+    "send": "Kirim",
+    "prompt": "Minta agen untuk bekerja di direktori ini...",
+    "noSessions": "Tidak ada sesi agen untuk host ini.",
+    "approval": "Agen memerlukan keputusan Anda",
+    "answer": "Jawab (JSON untuk pertanyaan terstruktur)",
+    "allow": "Izinkan sekali",
+    "deny": "Tolak",
+    "tool": "Aktivitas alat",
+    "streamFailed": "Aliran agen terputus. Buka ulang sesi untuk terhubung kembali.",
+    "status": {
+      "starting": "Memulai",
+      "ready": "Siap",
+      "running": "Bekerja",
+      "stopped": "Berhenti",
+      "error": "Kesalahan"
+    },
+    "installRuntime": "Instal agen terpilih dan Node.js",
+    "installSource": "Sumber resmi saja: nodejs.org (terverifikasi SHA-256) dan registry.npmjs.org (integritas paket terkunci). Diinstal untuk pengguna SSH di ~/.local/share/termix-agent-runtime; memerlukan curl, tar, dan Linux/macOS x64 atau arm64. Tidak mengubah kebijakan penerusan SSH.",
+    "installSucceeded": "Instalasi terverifikasi. Anda sekarang dapat memulai agen; penerusan jarak jauh loopback SSH juga harus diizinkan.",
+    "installFailed": "Instalasi gagal. Periksa log dan coba lagi.",
+    "installLog": "Log instalasi",
+    "enableForwarding": "Aktifkan penerusan Agen",
+    "forwardingScope": "Linux dengan systemd/OpenSSH; memerlukan root atau sudo tanpa kata sandi. Melakukan cadangan dan validasi konfigurasi SSH, lalu memuat ulang. Hanya akun SSH saat ini dan sumber koneksi yang diamati yang menerima penerusan jarak jauh loopback; penerusan lokal yang ada tetap dipertahankan. Perubahan yang gagal akan dikembalikan.",
+    "forwardingSucceeded": "Penerusan jarak jauh loopback SSH siap. Mulai atau lanjutkan agen untuk membuka koneksi SSH baru.",
+    "forwardingFailed": "Konfigurasi penerusan SSH gagal. Periksa log; tidak ada konfigurasi yang tidak tervalidasi yang disimpan.",
+    "search": "Cari sesi",
+    "sessionName": "Nama sesi",
+    "rename": "Ubah nama",
+    "archive": "Arsipkan dan hentikan",
+    "restore": "Pulihkan sesi",
+    "queue": "Pesan yang antri",
+    "enqueue": "Antrikan pesan",
+    "continueQueue": "Lanjutkan antrian",
+    "pauseQueue": "Jeda antrian",
+    "editQueued": "Sunting pesan yang antri",
+    "save": "Simpan",
+    "remove": "Hapus",
+    "upload": "Unggah lampiran",
+    "remoteFile": "Jalur file di dalam direktori kerja",
+    "attach": "Lampirkan file dari host",
+    "attachments": "Gunakan kembali lampiran sebelumnya",
+    "attachmentLimit": "Maksimum 4 lampiran, masing-masing 1 MiB",
+    "review": "Perubahan Git",
+    "gitStatus": "Segarkan status Git",
+    "diffFile": "Jalur file untuk ditinjau",
+    "diff": "Lihat diff",
+    "branch": "Nama cabang baru",
+    "createWorktree": "Buat worktree",
+    "useWorktree": "Sesi baru di worktree ini",
+    "worktreeHint": "Membuat cabang baru dari HEAD. Perubahan yang belum dikomit tetap berada di direktori saat ini. Worktree yang ada tidak pernah dihapus secara otomatis.",
+    "clean": "Tidak ada perubahan",
+    "reconnecting": "Menghubungkan ulang dan memulihkan pesan…",
+    "unavailable": "Sesi tidak dapat diakses lagi. Periksa izin Anda atau masuk kembali.",
+    "shortcuts": "Enter mengirim atau mengantrikan · Shift+Enter menambahkan baris · Esc menginterupsi dan menjeda antrian",
+    "activeSessions": "Aktif",
+    "archivedSessions": "Diarsipkan",
+    "dismiss": "Tutup",
+    "changes": "Perubahan",
+    "close": "Tutup",
+    "cancel": "Batal",
+    "sessionSetup": "Sesi",
+    "hostSetup": "Pengaturan host",
+    "changedFiles": "File yang berubah",
+    "worktree": "Worktree",
+    "attachShort": "Lampirkan",
+    "emptyTranscript": "Kirim pesan untuk memulai agen."
+  },
+  "plugin": {
+    "name": "Asisten AI",
+    "description": "Sebuah asisten AI yang membaca konfigurasi Anda dan mengusulkan perubahan untuk Anda setujui."
+  },
+  "ops": {
+    "searchHosts": "Cari host",
+    "selectedCount": "{{count}} dipilih",
+    "clear": "Hapus",
+    "fleets": "Armada",
+    "folders": "Folder",
+    "tags": "Tag",
+    "allHosts": "Semua host",
+    "noHosts": "Tidak ada host",
+    "newConversation": "Percakapan baru",
+    "sendHint_other": "Berjalan pada {{count}} host. Perintah berjalan tanpa meminta izin terlebih dahulu.",
+    "runCommand": "Jalankan perintah",
+    "hostFacts": "Fakta host",
+    "hostCount_other": "{{count}} host",
+    "succeeded": "{{count}} berhasil",
+    "failed": "{{count}} gagal",
+    "exitCode": "keluar {{code}}",
+    "timedOut": "batas waktu terlewati",
+    "stopped": "dihentikan",
+    "notRun": "tidak dijalankan",
+    "cached": "disimpan di cache",
+    "duration": "{{seconds}}d",
+    "noOutput": "(tidak ada output)"
+  },
+  "assistant": {
+    "title": "Asisten AI",
+    "moveHint": "Seret untuk memindahkan. Klik dua kali untuk menempelkan ke sisi.",
+    "toggle": "Buka/tutup asisten AI",
+    "close": "Tutup",
+    "dock": "Dok ke kanan",
+    "float": "Melayang",
+    "openTab": "Buka tampilan penuh",
+    "history": "Percakapan",
+    "noConversations": "Belum ada percakapan",
+    "untitled": "Tanpa Judul",
+    "deleteConversation": "Hapus percakapan",
+    "deleteConfirm": "Hapus percakapan ini?",
+    "emptyTitle": "Tanyakan atau ubah apa saja di Termix",
+    "emptyHint": "Asisten bekerja sebagai Anda melalui CLI Termix dan menjalankan perintah pada host target Anda. Ketik @ untuk menambahkan host, armada, folder, atau tag sebagai target.",
+    "inputPlaceholder": "Tanyakan pada asisten. Ketik @ untuk menambahkan target.",
+    "noTargets": "Tidak ada host target. Ketik @ untuk menambahkan beberapa.",
+    "sendHint": "Perubahan dan perintah dijalankan tanpa meminta konfirmasi terlebih dahulu.",
+    "removeTarget": "Hapus {{name}}",
+    "kind": {
+      "host": "Host",
+      "fleet": "Armada",
+      "folder": "Folder",
+      "tag": "Tag"
+    },
+    "emptyHintBasic": "Asisten bekerja sebagai Anda melalui CLI Termix, dengan izin Anda.",
+    "inputPlaceholderBasic": "Tanyakan pada asisten.",
+    "sendHintBasic": "Perubahan dijalankan tanpa meminta konfirmasi terlebih dahulu.",
+    "thinking": "Berpikir",
+    "thinkingActive": "Berpikir...",
+    "compacted": "Konteks dikompresi: pesan sebelumnya telah diringkas",
+    "compact": "Kompres percakapan",
+    "nothingToCompact": "Percakapan terlalu pendek untuk dikompresi.",
+    "contextMeter": "Konteks: {{used}} dari {{window}} token digunakan oleh panggilan terbaru",
+    "contextMeterSource": "Jendela adalah {{source}}.",
+    "contextMeterReserved": "{{tokens}} token disimpan untuk balasan.",
+    "todayTokens": "Hari ini {{tokens}}",
+    "todayTitle": "Token yang Anda gunakan hari ini. Klik untuk detail.",
+    "usage": "Penggunaan token",
+    "conversationTokens": "{{tokens}} token",
+    "openFloating": "Panel melayang",
+    "openFloatingHint": "Buka asisten dalam panel di atas halaman apa pun. Tekan {{shortcut}} di mana saja untuk membuka atau menutupnya.",
+    "shortcutHint": "Tekan {{shortcut}} di halaman apa pun untuk membuka asisten dalam panel melayang."
+  },
+  "usage": {
+    "title": "Penggunaan token",
+    "settingDescription": "Token yang digunakan panggilan AI Anda selama 30 hari terakhir.",
+    "cardTitle": "Penggunaan token AI",
+    "today": "Hari ini",
+    "week": "7 hari",
+    "month": "30 hari",
+    "mine": "Milik saya",
+    "everyone": "Semua pengguna",
+    "mineCaption": "Token Anda di setiap fitur AI.",
+    "everyoneCaption": "Token di setiap pengguna dan fitur AI.",
+    "byDay": "Per hari",
+    "byModel": "Per model",
+    "bySource": "Per fitur",
+    "byUser": "Per pengguna",
+    "model": "Model",
+    "feature": "Fitur",
+    "user": "Pengguna",
+    "calls": "Panggilan",
+    "prompt": "Masukan",
+    "completion": "Keluaran",
+    "total": "Total",
+    "empty": "Tidak ada penggunaan AI dalam 30 hari terakhir.",
+    "loadFailed": "Gagal memuat penggunaan",
+    "estimatedNote": "Beberapa angka adalah perkiraan, sekitar empat karakter per token, karena penyedia tidak melaporkan penggunaannya.",
+    "source": {
+      "assistant": "Asisten",
+      "terminal": "Panel terminal",
+      "compaction": "Kompaksi",
+      "assets": "Anotasi aset"
+    }
+  },
+  "autoOps": {
+    "viewAssistant": "Asisten",
+    "viewAutoOps": "Auto-ops",
+    "intro": "Auto-ops memungkinkan asisten memeriksa host Anda secara mandiri. Otomasi memulainya berdasarkan jadwal atau ketika terjadi masalah, lalu menulis laporan atau mengusulkan perbaikan untuk Anda setujui. Mulai dengan preset.",
+    "sections": {
+      "tasks": "Tugas",
+      "approvals": "Persetujuan",
+      "presets": "Preset"
+    },
+    "provider": "Penyedia untuk tugas",
+    "providerDefault": "Penyedia pertama dengan model default",
+    "model": "Model untuk tugas",
+    "modelDefault": "Model default penyedia",
+    "saveModel": "Simpan model",
+    "preferencesHint": "Penyedia dan model yang digunakan oleh tugas latar belakang. Biarkan seperti adanya untuk menggunakan penyedia dan model default Anda.",
+    "task": "Tugas",
+    "tokens": "{{tokens}} token",
+    "tokenUsage": "{{total}} token ({{prompt}} masuk, {{completion}} keluar)",
+    "dryRun": "Jalankan uji coba",
+    "trigger": "Pemicu",
+    "noTasks": "Belum ada tugas",
+    "tasksHint": "Tugas adalah eksekusi otomasi yang memiliki langkah Tanya AI. Aktifkan preset, atau buat sendiri di Otomasi: tambahkan langkah Tanya AI ke otomasi apa pun. Eksekusi akan muncul di sini.",
+    "openAutomations": "Buka Otomasi",
+    "browsePresets": "Jelajahi preset",
+    "noApprovals": "Tidak ada rencana yang menunggu persetujuan",
+    "loadFailed": "Gagal memuat auto-ops",
+    "decideFailed": "Keputusan tidak dapat disimpan",
+    "openConversation": "Buka di asisten",
+    "approve": "Setujui dan jalankan",
+    "reject": "Tolak",
+    "expires": "Kadaluarsa {{time}}",
+    "enabled": "Diaktifkan",
+    "updateAvailable": "Pembaruan tersedia",
+    "shared": "Dibagikan",
+    "needsAutomations": "Membutuhkan Otomasi",
+    "enableAgain": "Aktifkan lagi",
+    "deletePreset": "Hapus preset",
+    "autonomy": {
+      "report": "Hanya laporan",
+      "propose": "Usulkan rencana"
+    },
+    "status": {
+      "running": "Sedang berjalan",
+      "reported": "Dilaporkan",
+      "proposed": "Menunggu persetujuan",
+      "approved": "Disetujui",
+      "rejected": "Ditolak",
+      "expired": "Kadaluarsa",
+      "executing": "Menjalankan rencana",
+      "done": "Selesai",
+      "failed": "Gagal",
+      "skipped": "Dilewati"
+    },
+    "severity": {
+      "info": "Info",
+      "warning": "Peringatan",
+      "critical": "Kritis"
+    },
+    "plan": {
+      "title": "Rencana yang diusulkan",
+      "commands": "Perintah",
+      "rationale": "Alasan",
+      "risk": "Risiko",
+      "rollback": "Rollback",
+      "verify": "Verifikasi",
+      "progress": "Progres"
+    },
+    "enable": {
+      "title": "Aktifkan {{name}}",
+      "submit": "Aktifkan",
+      "name": "Nama",
+      "targets": "Host",
+      "targetAll": "Semua host",
+      "targetTrigger": "Host yang memicu pemicu",
+      "targetHosts": "Host yang dipilih",
+      "noHosts": "Pilih setidaknya satu host.",
+      "threshold": "Batas ambang (%)",
+      "forSeconds": "Selama setidaknya (detik)",
+      "time": "Waktu dalam sehari",
+      "cron": "Jadwal (cron)",
+      "dockerEvent": "Peristiwa kontainer",
+      "dockerEvents": {
+        "exited": "Berhenti",
+        "unhealthy": "Tidak sehat",
+        "restarting": "Sedang dimulai ulang"
+      },
+      "badTime": "Masukkan waktu dalam format JJ:MM.",
+      "autonomy": "Apa yang boleh dilakukan asisten",
+      "maxRunSeconds": "Batas waktu (detik)",
+      "runbook": "Buku prosedur",
+      "runbookHint": "Apa yang harus dilakukan asisten, dalam kata-kata sederhana. Bahasa Inggris bekerja paling baik.",
+      "shared": "Bagikan saat disimpan sebagai preset",
+      "sharedHint": "Semua orang yang dapat menggunakan operasi otomatis kemudian dapat mengaktifkannya.",
+      "saveAsPreset": "Simpan sebagai preset",
+      "savedPreset": "Tersimpan",
+      "failed": "Otomatisasi tidak dapat dibuat",
+      "saveFailed": "Preset tidak dapat disimpan"
+    },
+    "presets": {
+      "daily-patrol": {
+        "title": "Patroli harian",
+        "description": "Setiap pagi pukul 09:00, memeriksa disk, memori, beban, layanan yang gagal, kontainer, sertifikat, pembaruan, reboot yang tertunda, dan sinkronisasi waktu setiap host, serta melaporkan berdasarkan tingkat keparahan."
+      },
+      "disk-cleanup": {
+        "title": "Pembersihan ruang disk",
+        "description": "Ketika disk tetap pada 85% atau lebih selama 5 menit, menemukan apa yang mengisinya dan mengusulkan pembersihan yang aman untuk Anda setujui. Data bisnis tidak pernah disentuh."
+      },
+      "host-down-triage": {
+        "title": "Penanganan awal host mati",
+        "description": "Ketika host menjadi offline, menyelidiki dari host lain dan Proxmox, serta melaporkan apakah masalahnya ada pada jaringan, mesin yang berhenti, atau SSH."
+      },
+      "service-failure": {
+        "title": "Kegagalan layanan",
+        "description": "Ketika pemeriksaan kesehatan mulai gagal, menemukan unit systemd di baliknya, membaca status dan lognya, serta mengusulkan satu kali restart untuk Anda setujui jika itu dapat membantu. Konfigurasi tidak pernah diubah."
+      },
+      "container-anomaly": {
+        "title": "Anomali kontainer",
+        "description": "Ketika kontainer berhenti, menjadi tidak sehat, atau terus dimulai ulang, membaca status, kode keluar, log, dan memorinya, serta mengusulkan untuk memulai atau memulai ulang sekali untuk Anda setujui. Tidak ada yang dihapus."
+      },
+      "resource-overload-cpu": {
+        "title": "Beban berlebih CPU",
+        "description": "Ketika CPU tetap pada 95% atau lebih selama 15 menit, menemukan proses, layanan, dan kontainer di baliknya serta melaporkan apa yang harus dilakukan. Tidak ada yang diubah."
+      },
+      "resource-overload-memory": {
+        "title": "Beban berlebih memori",
+        "description": "Ketika memori tetap pada 95% atau lebih selama 10 menit, menemukan apa yang menggunakannya, swapping, dan pembunuh out-of-memory, serta melaporkan apa yang harus dilakukan. Tidak ada yang diubah."
+      },
+      "security-updates-weekly": {
+        "title": "Pembaruan keamanan mingguan",
+        "description": "Setiap Senin pukul 09:30, mencantumkan pembaruan keamanan yang tertunda berdasarkan tingkat keparahan, reboot yang tertunda dan paket di baliknya, kernel yang berjalan dan terinstal, serta hari sejak pembaruan terakhir, dalam satu tabel untuk semua host."
+      },
+      "cert-expiry-weekly": {
+        "title": "Kedaluwarsa sertifikat mingguan",
+        "description": "Setiap Senin pukul 09:45, membaca kedaluwarsa sertifikat Let's Encrypt, server web, dan Kubernetes di setiap host dan menandai yang kurang dari 30 hari, kritis kurang dari 7 hari."
+      },
+      "failing-drive": {
+        "title": "Drive rusak",
+        "description": "Ketika Storage Health mendeteksi drive yang rusak atau aus, pool atau array yang terdegradasi, atau thin pool yang hampir penuh, sistem akan membaca status SMART, array, dan pool, lalu melaporkan tingkat urgensi serta langkah yang harus diambil. Tidak ada perubahan yang dilakukan secara otomatis."
+      }
+    },
+    "report": {
+      "verdict": "Keputusan",
+      "evidence": "Bukti",
+      "actionsTaken": "Tindakan yang diambil",
+      "recommendations": "Rekomendasi",
+      "nothingFound": "Tidak ada yang ditemukan sebelum eksekusi berakhir.",
+      "noChanges": "Tidak ada perubahan yang dibuat.",
+      "openConversation": "Buka percakapan di asisten untuk melihat setiap langkah dan mengajukan pertanyaan lanjutan.",
+      "noFurtherAction": "Tidak diperlukan tindakan lebih lanjut.",
+      "stoppedBudgetRun": "Berhenti: eksekusi ini menggunakan kuota {{tokens}} token-nya.",
+      "stoppedBudgetDaily": "Berhenti: kuota harian pemilik sebesar {{tokens}} token telah habis.",
+      "stoppedDeadline": "Berhenti: batas waktu otomatisasi telah tercapai.",
+      "stoppedPaused": "Berhenti: administrator menjeda operasi otomatis AI.",
+      "stoppedAborted": "Berhenti: eksekusi otomatisasi dibatalkan.",
+      "providerFailed": "Penyedia AI gagal: {{error}}",
+      "noHosts": "Tidak satu pun host target dapat dijangkau oleh pemilik otomatisasi.",
+      "noProvider": "Pemilik otomatisasi tidak memiliki penyedia AI dengan model untuk menjalankan tugas.",
+      "needsOpsUse": "Pemilik otomatisasi tidak memiliki izin ai.ops.use.",
+      "assistantOff": "Asisten AI dimatikan untuk pemilik otomatisasi.",
+      "skippedPaused": "Auto-ops AI dijeda oleh administrator.",
+      "skippedDuplicate": "Tugas untuk otomatisasi dan host yang sama masih berjalan atau menunggu persetujuan.",
+      "skippedRate": "Otomatisasi ini sudah memulai {{count}} tugas AI dalam satu jam terakhir.",
+      "hostNotRun": "Tidak dijalankan: rencana dihentikan.",
+      "hostNoAccess": "Tidak dijalankan: pemilik tidak dapat lagi terhubung ke host ini.",
+      "hostUnreachable": "Tidak dijalankan: host tidak dapat dijangkau.",
+      "hostStopped": "Berhenti pada perintah pertama yang gagal.",
+      "executionDone": "Rencana yang disetujui berjalan di {{count}} host dan setiap perintah serta pemeriksaan berhasil.",
+      "executionFailed": "Rencana yang disetujui tidak selesai di semua host.",
+      "executionStopped": "Rencana yang disetujui dihentikan sebelum selesai.",
+      "approvedBy": "Rencana yang disetujui berjalan sesuai tertulis. Disetujui oleh {{user}}.",
+      "noticeReported": "Laporan AI: {{title}}",
+      "noticeProposed": "Rencana AI menunggu persetujuan: {{title}}",
+      "noticeExecuted": "Rencana AI dieksekusi: {{title}}",
+      "noticeFailed": "Tugas AI gagal: {{title}}",
+      "noticeAssetsAnnotationFailed": "Anotasi aset gagal"
+    }
+  },
+  "assets": {
+    "title": "Aset",
+    "search": "Cari nama, kunci, atau alamat",
+    "allZones": "Semua zona",
+    "showRemoved": "Tampilkan yang dihapus",
+    "collectNow": "Kumpulkan sekarang",
+    "collecting": "Mengumpulkan…",
+    "collectFailed": "Tidak dapat memulai pengumpulan",
+    "neverRun": "Belum dikumpulkan",
+    "lastRun": "Terakhir dikumpulkan {{time}}: {{ok}} dari {{total}} host",
+    "lastRunFailed": "Pengumpulan pada {{time}} gagal",
+    "hostsFailed_other": "{{count}} host gagal",
+    "loadFailed": "Tidak dapat memuat inventaris",
+    "saveFailed": "Tidak dapat menyimpan",
+    "empty": "Belum ada aset",
+    "emptyHint": "Kumpulkan sekarang untuk membaca setiap host yang dapat dihubungi oleh pengumpul.",
+    "emptyHintView": "Seseorang dengan izin ai.assets.manage harus mengumpulkan terlebih dahulu.",
+    "removed": "Dihapus",
+    "pinned": "Dipin",
+    "multiZone": "Multi-zona",
+    "multiZoneHint": "Memiliki alamat di lebih dari satu zona, sehingga dapat mencapai keduanya: potensi pivot.",
+    "columns": {
+      "name": "Nama",
+      "kind": "Jenis",
+      "zone": "Zona",
+      "ips": "Alamat",
+      "listening": "Port",
+      "outbound": "Keluar",
+      "services": "Layanan",
+      "collected": "Terakhir dikumpulkan",
+      "role": "Peran",
+      "importance": "Kepentingan",
+      "system": "Sistem"
+    },
+    "kind": {
+      "host": "Host",
+      "guest": "Tamu",
+      "container": "Container",
+      "external": "Eksternal"
+    },
+    "zone": {
+      "internal": "Internal",
+      "dmz": "DMZ",
+      "external": "Eksternal",
+      "cloud": "Cloud",
+      "overlay": "Overlay"
+    },
+    "sections": {
+      "os": "Sistem operasi",
+      "hostname": "Hostname",
+      "uptimeSec": "Waktu aktif (detik)",
+      "interfaces": "Antarmuka",
+      "routes": "Rute",
+      "listening": "Port yang mendengarkan",
+      "connections": "Koneksi yang aktif",
+      "services": "Layanan yang berjalan",
+      "containers": "Kontainer",
+      "kubernetes": "Kubernetes",
+      "guests": "Tamu Proxmox",
+      "cloud": "Cloud",
+      "missing": "Bagian tanpa output",
+      "guest": "Tamu Proxmox",
+      "container": "Kontainer"
+    },
+    "outgoing": "Keluar",
+    "incoming": "Masuk",
+    "noEdges": "Tidak ada",
+    "stale": "Tidak terlihat dalam pengumpulan terbaru",
+    "pinZone": "Zona",
+    "rulesDecide": "Ditetapkan oleh aturan",
+    "settingsTitle": "Zona dan jadwal",
+    "scheduleTitle": "Pengumpulan",
+    "daily": "Kumpulkan harian",
+    "dailyHint": "Host juga dikumpulkan ulang saat ditambahkan atau diubah.",
+    "time": "Waktu (UTC)",
+    "save": "Simpan",
+    "collector": "Mengumpulkan sebagai {{collector}}, menjangkau host yang dapat diakses akun tersebut.",
+    "collectorMe": "Anda",
+    "collectorOther": "manajer lain",
+    "collectorNone": "belum ada",
+    "collectAsMe": "Kumpulkan sebagai saya",
+    "zonesTitle": "Aturan zona",
+    "zonesHint": "Aturan memetakan CIDR ke zona, sebelum aturan bawaan. Prefiks paling spesifik menang, lalu prioritas lebih tinggi. Aset akan dizonasi ulang saat Anda menyimpan.",
+    "zoneName": "Nama",
+    "zoneNameExample": "LAN pusat data",
+    "zoneKind": "Jenis",
+    "cidr": "CIDR",
+    "priority": "Prioritas",
+    "addZone": "Tambah aturan",
+    "deleteZone": "Hapus aturan",
+    "cancelEdit": "Batal",
+    "annotating": "Mengannotasi…",
+    "neverAnnotated": "Belum dianotasi",
+    "lastAnnotation": "Terakhir dianotasi {{time}}: {{ok}} dari {{total}} aset, {{tokens}} token",
+    "annotationFailed": "gagal: {{reason}}",
+    "annotateNow": "Annotasi sekarang",
+    "annotateFailed": "Tidak dapat memulai anotasi",
+    "modeTable": "Tabel",
+    "modeGraph": "Grafik",
+    "importance": {
+      "critical": "Kritis",
+      "high": "Tinggi",
+      "medium": "Sedang",
+      "low": "Rendah"
+    },
+    "importanceUnknown": "Belum dinilai",
+    "importanceReason": "Alasan",
+    "sourceAi": "AI",
+    "sourceAiHint": "Ditulis oleh anotasi; eksekusi berikutnya mungkin mengubahnya.",
+    "sourceUser": "Terkunci",
+    "sourceUserHint": "Ditetapkan oleh pengguna; anotasi tidak mengubahnya hingga dibuka kuncinya.",
+    "unlock": "Buka kunci: izinkan anotasi mengisi ini lagi",
+    "unlockField": "Buka kunci {{field}}",
+    "editAnnotation": "Sunting",
+    "lockHint": "Bidang yang Anda ubah dikunci agar tidak berubah pada proses anotasi berikutnya.",
+    "factsTitle": "Fakta",
+    "closePanel": "Tutup",
+    "impact": "Dampak",
+    "clearImpact": "Hapus",
+    "impactSummary_other": "Jika gagal, {{count}} aset ikut mati ({{critical}} kritis, {{high}} tinggi), {{weak}} lainnya hanya terhubung ke mereka.",
+    "impactTruncated": "Dipotong pada 6 lompatan atau 300 aset.",
+    "impactDirect": "Langsung",
+    "impactTransitive": "Melalui lainnya",
+    "impactWeak": "Hanya terhubung ke mereka",
+    "expandContainers": "Tampilkan kontainer",
+    "showExternal": "Tampilkan alamat eksternal",
+    "graphCounts": "{{nodes}} aset, {{edges}} relasi",
+    "graphTitle": "Grafik aset",
+    "noZone": "Tanpa zona",
+    "annotationTitle": "Anotasi AI",
+    "annotateAfterCollect": "Anotasi setelah setiap pengumpulan",
+    "annotateAfterCollectHint": "Hanya aset yang berubah sejak anotasi terakhir, dan tetangganya, yang dikirim ke model.",
+    "annotateProvider": "Penyedia",
+    "annotateProviderDefault": "Pilihan auto-ops dari pengumpul",
+    "annotateModel": "Model",
+    "annotateModelDefault": "Model default dari penyedia",
+    "annotationHint": "Anotasi berjalan sebagai pengumpul, dengan penyedia pengumpul. Ringkasan tidak berisi lingkungan, baris perintah, atau alamat eksternal.",
+    "annotateAll": "Anotasi ulang semuanya"
+  },
+  "exposure": {
+    "title": "Entri internet",
+    "disclaimer": "Inventaris konfigurasi saja. Pengikatan publik dan aturan forwarding tidak membuktikan keterjangkauan internet. Listener privat dipertahankan sebagai bukti backend.",
+    "loadFailed": "Tidak dapat memuat inventaris paparan.",
+    "saveFailed": "Tidak dapat menyimpan prioritas.",
+    "search": "Saring alamat, host, nama, atau jalur",
+    "allPriority": "Semua prioritas",
+    "allZones": "Semua zona",
+    "allSources": "Semua sumber",
+    "high": "Tinggi",
+    "medium": "Sedang",
+    "low": "Rendah",
+    "active": "Aktif",
+    "stale": "Kadaluarsa",
+    "resolved": "Tidak lagi diamati",
+    "all": "Semua",
+    "refresh": "Segarkan",
+    "loading": "Memuat…",
+    "empty": "Tidak ada entri yang cocok. Periksa cakupan pengumpulan di bawah sebelum menarik kesimpulan.",
+    "never": "Belum dikumpulkan. Kumpulkan aset untuk menginventarisasi entri.",
+    "endpoint": "Entri",
+    "source": "Sumber",
+    "priority": "Prioritas tinjauan",
+    "pathState": "Jalur konfigurasi",
+    "freshness": "Kesegaran",
+    "details": "Detail bukti",
+    "close": "Tutup",
+    "notTested": "Keterjangkauan eksternal: belum diuji.",
+    "priorityReason": "Prioritas adalah petunjuk tinjauan, bukan putusan kerentanan. Port manajemen dan layanan data diprioritaskan; identitas layanan dan kebijakan akses masih memerlukan verifikasi.",
+    "tls": "Konfigurasi TLS",
+    "restrictions": "Pembatasan akses",
+    "observed": "Terakhir diamati",
+    "rulePriority": "Prioritas aturan (buka kunci)",
+    "evidence": "Pengamatan",
+    "coverage": "Cakupan pengumpulan",
+    "changes": "Perubahan terbaru",
+    "current": "Saat ini",
+    "partial": "Tidak lengkap",
+    "complete": "Asosiasi konfigurasi lengkap",
+    "conflicting": "Ambigu atau siklis",
+    "configured": "Dinyatakan dalam konfigurasi",
+    "unknown": "Tidak diketahui",
+    "status_ok": "Dikumpulkan",
+    "status_unsupported": "Alat tidak tersedia",
+    "status_denied": "Izin ditolak",
+    "status_failed": "Pengumpulan atau parsing gagal",
+    "status_truncated": "Dipotong",
+    "change_baseline": "Garis dasar ditetapkan",
+    "change_added": "Entri ditambahkan",
+    "change_changed": "Konfigurasi berubah",
+    "change_removed": "Entri tidak lagi diamati",
+    "change_coverage": "Cakupan menurun",
+    "explain": "Jelaskan bukti",
+    "explaining": "Menjelaskan…",
+    "explainFailed": "Penjelasan gagal atau bukti berubah.",
+    "aiLabel": "Interpretasi AI · bukan temuan yang terverifikasi",
+    "previous": "Sebelumnya",
+    "next": "Selanjutnya",
+    "binding": "Lingkup pengikatan",
+    "binding_public": "Kandidat entri publik",
+    "binding_local": "Backend pribadi/lokal",
+    "binding_unknown": "Pengikatan tidak terselesaikan",
+    "ruleGaps": "Aturan tidak terurai: {{count}}",
+    "unsupportedRule": "Aturan tidak didukung; bukti sebelumnya dipertahankan",
+    "scope": "Tampilan",
+    "scope_internet": "Kandidat entri internet",
+    "scope_all": "Semua bukti",
+    "scope_unknown": "Eksposur tidak diketahui",
+    "inventorySummary": "{{internet}} kandidat entri internet · {{all}} aturan total · {{unknown}} dengan eksposur tidak diketahui",
+    "bindingCount": "{{count}} pengikatan yang diamati",
+    "pathsTruncated": "Ekspansi jalur mencapai batasnya. Ini adalah bukti parsial.",
+    "pathBranch": "Jalur {{index}}",
+    "branched": "Cabang bersyarat",
+    "reason_sensitive": "Tinjau port layanan {{port}} (entri atau backend)",
+    "reason_public-address": "Pengikatan alamat publik yang diamati",
+    "reason_wan-zone": "Zona sumber OpenWrt WAN; penerimaan firewall belum diverifikasi",
+    "reason_configured-public-tunnel": "Tunnel publik yang dikonfigurasi; jangkauan eksternal belum diuji",
+    "reason_internal-only": "Hanya pengikatan internal atau lokal yang diamati",
+    "reason_exposure-unknown": "Bukti tidak cukup untuk mengklasifikasikan eksposur",
+    "reason_critical-asset": "Aset ditandai kritis",
+    "reason_manual": "Prioritas dipilih oleh pengguna"
+  },
+  "companion": {
+    "toggle": "Panel asisten"
+  },
+  "widget": {
+    "loading": "Memuat...",
+    "empty": "Belum ada tugas",
+    "pending_other": "{{count}} rencana menunggu persetujuan",
+    "maxItems": "Tugas yang ditampilkan"
+  }
+}

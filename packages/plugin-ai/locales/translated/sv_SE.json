@@ -1,0 +1,872 @@
+{
+  "permissions": {
+    "use": {
+      "title": "Använd assistenten",
+      "description": "Öppna assistenten och ställ frågor."
+    },
+    "manage_providers": {
+      "title": "Hantera leverantörer",
+      "description": "Lägg till, redigera och ta bort AI-leverantörer och deras API-nycklar."
+    },
+    "apply_proposals": {
+      "title": "Tillämpa förslag",
+      "description": "Låt assistenten utföra de ändringar den föreslår."
+    },
+    "services": {
+      "use": {
+        "title": "Använd AI från andra funktioner",
+        "description": "Andra funktioner kan anropa assistenten åt dig."
+      }
+    },
+    "secrets": {
+      "share": {
+        "title": "Dela API-nyckeln",
+        "description": "Andra funktioner kan använda den sparade AI-API-nyckeln utan att se den."
+      }
+    },
+    "ops": {
+      "use": {
+        "title": "Kör kommandon på värdar med AI-assistenten",
+        "description": "Låt assistenten köra valfritt skal-kommando på de värdar du väljer. Endast för administratörer som standard."
+      }
+    },
+    "usage": {
+      "view_all": {
+        "title": "Visa allas AI-användning",
+        "description": "Se vilka token varje användares AI-anrop har använt, inte bara dina egna. Endast för administratörer som standard."
+      }
+    },
+    "assets": {
+      "view": {
+        "title": "Visa tillgångsregistret",
+        "description": "Se de insamlade värdarna, gästerna, behållarna, zonerna och anslutningarna. Endast administratörer som standard."
+      },
+      "manage": {
+        "title": "Hantera tillgångsregistret",
+        "description": "Starta insamlingar, redigera zoner, fäst zoner och ändra schemat. Insamling läser värdar skrivskyddat. Endast administratörer som standard."
+      }
+    }
+  },
+  "settings": {
+    "assistantUnavailable": "AI-assistenten är inaktiverad på denna server.",
+    "providersNeedOptIn": "Aktivera AI-assistenten ovan för att lägga till leverantörer.",
+    "providers": {
+      "label": "Leverantörer",
+      "description": "De AI-tjänster som assistenten och agenter kan använda."
+    },
+    "admin": {
+      "globallyEnabled": {
+        "label": "AI-assistent",
+        "description": "Låt användare aktivera AI-assistenten. När detta är inaktiverat är assistenten dold och blockerad för alla."
+      },
+      "privateEndpoints": {
+        "label": "Tillåtna privata AI-värdar",
+        "description": "Värdar på ditt privata nätverk som användare kan peka en leverantör mot, till exempel en självhostad Ollama. Ange en värd per rad."
+      },
+      "opsConcurrency": {
+        "label": "Parallella värdar för AI-assistenten",
+        "description": "Hur många värdar ett kommando från assistenten körs på samtidigt."
+      },
+      "opsCommandTimeout": {
+        "label": "Timeout för kommandon från AI-assistenten (sekunder)",
+        "description": "Hur länge ett kommando får köras på en värd innan det stoppas. Assistenten kan be om upp till 600."
+      },
+      "opsOutputLimit": {
+        "label": "Utdata per värd för AI-assistenten (tecken)",
+        "description": "Hur mycket av varje värdas utdata som sparas. Längre utdata behåller början och slutet."
+      },
+      "autoOpsPaused": {
+        "label": "Pausa automatiska AI-operationer",
+        "description": "Stoppar alla pågående AI-uppgifter och godkända planer och vägrar nya, tills det stängs av igen."
+      },
+      "autoOpsRunsPerHour": {
+        "label": "AI-uppgifter per automatisering per timme",
+        "description": "Fler utlösare under samma timme hoppas över."
+      },
+      "autoOpsRunTokens": {
+        "label": "Token-budget per AI-uppgift",
+        "description": "En uppgift som använder så många token stoppas och rapporterar vad den hittade."
+      },
+      "autoOpsDailyTokens": {
+        "label": "Daglig AI-token-budget per användare",
+        "description": "När en användare har använt så många token idag (UTC) hoppas deras AI-uppgifter över eller stoppas."
+      },
+      "assetsDailyCollect": {
+        "label": "Samla in tillgångsregistret dagligen",
+        "description": "Läser varje värd som insamlaren kan ansluta till en gång om dagen med ett skrivskyddat skript."
+      },
+      "assetsCollectTime": {
+        "label": "Tid för tillgångsinsamling (UTC)",
+        "description": "TT:MM, till exempel 03:00."
+      },
+      "assetsCollector": {
+        "label": "Tillgångsinsamlare"
+      },
+      "assetsAnnotateAfterCollect": {
+        "label": "Annotera tillgångar efter varje insamling",
+        "description": "En modell skriver varje ändrad tillgångs roll, viktighet och affärssystem, samt beroenden som fakta visar."
+      },
+      "assetsAnnotateRunTokens": {
+        "label": "Tokenbudget per tillgångsannotation",
+        "description": "En körning stoppas när dess modellanrop har använt så många tokens; det som skrevs behålls."
+      },
+      "assetsAnnotateProvider": {
+        "label": "Tillgångsannotationsleverantör"
+      },
+      "assetsAnnotateModel": {
+        "label": "Tillgångsannotationsmodell"
+      },
+      "exposureRetentionDays": {
+        "label": "Behåll av exponeringshistorik (dagar)",
+        "description": "Behåller väntande aviseringar och bevis som refereras av aktuella poster oavsett ålder."
+      }
+    },
+    "host": {
+      "enableAiAssistant": {
+        "label": "Aktivera AI-assistent",
+        "description": "Tillåt AI-assistenten att hjälpa till i denna värdens terminal. Inaktiverad som standard, och kräver fortfarande att AI är aktiverat för ditt konto."
+      },
+      "showPanel": {
+        "label": "Panel bredvid terminalen",
+        "description": "Erbjud en assistentpanel bredvid SSH-terminalen för denna värd."
+      }
+    },
+    "user": {
+      "autoOpsPreferences": {
+        "label": "Inställningar för automatiska operationer"
+      },
+      "companionAutoOpen": {
+        "label": "Öppna assistentpanelen med en terminal",
+        "description": "Visa assistentpanelen när en terminal öppnas på en värd som har den."
+      },
+      "companionSide": {
+        "label": "Placering för assistentpanelen",
+        "description": "Var panelen visas i förhållande till terminalen.",
+        "right": "Höger",
+        "left": "Vänster",
+        "bottom": "Nere"
+      },
+      "companionSize": {
+        "label": "Storlek på assistentpanelen",
+        "description": "Bredd, eller höjd längst ner, i pixlar."
+      },
+      "companionEdgeButton": {
+        "label": "Knapp för assistentpanelen vid kanten",
+        "description": "Visa en liten knapp vid terminalens kant för att öppna panelen."
+      }
+    }
+  },
+  "ai": {
+    "send": "Skicka",
+    "stop": "Stoppa",
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "running": "kör",
+    "approve": "Godkänn",
+    "reject": "Avvisa",
+    "selectProvider": "Välj en leverantör",
+    "addProvider": "Lägg till leverantör",
+    "manageModels": "Hantera modeller",
+    "editProvider": "Redigera leverantör",
+    "removeProvider": "Ta bort leverantör",
+    "providerType": "Leverantör",
+    "providerLabel": "Namn",
+    "providerLabelPlaceholder": "Till exempel: Lokal Ollama",
+    "baseUrl": "Serveradress",
+    "apiKey": "API-nyckel",
+    "defaultModel": "Standardmodell",
+    "defaultModelPlaceholder": "Till exempel: llama3.1 eller claude-opus-5",
+    "labelRequired": "Ge denna leverantör ett namn",
+    "providerSaveFailed": "Kunde inte spara leverantören",
+    "providerUpdated": "Leverantören har uppdaterats",
+    "providerDeleteFailed": "Kunde inte ta bort leverantören",
+    "privateEndpointHint": "Adresser på ditt privata nätverk kräver att en administratör tillåter värdens först.",
+    "providerOllama": "Ollama",
+    "providerAnthropic": "Anthropic",
+    "providerOpenai": "OpenAI",
+    "providerGemini": "Google Gemini",
+    "providerOpenaiCompatible": "OpenAI-kompatibel",
+    "toolArguments": "Inmatning",
+    "toolResult": "Resultat",
+    "statusApplied": "Tillämpad",
+    "statusRejected": "Avvisad",
+    "proposalApplyFailed": "Kunde inte tillämpa ändringen",
+    "proposalRejectFailed": "Kunde inte avvisa ändringen",
+    "enableTitle": "Aktivera AI-assistenten",
+    "enableDescription": "Låt assistenten läsa din konfiguration och föreslå ändringar som du kan godkänna.",
+    "readOnlyCommands": "Tillåt skrivskyddade diagnostikkommandon",
+    "readOnlyCommandsDescription": "Assistenten kan köra en kort lista med säkra kommandon som df och uptime utan att fråga varje gång. Allt som ändrar en server föreslås alltid först.",
+    "modelDetectFailed": "Kunde inte nå leverantören, så detta är en generell lista. Du kan skriva in vilket modellnamn som helst.",
+    "modelCustom": "Ange ett modellnamn",
+    "modelRefresh": "Uppdatera lista",
+    "modelPlaceholder": "Välj eller skriv en modell",
+    "runCommandTitle": "Kör kommando",
+    "assistant": "AI-assistent",
+    "terminalPanelEmpty": "Fråga assistenten om denna värd. Allt som ändrar tillståndet kräver ditt godkännande först.",
+    "terminalPanelPlaceholder": "Fråga om denna värd...",
+    "noProvidersConfigured": "Ingen AI-leverantör är konfigurerad ännu. Lägg till en i Inställningar.",
+    "runsInOpenTerminal": "Körs i din öppna terminalsession.",
+    "runInTerminal": "Kör",
+    "terminalContextPrefill": "Här är min terminalutdata:\n\n{{output}}\n\n",
+    "secrets": {
+      "shareApiKey": "Låt andra funktioner använda din AI-leverantörs API-nyckel för deras egna förfrågningar. Nyckeln kopieras aldrig, och du kan återkalla detta när som helst."
+    },
+    "removeProviderConfirm": "Ta bort leverantören {{name}}?",
+    "contextWindows": "Kontextfönster per modell",
+    "contextWindowsHint": "Läs från leverantören där den rapporterar ett. Ange ett antal token för att åsidosätta det för en modell, eller lämna det tomt för att använda det leverantören rapporterar. Uppdatera frågar leverantören igen.",
+    "contextWindowValue": "Kontextfönster: {{tokens}} ({{source}})",
+    "contextOverride": "Åsidosätt kontextfönster för {{model}}",
+    "contextSourceOverride": "angivet av dig",
+    "contextSourceProvider": "rapporterat av leverantören",
+    "contextSourceGuess": "gissat från modellnamnet",
+    "contextSourceDefault": "standard för okända modeller",
+    "contextLoadFailed": "Kunde inte läsa kontextfönstren",
+    "contextRefresh": "Uppdatera",
+    "contextWindowInvalid": "Ange kontextfönstret som ett helt antal token, minst 1024.",
+    "advanced": "Avancerat",
+    "advancedHint": "Lämna ett inställningsvärde på Standard för att använda modellens egna.",
+    "advancedDefault": "Standard",
+    "advancedDefaultAuto": "Standard (auto)",
+    "advancedAuto": "Auto",
+    "advancedEndpoint": "Slutpunkt",
+    "advancedEndpointResponses": "Svars-API",
+    "advancedEndpointChat": "Chatkompletteringar",
+    "advancedReasoningEffort": "Resonemangsinsats",
+    "advancedReasoningSummary": "Resonemangssammanfattning",
+    "advancedReasoningSummaryHint": "Endast för Responses API.",
+    "advancedVerbosity": "Detaljnivå",
+    "advancedNone": "Ingen",
+    "advancedMinimal": "Minimal",
+    "advancedLow": "Låg",
+    "advancedMedium": "Medel",
+    "advancedHigh": "Hög",
+    "advancedXhigh": "Extra hög",
+    "advancedMax": "Max",
+    "advancedConcise": "Kortfattad",
+    "advancedDetailed": "Detaljerad",
+    "advancedOff": "Av",
+    "advancedMaxOutputTokens": "Max antal utdata-tokens",
+    "advancedMaxOutputTokensInvalid": "Ange ett heltal mellan 1 och 1 000 000.",
+    "advancedTemperature": "Temperatur",
+    "advancedTemperatureHint": "OpenAI:s resonemangsmodeller accepterar detta endast när ansträngning för resonemang är inställd på \"Ingen\". Vid andra inställningar skickas det inte.",
+    "advancedTemperatureInvalid": "Ange ett tal mellan 0 och 2."
+  },
+  "nav": {
+    "ai": "AI-assistent"
+  },
+  "onboarding": {
+    "aiTitle": "AI-assistent",
+    "aiIntro": "Termix kan inkludera en AI-assistent. Du kan ändra detta senare i dina inställningar.",
+    "aiSkipTitle": "Lämna det avstängt",
+    "aiSkipDesc": "Termix fungerar som den gör nu. Assistenten förblir dold.",
+    "aiEnableTitle": "Aktivera den",
+    "aiEnableDesc": "Lägger till en assistent som läser din konfiguration och föreslår ändringar som du godkänner. Kräver en leverantör som du tillhandahåller, till exempel en lokal Ollama.",
+    "aiNote": "Inget skickas någonstans förrän du lägger till en leverantör och skickar ett meddelande."
+  },
+  "agents": {
+    "working": "Arbetar...",
+    "startingIndicator": "Startar agenten...",
+    "noCompatibleProvider": "Ingen av dina AI-leverantörer fungerar med {{agent}}. Claude Code kräver Anthropic och Codex kräver OpenAI.",
+    "noProviders": "Lägg till en AI-leverantör i Inställningar först.",
+    "title": "AI-agent",
+    "permissionTitle": "Kör fjärr-AI-agenter",
+    "permissionDescription": "Starta kodningsagenter på SSH-värdar med konfigurerade AI-leverantörer. Agenter kan köra kommandon och ändra filer som SSH-användaren.",
+    "new": "Ny session",
+    "description": "Kör en agent i en katalog på denna värd med en Termix AI-leverantör.",
+    "runtime": "Agent",
+    "provider": "Termix-leverantör",
+    "chooseProvider": "Välj en kompatibel leverantör",
+    "model": "Modell",
+    "directory": "Arbetskatalog",
+    "executable": "Exekverbar fil (valfri absolut sökväg)",
+    "requirements": "Värden behöver Node.js 22.19+ och den valda agenten installerad. SSH-fjärrloopback-omdirigering måste tillåtas. Befintliga agentkonfigurationer skrivs inte över.",
+    "responsesRequired": "Codex kräver en Responses API-slutpunkt. En slutpunkt som bara stöder Chat Completions kan inte köra Codex.",
+    "piPermissions": "Pi-verktyg körs med behörigheterna för detta SSH-konto. Starta bara i en katalog som du auktoriserar agenten att ändra.",
+    "start": "Starta agent",
+    "resume": "Återuppta",
+    "stop": "Stoppa session",
+    "interrupt": "Avbryt tur",
+    "send": "Skicka",
+    "prompt": "Be agenten arbeta i denna katalog...",
+    "noSessions": "Inga agentsessioner för denna värd.",
+    "approval": "Agenten behöver ditt beslut",
+    "answer": "Svar (JSON för strukturerade frågor)",
+    "allow": "Tillåt en gång",
+    "deny": "Neka",
+    "tool": "Verktögsaktivitet",
+    "streamFailed": "Agentströmmen kopplades bort. Öppna om sessionen för att ansluta igen.",
+    "status": {
+      "starting": "Startar",
+      "ready": "Redo",
+      "running": "Arbetar",
+      "stopped": "Stoppad",
+      "error": "Fel"
+    },
+    "installRuntime": "Installera vald agent och Node.js",
+    "installSource": "Endast officiella källor: nodejs.org (SHA-256 verifierad) och registry.npmjs.org (låst paketintegritet). Installeras för SSH-användaren i ~/.local/share/termix-agent-runtime; kräver curl, tar och Linux/macOS x64 eller arm64. Ändrar inte SSH-videopolitiken.",
+    "installSucceeded": "Installationen verifierad. Du kan nu starta agenten; SSH-loopback remote forwarding måste också tillåtas.",
+    "installFailed": "Installationen misslyckades. Granska loggen och försök igen.",
+    "installLog": "Installationslogg",
+    "enableForwarding": "Aktivera agentforwarding",
+    "forwardingScope": "Linux med systemd/OpenSSH; kräver root eller lösenordsfritt sudo. Säkerhetskopierar och validerar SSH-konfigurationen, och laddar om den. Endast det aktuella SSH-kontot och den observerade anslutningskällan får loopback remote forwarding; befintlig lokal forwarding bevaras. Misslyckade ändringar återskapas.",
+    "forwardingSucceeded": "SSH-loopback remote forwarding är redo. Starta eller återuppta agenten för att öppna en ny SSH-anslutning.",
+    "forwardingFailed": "SSH-forwarding-konfigurationen misslyckades. Granska loggen; ingen ovalidierad konfiguration behålls.",
+    "search": "Sök i sessioner",
+    "sessionName": "Sessionsnamn",
+    "rename": "Byt namn",
+    "archive": "Arkivera och stoppa",
+    "restore": "Återställ session",
+    "queue": "Köade meddelanden",
+    "enqueue": "Köa meddelande",
+    "continueQueue": "Fortsätt kö",
+    "pauseQueue": "Pausa kö",
+    "editQueued": "Redigera köat meddelande",
+    "save": "Spara",
+    "remove": "Ta bort",
+    "upload": "Ladda upp bilaga",
+    "remoteFile": "Filsökväg inuti arbetsmappen",
+    "attach": "Bifoga en fil från värdmaskinen",
+    "attachments": "Återanvänd en tidigare bilaga",
+    "attachmentLimit": "Upp till 4 bilagor, 1 MiB vardera",
+    "review": "Git-ändringar",
+    "gitStatus": "Uppdatera Git-status",
+    "diffFile": "Filsökväg att granska",
+    "diff": "Visa diff",
+    "branch": "Nytt grennamn",
+    "createWorktree": "Skapa worktree",
+    "useWorktree": "Ny session i denna worktree",
+    "worktreeHint": "Skapar en ny gren från HEAD. Ocommitade ändringar stannar i den aktuella mappen. Befintliga worktrees raderas aldrig automatiskt.",
+    "clean": "Inga ändringar",
+    "reconnecting": "Återansluter och återställer meddelanden…",
+    "unavailable": "Sessionen är inte längre tillgänglig. Kontrollera dina behörigheter eller logga in igen.",
+    "shortcuts": "Enter skickar eller köar · Shift+Enter lägger till en rad · Esc avbryter och pausar kön",
+    "activeSessions": "Aktiva",
+    "archivedSessions": "Arkiverade",
+    "dismiss": "Avfärda",
+    "changes": "Ändringar",
+    "close": "Stäng",
+    "cancel": "Avbryt",
+    "sessionSetup": "Session",
+    "hostSetup": "Värdinställning",
+    "changedFiles": "Ändrade filer",
+    "worktree": "Worktree",
+    "attachShort": "Bifoga",
+    "emptyTranscript": "Skicka ett meddelande för att starta agenten."
+  },
+  "plugin": {
+    "name": "AI-assistent",
+    "description": "En AI-assistent som läser din konfiguration och föreslår ändringar för dig att godkänna."
+  },
+  "ops": {
+    "searchHosts": "Sök värdar",
+    "selectedCount": "{{count}} valda",
+    "clear": "Rensa",
+    "fleets": "Flottor",
+    "folders": "Mappar",
+    "tags": "Taggar",
+    "allHosts": "Alla värdar",
+    "noHosts": "Inga värdar",
+    "newConversation": "Ny konversation",
+    "sendHint_one": "Körs på {{count}} värd. Kommandon körs utan att fråga först.",
+    "sendHint_other": "Körs på {{count}} värdar. Kommandon körs utan att fråga först.",
+    "runCommand": "Kör kommando",
+    "hostFacts": "Värdinformation",
+    "hostCount_one": "{{count}} värd",
+    "hostCount_other": "{{count}} värdar",
+    "succeeded": "{{count}} okej",
+    "failed": "{{count}} misslyckades",
+    "exitCode": "exit {{code}}",
+    "timedOut": "tidsgräns överskriden",
+    "stopped": "stoppad",
+    "notRun": "ej körd",
+    "cached": "cachelagrad",
+    "duration": "{{seconds}}s",
+    "noOutput": "(ingen utdata)"
+  },
+  "assistant": {
+    "title": "AI-assistent",
+    "moveHint": "Dra för att flytta. Dubbelklicka för att fästa vid sidan.",
+    "toggle": "Växla AI-assistenten",
+    "close": "Stäng",
+    "dock": "Fäst till höger",
+    "float": "Flytande",
+    "openTab": "Öppna fullständig vy",
+    "history": "Samtal",
+    "noConversations": "Inga samtal ännu",
+    "untitled": "Namnlös",
+    "deleteConversation": "Ta bort samtal",
+    "deleteConfirm": "Vill du ta bort detta samtal?",
+    "emptyTitle": "Fråga om eller ändra något i Termix",
+    "emptyHint": "Assistenten arbetar som du via Termix CLI och kör kommandon på dina målserver. Skriv @ för att lägga till servrar, flotta, mappar eller taggar som mål.",
+    "inputPlaceholder": "Fråga assistenten. Skriv @ för att lägga till mål.",
+    "noTargets": "Inga målserver. Skriv @ för att lägga till några.",
+    "sendHint": "Ändringar och kommandon körs utan att fråga först.",
+    "removeTarget": "Ta bort {{name}}",
+    "kind": {
+      "host": "Server",
+      "fleet": "Flotta",
+      "folder": "Mapp",
+      "tag": "Tagg"
+    },
+    "emptyHintBasic": "Assistenten arbetar som du via Termix CLI, med dina behörigheter.",
+    "inputPlaceholderBasic": "Fråga assistenten.",
+    "sendHintBasic": "Ändringar körs utan att fråga först.",
+    "thinking": "Tänker",
+    "thinkingActive": "Tänker...",
+    "compacted": "Kontext komprimerad: tidigare meddelanden har sammanfattats",
+    "compact": "Komprimera samtalet",
+    "nothingToCompact": "Samtalet är för kort för att komprimera ännu.",
+    "contextMeter": "Kontext: {{used}} av {{window}} token användes av det senaste anropet",
+    "contextMeterSource": "Fönstret är {{source}}.",
+    "contextMeterReserved": "{{tokens}} token hålls fria för svaret.",
+    "todayTokens": "Idag {{tokens}}",
+    "todayTitle": "Token du använde idag. Klicka för detaljer.",
+    "usage": "Tokenanvändning",
+    "conversationTokens": "{{tokens}} token",
+    "openFloating": "Flytande panel",
+    "openFloatingHint": "Öppna assistenten i en panel över vilken sida som helst. Tryck på {{shortcut}} var som helst för att öppna eller stänga den.",
+    "shortcutHint": "Tryck på {{shortcut}} på vilken sida som helst för att öppna assistenten i en flytande panel."
+  },
+  "usage": {
+    "title": "Tokenanvändning",
+    "settingDescription": "Token som dina AI-anrop använde under de senaste 30 dagarna.",
+    "cardTitle": "AI-tokenanvändning",
+    "today": "Idag",
+    "week": "7 dagar",
+    "month": "30 dagar",
+    "mine": "Min",
+    "everyone": "Alla användare",
+    "mineCaption": "Dina token över alla AI-funktioner.",
+    "everyoneCaption": "Token över alla användare och AI-funktioner.",
+    "byDay": "Per dag",
+    "byModel": "Per modell",
+    "bySource": "Per funktion",
+    "byUser": "Per användare",
+    "model": "Modell",
+    "feature": "Funktion",
+    "user": "Användare",
+    "calls": "Anrop",
+    "prompt": "Inmatning",
+    "completion": "Utmatning",
+    "total": "Totalt",
+    "empty": "Ingen AI-användning under de senaste 30 dagarna.",
+    "loadFailed": "Kunde inte läsa in användning",
+    "estimatedNote": "Vissa siffror är uppskattningar, på cirka fyra tecken per token, eftersom leverantören inte rapporterade sin användning.",
+    "source": {
+      "assistant": "Assistent",
+      "terminal": "Terminalpanel",
+      "compaction": "Komprimering",
+      "assets": "Tillgångsannotation"
+    }
+  },
+  "autoOps": {
+    "viewAssistant": "Assistent",
+    "viewAutoOps": "Auto-ops",
+    "intro": "Auto-ops låter assistenten kontrollera dina värdar på egen hand. En automatisering startar den enligt schema eller när något går fel, och den skriver en rapport eller föreslår en åtgärd som du kan godkänna. Börja med en förinställning.",
+    "sections": {
+      "tasks": "Uppgifter",
+      "approvals": "Godkännanden",
+      "presets": "Förinställningar"
+    },
+    "provider": "Tjänstleverantör för uppgifter",
+    "providerDefault": "Första tjänstleverantören med en standardmodell",
+    "model": "Modell för uppgifter",
+    "modelDefault": "Tjänstleverantörens standardmodell",
+    "saveModel": "Spara modell",
+    "preferencesHint": "Den tjänstleverantör och modell som bakgrundsuppgifter använder. Lämna dem som de är för att använda din standardtjänstleverantör och standardmodell.",
+    "task": "Uppgift",
+    "tokens": "{{tokens}} token",
+    "tokenUsage": "{{total}} token ({{prompt}} in, {{completion}} ut)",
+    "dryRun": "Testkörning",
+    "trigger": "Utlösare",
+    "noTasks": "Inga uppgifter ännu",
+    "tasksHint": "Uppgifter är körningar av automatiseringar med ett \"Fråga AI\"-steg. Aktivera en förinställning, eller skapa din egen i Automatiseringar: lägg till ett \"Fråga AI\"-steg i vilken automatisering som helst. Körningar visas här.",
+    "openAutomations": "Öppna Automatiseringar",
+    "browsePresets": "Bläddra bland förinställningar",
+    "noApprovals": "Inga planer väntar på godkännande",
+    "loadFailed": "Kunde inte ladda auto-ops",
+    "decideFailed": "Beslutet kunde inte sparas",
+    "openConversation": "Öppna i assistenten",
+    "approve": "Godkänn och kör",
+    "reject": "Avvisa",
+    "expires": "Utgår {{time}}",
+    "enabled": "Aktiverad",
+    "updateAvailable": "Uppdatering tillgänglig",
+    "shared": "Delad",
+    "needsAutomations": "Kräver Automatiseringar",
+    "enableAgain": "Aktivera igen",
+    "deletePreset": "Ta bort förinställning",
+    "autonomy": {
+      "report": "Endast rapport",
+      "propose": "Föreslå en plan"
+    },
+    "status": {
+      "running": "Körs",
+      "reported": "Rapporterad",
+      "proposed": "Väntar på godkännande",
+      "approved": "Godkänd",
+      "rejected": "Avvisad",
+      "expired": "Utgången",
+      "executing": "Kör plan",
+      "done": "Klar",
+      "failed": "Misslyckades",
+      "skipped": "Hoppad över"
+    },
+    "severity": {
+      "info": "Info",
+      "warning": "Varning",
+      "critical": "Kritisk"
+    },
+    "plan": {
+      "title": "Föreslagen plan",
+      "commands": "Kommandon",
+      "rationale": "Varför",
+      "risk": "Risk",
+      "rollback": "Återställ",
+      "verify": "Verifiera",
+      "progress": "Förlopp"
+    },
+    "enable": {
+      "title": "Aktivera {{name}}",
+      "submit": "Aktivera",
+      "name": "Namn",
+      "targets": "Värdar",
+      "targetAll": "Alla värdar",
+      "targetTrigger": "Värden som utlöste händelsen",
+      "targetHosts": "Valda värdar",
+      "noHosts": "Välj minst en värd.",
+      "threshold": "Tröskelvärde (%)",
+      "forSeconds": "I minst (sekunder)",
+      "time": "Tid på dygnet",
+      "cron": "Schema (cron)",
+      "dockerEvent": "Behållarehändelse",
+      "dockerEvents": {
+        "exited": "Avslutad",
+        "unhealthy": "Ohälsosam",
+        "restarting": "Startar om"
+      },
+      "badTime": "Ange tiden som TT:MM.",
+      "autonomy": "Vad assistenten får göra",
+      "maxRunSeconds": "Tidsgräns (sekunder)",
+      "runbook": "Driftbok",
+      "runbookHint": "Vad assistenten ska göra, med enkla ord. Engelska fungerar bäst.",
+      "shared": "Dela när den sparas som en förinställning",
+      "sharedHint": "Alla som får använda auto-ops kan sedan aktivera den.",
+      "saveAsPreset": "Spara som förinställning",
+      "savedPreset": "Sparad",
+      "failed": "Automatiseringen kunde inte skapas",
+      "saveFailed": "Förinställningen kunde inte sparas"
+    },
+    "presets": {
+      "daily-patrol": {
+        "title": "Daglig patrull",
+        "description": "Varje morgon klockan 09:00 kontrollerar den alla värdars diskar, minne, belastning, misslyckade tjänster, behållare, certifikat, uppdateringar, väntande omstarter och tidsynkronisering, och rapporterar efter allvarlighetsgrad."
+      },
+      "disk-cleanup": {
+        "title": "Rensning av diskutrymme",
+        "description": "När en disk ligger på 85 % eller mer i 5 minuter, hittar den vad som fyller den och föreslår en säker rensning som du kan godkänna. Affärsdata påverkas aldrig."
+      },
+      "host-down-triage": {
+        "title": "Felsökning vid värdavbrott",
+        "description": "När en värd går offline, undersöker den den från andra värdar och Proxmox, och rapporterar om det beror på nätverket, en stoppad maskin eller SSH."
+      },
+      "service-failure": {
+        "title": "Tjänstfel",
+        "description": "När en hälsokontroll börjar misslyckas, hittar den systemd-enheten bakom den, läser dess status och logg, och föreslår en enda omstart som du kan godkänna om det kan hjälpa. Konfigurationen ändras aldrig."
+      },
+      "container-anomaly": {
+        "title": "Behållareavvikelse",
+        "description": "När en behållare avslutas, blir ohälsosam eller fortsätter att starta om, läser den dess tillstånd, avslutningskod, loggar och minne, och föreslår att starta eller starta om den en gång för din godkännande. Inget tas bort."
+      },
+      "resource-overload-cpu": {
+        "title": "CPU-överbelastning",
+        "description": "När CPU ligger på 95 % eller mer i 15 minuter, hittar den processerna, tjänsterna och behållarna bakom det och rapporterar vad som ska göras. Inget ändras."
+      },
+      "resource-overload-memory": {
+        "title": "Minnesöverbelastning",
+        "description": "När minnet ligger på 95 % eller mer i 10 minuter, hittar den vad som använder det, växling och out-of-memory-avslut, och rapporterar vad som ska göras. Inget ändras."
+      },
+      "security-updates-weekly": {
+        "title": "Veckovisa säkerhetsuppdateringar",
+        "description": "Varje måndag klockan 09:30 listar den väntande säkerhetsuppdateringar efter allvarlighetsgrad, väntande omstarter och paketen bakom dem, körande och installerade kärnor och dagar sedan senaste uppdatering, i en tabell för alla värdar."
+      },
+      "cert-expiry-weekly": {
+        "title": "Veckovis certifikatutgång",
+        "description": "Varje måndag klockan 09:45 läser den utgångstiden för Let's Encrypt-, webbserver- och Kubernetes-certifikat på varje värd och markerar de som är under 30 dagar, kritiska under 7."
+      },
+      "failing-drive": {
+        "title": "Felaktigt enhet",
+        "description": "När Storage Health upptäcker en enhet som håller på att gå sönder eller är slitet, en nedgraderad pool eller array, eller en tunn pool som fylls på, läser den SMART, array- och poolstatus och rapporterar hur akut det är och vad som bör göras. Inga ändringar görs."
+      }
+    },
+    "report": {
+      "verdict": "Dom",
+      "evidence": "Bevis",
+      "actionsTaken": "Utförda åtgärder",
+      "recommendations": "Rekommendationer",
+      "nothingFound": "Inget hittades innan körningen avslutades.",
+      "noChanges": "Inga ändringar gjordes.",
+      "openConversation": "Öppna konversationen i assistenten för att se varje steg och ställa uppföljande frågor.",
+      "noFurtherAction": "Ingen ytterligare åtgärd krävs.",
+      "stoppedBudgetRun": "Stoppad: denna körning använde sin budget på {{tokens}} tokens.",
+      "stoppedBudgetDaily": "Stoppad: ägarens dagliga budget på {{tokens}} tokens är slut.",
+      "stoppedDeadline": "Stoppad: automatiseringens tidsgräns nåddes.",
+      "stoppedPaused": "Stoppad: en administratör pausade AI-auto-ops.",
+      "stoppedAborted": "Stoppad: automatiseringskörningen avbröts.",
+      "providerFailed": "AI-leverantören misslyckades: {{error}}",
+      "noHosts": "Ingen av målvärdarna kan nås av automatiseringens ägare.",
+      "noProvider": "Automatiseringens ägare har ingen AI-leverantör med en modell att köra uppgifter på.",
+      "needsOpsUse": "Automatiseringens ägare har inte behörigheten ai.ops.use.",
+      "assistantOff": "AI-assistenten är inaktiverad för automatiseringens ägare.",
+      "skippedPaused": "AI-autoops är pausat av en administratör.",
+      "skippedDuplicate": "En uppgift för samma automatisering och värd körs fortfarande eller väntar på godkännande.",
+      "skippedRate": "Denna automatisering har redan startat {{count}} AI-uppgifter under den senaste timmen.",
+      "hostNotRun": "Inte körd: planen stoppades.",
+      "hostNoAccess": "Inte körd: ägaren kan inte längre ansluta till denna värd.",
+      "hostUnreachable": "Inte körd: värden kunde inte nås.",
+      "hostStopped": "Stoppad vid det första misslyckade kommandot.",
+      "executionDone": "Den godkända planen kördes på {{count}} värd(ar) och alla kommandon och kontroller lyckades.",
+      "executionFailed": "Den godkända planen slutfördes inte på alla värdar.",
+      "executionStopped": "Den godkända planen stoppades innan den var klar.",
+      "approvedBy": "Den godkända planen kördes som skriven. Godkänd av {{user}}.",
+      "noticeReported": "AI-rapport: {{title}}",
+      "noticeProposed": "AI-plan som väntar på godkännande: {{title}}",
+      "noticeExecuted": "AI-plan utförd: {{title}}",
+      "noticeFailed": "AI-uppgift misslyckades: {{title}}",
+      "noticeAssetsAnnotationFailed": "Tillgångsannotation misslyckades"
+    }
+  },
+  "assets": {
+    "title": "Tillgångar",
+    "search": "Sök namn, nyckel eller adress",
+    "allZones": "Alla zoner",
+    "showRemoved": "Visa borttagna",
+    "collectNow": "Samla in nu",
+    "collecting": "Samlar in…",
+    "collectFailed": "Kunde inte starta insamlingen",
+    "neverRun": "Inte insamlad ännu",
+    "lastRun": "Senast insamlad {{time}}: {{ok}} av {{total}} värdar",
+    "lastRunFailed": "Insamlingen vid {{time}} misslyckades",
+    "hostsFailed_one": "{{count}} värd misslyckades",
+    "hostsFailed_other": "{{count}} värdar misslyckades",
+    "loadFailed": "Kunde inte ladda registret",
+    "saveFailed": "Kunde inte spara",
+    "empty": "Inga tillgångar ännu",
+    "emptyHint": "Samla in nu för att läsa varje värd som insamlaren kan ansluta till.",
+    "emptyHintView": "Någon med behörigheten ai.assets.manage måste samla in först.",
+    "removed": "Borttagen",
+    "pinned": "Fäst",
+    "multiZone": "Multi-zon",
+    "multiZoneHint": "Har adresser i mer än en zon, så den kan nå båda: en potentiell pivot.",
+    "columns": {
+      "name": "Namn",
+      "kind": "Typ",
+      "zone": "Zon",
+      "ips": "Adresser",
+      "listening": "Portar",
+      "outbound": "Utgående",
+      "services": "Tjänster",
+      "collected": "Senast insamlad",
+      "role": "Roll",
+      "importance": "Viktighet",
+      "system": "System"
+    },
+    "kind": {
+      "host": "Värd",
+      "guest": "Gäst",
+      "container": "Behållare",
+      "external": "Extern"
+    },
+    "zone": {
+      "internal": "Intern",
+      "dmz": "DMZ",
+      "external": "Extern",
+      "cloud": "Moln",
+      "overlay": "Överlagring"
+    },
+    "sections": {
+      "os": "Operativsystem",
+      "hostname": "Värdnamn",
+      "uptimeSec": "Uptime (sekunder)",
+      "interfaces": "Gränssnitt",
+      "routes": "Rutter",
+      "listening": "Lyssnande portar",
+      "connections": "Etablerade anslutningar",
+      "services": "Aktiva tjänster",
+      "containers": "Behållare",
+      "kubernetes": "Kubernetes",
+      "guests": "Proxmox-gäster",
+      "cloud": "Moln",
+      "missing": "Avsnitt utan utdata",
+      "guest": "Proxmox-gäst",
+      "container": "Behållare"
+    },
+    "outgoing": "Utgående",
+    "incoming": "Inkommande",
+    "noEdges": "Inga",
+    "stale": "Inte sett i senaste insamlingen",
+    "pinZone": "Zon",
+    "rulesDecide": "Bestämd av reglerna",
+    "settingsTitle": "Zoner och schema",
+    "scheduleTitle": "Insamling",
+    "daily": "Samla in dagligen",
+    "dailyHint": "Värdar samlas också in igen när de läggs till eller ändras.",
+    "time": "Tid (UTC)",
+    "save": "Spara",
+    "collector": "Samlar in som {{collector}}, och når de värdar som kontot kan ansluta till.",
+    "collectorMe": "du",
+    "collectorOther": "en annan administratör",
+    "collectorNone": "ingen ännu",
+    "collectAsMe": "Samla in som jag",
+    "zonesTitle": "Zonregler",
+    "zonesHint": "En regel mappar en CIDR till en zon, före de inbyggda. Den mest specifika prefixet vinner, sedan högre prioritet. Tillgångar zoner om när du sparar.",
+    "zoneName": "Namn",
+    "zoneNameExample": "Data center LAN",
+    "zoneKind": "Typ",
+    "cidr": "CIDR",
+    "priority": "Prioritet",
+    "addZone": "Lägg till regel",
+    "deleteZone": "Ta bort regel",
+    "cancelEdit": "Avbryt",
+    "annotating": "Annoterar…",
+    "neverAnnotated": "Inte annoterad ännu",
+    "lastAnnotation": "Senast annoterad {{time}}: {{ok}} av {{total}} tillgångar, {{tokens}} token",
+    "annotationFailed": "misslyckades: {{reason}}",
+    "annotateNow": "Annotera nu",
+    "annotateFailed": "Kunde inte starta annotationen",
+    "modeTable": "Tabell",
+    "modeGraph": "Graf",
+    "importance": {
+      "critical": "Kritisk",
+      "high": "Hög",
+      "medium": "Medel",
+      "low": "Låg"
+    },
+    "importanceUnknown": "Inte betygsatt",
+    "importanceReason": "Varför",
+    "sourceAi": "AI",
+    "sourceAiHint": "Skrivet av annotationen; nästa körning kan ändra det.",
+    "sourceUser": "Låst",
+    "sourceUserHint": "Satt av en person; annotationer lämnar det orört tills det låses upp.",
+    "unlock": "Lås upp: låt annotationen fylla i detta igen",
+    "unlockField": "Lås upp {{field}}",
+    "editAnnotation": "Redigera",
+    "lockHint": "Fält du ändrar låses för senare annoteringar.",
+    "factsTitle": "Fakta",
+    "closePanel": "Stäng",
+    "impact": "Påverkan",
+    "clearImpact": "Rensa",
+    "impactSummary_one": "Om det misslyckas, går {{count}} tillgång ner med det ({{critical}} kritisk, {{high}} hög), {{weak}} fler ansluter bara till dem.",
+    "impactSummary_other": "Om det misslyckas, går {{count}} tillgångar ner med det ({{critical}} kritiska, {{high}} höga), {{weak}} fler ansluter bara till dem.",
+    "impactTruncated": "Avskuret vid 6 hopp eller 300 tillgångar.",
+    "impactDirect": "Direkt",
+    "impactTransitive": "Genom andra",
+    "impactWeak": "Ansluter bara till dem",
+    "expandContainers": "Visa containrar",
+    "showExternal": "Visa externa adresser",
+    "graphCounts": "{{nodes}} tillgångar, {{edges}} relationer",
+    "graphTitle": "Tillgångsgraf",
+    "noZone": "Ingen zon",
+    "annotationTitle": "AI-annotering",
+    "annotateAfterCollect": "Annotera efter varje insamling",
+    "annotateAfterCollectHint": "Endast tillgångar som ändrats sedan deras senaste annotering, och deras grannar, skickas till modellen.",
+    "annotateProvider": "Leverantör",
+    "annotateProviderDefault": "Insamlarens auto-ops-val",
+    "annotateModel": "Modell",
+    "annotateModelDefault": "Leverantörens standardmodell",
+    "annotationHint": "Annotering körs som insamlaren, med insamlarens leverantörer. Sammanfattningar innehåller ingen miljö, kommandorader eller externa adresser.",
+    "annotateAll": "Annotera allt igen"
+  },
+  "exposure": {
+    "title": "Internet-ingångar",
+    "disclaimer": "Endast konfigurationsinventering. Publika bindningar och vidarebefordringsregler bevisar inte internetåtkomst. Privata lyssnare behålls som bakgrundsbeklädnad.",
+    "loadFailed": "Kunde inte ladda exponeringsinventeringen.",
+    "saveFailed": "Kunde inte spara prioritet.",
+    "search": "Filtrera adress, värd, namn eller sökväg",
+    "allPriority": "Alla prioriteringar",
+    "allZones": "Alla zoner",
+    "allSources": "Alla källor",
+    "high": "Hög",
+    "medium": "Medel",
+    "low": "Låg",
+    "active": "Aktiv",
+    "stale": "Föråldrad",
+    "resolved": "Inte längre observerad",
+    "all": "Alla",
+    "refresh": "Uppdatera",
+    "loading": "Laddar…",
+    "empty": "Inga matchande poster. Kontrollera insamlingsäckningen nedan innan du drar slutsatser.",
+    "never": "Inte insamlad ännu. Samla tillgångar för att inventera poster.",
+    "endpoint": "Ingång",
+    "source": "Källa",
+    "priority": "Granskningsprioritet",
+    "pathState": "Konfigurationssökväg",
+    "freshness": "Färska",
+    "details": "Detaljer om bevis",
+    "close": "Stäng",
+    "notTested": "Extern räckvidd: inte testad.",
+    "priorityReason": "Prioritet är en granskningsledtråd, inte en sårbarhetsdom. Publika administrations- och datatjänstportar prioriteras; tjänsteidentitet och åtkomstpolicy kräver fortfarande verifiering.",
+    "tls": "TLS-konfiguration",
+    "restrictions": "Åtkomstbegränsningar",
+    "observed": "Senast observerad",
+    "rulePriority": "Regelprioritet (lås upp)",
+    "evidence": "Observation",
+    "coverage": "Insamlingsäckning",
+    "changes": "Senaste ändringar",
+    "current": "Aktuell",
+    "partial": "Ofullständig",
+    "complete": "Konfigurationsassociationen är klar",
+    "conflicting": "Tvetydig eller cyklisk",
+    "configured": "Declarerad i konfigurationen",
+    "unknown": "Okänd",
+    "status_ok": "Insamlat",
+    "status_unsupported": "Verktyg tillgängligt",
+    "status_denied": "Åtkomst nekad",
+    "status_failed": "Insamling eller analys misslyckades",
+    "status_truncated": "Avkortad",
+    "change_baseline": "Baslinje etablerad",
+    "change_added": "Post tillagd",
+    "change_changed": "Konfigurationen har ändrats",
+    "change_removed": "Posten observeras inte längre",
+    "change_coverage": "Täckningen har försämrats",
+    "explain": "Förklara bevis",
+    "explaining": "Förklarar…",
+    "explainFailed": "Förklaringen misslyckades eller bevisen har ändrats.",
+    "aiLabel": "AI-tolkning · inte ett verifierat fynd",
+    "previous": "Föregående",
+    "next": "Nästa",
+    "binding": "Bindningens omfattning",
+    "binding_public": "Kandidat för offentlig post",
+    "binding_local": "Privat/lokal backend",
+    "binding_unknown": "Oupplöst bindning",
+    "ruleGaps": "Oanalyserade regler: {{count}}",
+    "unsupportedRule": "Regel stöds ej; tidigare bevis behålls",
+    "scope": "Visa",
+    "scope_internet": "Kandidater för internet-poster",
+    "scope_all": "Alla bevis",
+    "scope_unknown": "Okänd exponering",
+    "inventorySummary": "{{internet}} kandidater för internet-poster · {{all}} regler totalt · {{unknown}} med okänd exponering",
+    "bindingCount": "observerade {{count}} bindningar",
+    "pathsTruncated": "Sökvägsutökningen nådde sin gräns. Detta är ofullständiga bevis.",
+    "pathBranch": "Sökväg {{index}}",
+    "branched": "Villkorliga grenar",
+    "reason_sensitive": "Granska tjänstport {{port}} (post eller backend)",
+    "reason_public-address": "Observerad bindning till offentlig adress",
+    "reason_wan-zone": "OpenWrt WAN-källzon; brandväggsacceptans ej verifierad",
+    "reason_configured-public-tunnel": "Konfigurerad offentlig tunnel; extern tillgänglighet ej testad",
+    "reason_internal-only": "Endast interna eller lokala bindningar observerade",
+    "reason_exposure-unknown": "Otillräckliga bevis för att klassificera exponering",
+    "reason_critical-asset": "Tillgång markerad som kritisk",
+    "reason_manual": "Prioritet vald av användare"
+  },
+  "companion": {
+    "toggle": "Assistentpanel"
+  },
+  "widget": {
+    "loading": "Laddar...",
+    "empty": "Inga uppgifter ännu",
+    "pending_one": "{{count}} plan väntar på godkännande",
+    "pending_other": "{{count}} planer väntar på godkännande",
+    "maxItems": "Uppgifter att visa"
+  }
+}

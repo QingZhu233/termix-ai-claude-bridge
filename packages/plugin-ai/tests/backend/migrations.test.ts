@@ -1,0 +1,257 @@
+import fs from "node:fs";
+import path from "node:path";
+import { afterEach, describe, expect, it } from "vitest";
+import { createTestDb, type TestDb } from "@termix-ssh/plugin-sdk/testing";
+import { findUnownedTableWrites } from "@termix-ssh/plugin-sdk/ddl";
+import { LEGACY_DDL, pluginDir } from "./helpers";
+
+let db: TestDb | null = null;
+
+afterEach(() => {
+  db?.close();
+  db = null;
+});
+
+const tables = (sqlite: TestDb["sqlite"]) =>
+  (
+    sqlite
+      .prepare(
+        "SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE '%ai_%' ORDER BY name",
+      )
+      .all() as Array<{ name: string }>
+  ).map((row) => row.name);
+
+const indexes = (sqlite: TestDb["sqlite"], table: string) =>
+  (
+    sqlite
+      .prepare(
+        "SELECT name FROM sqlite_master WHERE type = 'index' AND tbl_name = ? AND name LIKE 'idx_%' ORDER BY name",
+      )
+      .all(table) as Array<{ name: string }>
+  ).map((row) => row.name);
+
+describe("ai adoption migration", () => {
+  it("renames the legacy tables and keeps every row, index and cascade", async () => {
+    db = await createTestDb(pluginDir, {
+      before: (sqlite) => {
+        sqlite.exec(LEGACY_DDL);
+        sqlite
+          .prepare("INSERT INTO users (id, username) VALUES ('u1', 'u1')")
+          .run();
+        sqlite.exec(`
+          INSERT INTO ai_providers (id, user_id, provider_type, label, api_key, api_key_prefix)
+            VALUES (3, 'u1', 'ollama', 'Local', 'enc-key', 'abc123');
+          INSERT INTO ai_conversations (id, user_id, title) VALUES (5, 'u1', 'Disk');
+          INSERT INTO ai_messages (conversation_id, role, content) VALUES (5, 'user', 'why full');
+          INSERT INTO ai_proposals (conversation_id, user_id, kind) VALUES (5, 'u1', 'propose_run_command');
+        `);
+      },
+    });
+
+    expect(tables(db.sqlite)).toEqual([
+      "p_ai_agent_events",
+      "p_ai_agent_queue",
+      "p_ai_agent_sessions",
+      "p_ai_asset_edges",
+      "p_ai_asset_runs",
+      "p_ai_assets",
+      "p_ai_cli_runs",
+      "p_ai_conversations",
+      "p_ai_exposure_changes",
+      "p_ai_exposure_entries",
+      "p_ai_exposure_observations",
+      "p_ai_messages",
+      "p_ai_ops_runs",
+      "p_ai_preset_links",
+      "p_ai_proposals",
+      "p_ai_providers",
+      "p_ai_task_presets",
+      "p_ai_task_runs",
+      "p_ai_usage",
+      "p_ai_zones",
+    ]);
+
+    const provider = db.sqlite
+      .prepare("SELECT * FROM p_ai_providers WHERE id = 3")
+      .get() as Record<string, unknown>;
+    // The key stays until core's boot migration moves it into ctx.secrets.
+    expect(provider).toMatchObject({
+      label: "Local",
+      api_key: "enc-key",
+      advanced: null,
+    });
+
+    expect(indexes(db.sqlite, "p_ai_providers")).toEqual([
+      "idx_ai_providers_user_label",
+    ]);
+    expect(indexes(db.sqlite, "p_ai_proposals")).toEqual([
+      "idx_ai_proposals_conversation",
+      "idx_ai_proposals_user",
+    ]);
+
+    // The rename carried the foreign keys: a conversation still takes its
+    // messages and proposals with it.
+    db.sqlite.prepare("DELETE FROM p_ai_conversations WHERE id = 5").run();
+    const count = (table: string) =>
+      (
+        db!.sqlite.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get() as {
+          n: number;
+        }
+      ).n;
+    expect(count("p_ai_messages")).toBe(0);
+    expect(count("p_ai_proposals")).toBe(0);
+  });
+
+  it("creates fresh tables when there is nothing to adopt", async () => {
+    db = await createTestDb(pluginDir);
+
+    expect(tables(db.sqlite)).toEqual([
+      "p_ai_agent_events",
+      "p_ai_agent_queue",
+      "p_ai_agent_sessions",
+      "p_ai_asset_edges",
+      "p_ai_asset_runs",
+      "p_ai_assets",
+      "p_ai_cli_runs",
+      "p_ai_conversations",
+      "p_ai_exposure_changes",
+      "p_ai_exposure_entries",
+      "p_ai_exposure_observations",
+      "p_ai_messages",
+      "p_ai_ops_runs",
+      "p_ai_preset_links",
+      "p_ai_proposals",
+      "p_ai_providers",
+      "p_ai_task_presets",
+      "p_ai_task_runs",
+      "p_ai_usage",
+      "p_ai_zones",
+    ]);
+    const columns = (
+      db.sqlite.prepare("PRAGMA table_info(p_ai_providers)").all() as Array<{
+        name: string;
+      }>
+    ).map((column) => column.name);
+    expect(columns).not.toContain("api_key");
+
+    db.sqlite
+      .prepare("INSERT INTO users (id, username) VALUES ('u1', 'u1')")
+      .run();
+    db.sqlite
+      .prepare("INSERT INTO p_ai_conversations (id, user_id) VALUES (1, 'u1')")
+      .run();
+    db.sqlite
+      .prepare(
+        "INSERT INTO p_ai_messages (conversation_id, role) VALUES (1, 'user')",
+      )
+      .run();
+    db.sqlite.prepare("DELETE FROM p_ai_conversations WHERE id = 1").run();
+    expect(
+      (
+        db.sqlite.prepare("SELECT COUNT(*) AS n FROM p_ai_messages").get() as {
+          n: number;
+        }
+      ).n,
+    ).toBe(0);
+  });
+});
+
+describe("provider advanced migration", () => {
+  it("adds a nullable advanced column", async () => {
+    db = await createTestDb(pluginDir);
+    const columns = db.sqlite
+      .prepare("PRAGMA table_info(p_ai_providers)")
+      .all();
+    expect(columns).toContainEqual(
+      expect.objectContaining({ name: "advanced", type: "TEXT", notnull: 0 }),
+    );
+  });
+
+  it("writes only the plugin's own tables and uses longtext on mysql", () => {
+    for (const dialect of ["sqlite", "postgres", "mysql"]) {
+      const sql = fs.readFileSync(
+        path.join(
+          pluginDir,
+          "migrations",
+          dialect,
+          "0013_provider_advanced.sql",
+        ),
+        "utf8",
+      );
+      expect(findUnownedTableWrites("ai", sql)).toEqual([]);
+      if (dialect === "mysql") {
+        expect(sql).toContain(
+          "ALTER TABLE `p_ai_providers` ADD COLUMN `advanced` longtext;",
+        );
+      }
+    }
+  });
+});
+
+describe("asset inventory migration", () => {
+  it("keeps one asset per key and one edge per pair and type", async () => {
+    db = await createTestDb(pluginDir);
+    const insertAsset = db.sqlite.prepare(
+      "INSERT INTO p_ai_assets (key, kind, name) VALUES (?, 'host', ?)",
+    );
+    insertAsset.run("host:1", "web-1");
+    expect(() => insertAsset.run("host:1", "again")).toThrow(/UNIQUE/);
+
+    const insertEdge = db.sqlite.prepare(
+      "INSERT INTO p_ai_asset_edges (from_asset, to_asset, type, source, first_seen, last_seen) VALUES (1, 2, ?, 'collector', 'a', 'a')",
+    );
+    insertEdge.run("connects_to");
+    insertEdge.run("runs_on");
+    expect(() => insertEdge.run("connects_to")).toThrow(/UNIQUE/);
+  });
+
+  it("has nullable annotation columns for later milestones", async () => {
+    db = await createTestDb(pluginDir);
+    const columns = db.sqlite
+      .prepare("PRAGMA table_info(p_ai_assets)")
+      .all() as Array<{ name: string; notnull: number }>;
+    for (const name of [
+      "role",
+      "role_source",
+      "importance",
+      "importance_source",
+      "importance_reason",
+      "system",
+      "system_source",
+      "annotated_at",
+    ]) {
+      expect(columns).toContainEqual(
+        expect.objectContaining({ name, notnull: 0 }),
+      );
+    }
+  });
+
+  it("writes only the plugin's own tables", () => {
+    for (const dialect of ["sqlite", "postgres", "mysql"]) {
+      const sql = fs.readFileSync(
+        path.join(pluginDir, "migrations", dialect, "0010_asset_inventory.sql"),
+        "utf8",
+      );
+      expect(findUnownedTableWrites("ai", sql)).toEqual([]);
+    }
+  });
+});
+
+describe("mysql migrations", () => {
+  it("widen messages and proposals past the 64KB TEXT cap", () => {
+    const sql = fs.readFileSync(
+      path.join(pluginDir, "migrations", "mysql", "0004_mysql_long_text.sql"),
+      "utf8",
+    );
+    expect(sql).toContain(
+      "ALTER TABLE `p_ai_messages` MODIFY COLUMN `content` longtext NOT NULL DEFAULT ('');",
+    );
+    expect(sql).toContain(
+      "ALTER TABLE `p_ai_messages` MODIFY COLUMN `tool_calls` longtext;",
+    );
+    expect(sql).toContain(
+      "ALTER TABLE `p_ai_proposals` MODIFY COLUMN `payload` longtext NOT NULL DEFAULT ('{}');",
+    );
+    expect(findUnownedTableWrites("ai", sql)).toEqual([]);
+  });
+});

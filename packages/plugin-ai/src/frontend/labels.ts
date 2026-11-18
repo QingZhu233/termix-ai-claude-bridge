@@ -1,0 +1,88 @@
+/**
+ * Turns the internal identifiers the assistant works in into text a user can
+ * read. Tool names, proposal kinds and payload keys all surface in the panel,
+ * and raw ids like "propose_create_automation" or "thresholddurationseconds"
+ * are not something to show anyone.
+ */
+
+/** What each tool is doing, phrased as an action rather than a function name. */
+const TOOL_LABELS: Record<string, string> = {
+  list_hosts: "Reading hosts",
+  get_host: "Reading host",
+  list_fleets: "Reading fleets",
+  list_snippets: "Reading snippets",
+  list_automations: "Reading automations",
+  get_automation: "Reading automation",
+  list_workspaces: "Reading workspaces",
+  list_notification_channels: "Reading notification channels",
+  list_homepage_items: "Reading homepage items",
+  get_command_history: "Reading command history",
+  get_network_topology: "Reading network topology",
+  propose_create_host: "Add host",
+  propose_update_host: "Update host",
+  propose_delete_host: "Delete host",
+  propose_create_snippet: "Create snippet",
+  propose_update_snippet: "Update snippet",
+  propose_delete_snippet: "Delete snippet",
+  propose_create_automation: "Create automation",
+  propose_create_fleet: "Create fleet",
+  propose_run_command: "Run command",
+  search_actions: "Finding actions",
+  run_read_action: "Reading through an action",
+  propose_action: "Run action",
+  list_targets: "Reading targets",
+  run_command: "Running command",
+  get_host_facts: "Reading host facts",
+  termix: "Running Termix CLI",
+  set_targets: "Setting targets",
+  open_host_terminal: "Opening terminal",
+  open_tab: "Opening tab",
+  open_settings: "Opening settings",
+  open_plugin_view: "Opening view",
+};
+
+/** Readable names for the payload keys the propose tools emit. */
+const FIELD_LABELS: Record<string, string> = {
+  hostId: "Host",
+  actionId: "Action",
+  resourceKey: "Target",
+  hostIds: "Hosts",
+  snippetId: "Snippet",
+  automationId: "Automation",
+  name: "Name",
+  ip: "Address",
+  port: "Port",
+  username: "Username",
+  folder: "Folder",
+  tags: "Tags",
+  content: "Command",
+  description: "Description",
+  definition: "Definition",
+  enabled: "Enabled",
+  triggerType: "Trigger",
+  thresholdValue: "Threshold",
+  thresholdDurationSeconds: "Duration (seconds)",
+  cooldownMinutes: "Cooldown (minutes)",
+};
+
+/**
+ * Splits snake_case and camelCase into words and capitalises the first.
+ * Used whenever an identifier has no explicit label, so something added later
+ * still reads as words rather than one run-on token.
+ */
+export function humanize(value: string): string {
+  const spaced = value
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/[_-]+/g, " ")
+    .trim();
+  if (!spaced) return value;
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1).toLowerCase();
+}
+
+export function toolLabel(name: string): string {
+  return TOOL_LABELS[name] ?? humanize(name);
+}
+
+export function fieldLabel(key: string): string {
+  return FIELD_LABELS[key] ?? humanize(key);
+}

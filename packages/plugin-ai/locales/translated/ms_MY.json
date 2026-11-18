@@ -1,0 +1,867 @@
+{
+  "permissions": {
+    "use": {
+      "title": "Gunakan pembantu",
+      "description": "Buka pembantu dan tanya apa sahaja."
+    },
+    "manage_providers": {
+      "title": "Urus penyedia",
+      "description": "Tambah, sunting dan buang penyedia AI serta kunci API mereka."
+    },
+    "apply_proposals": {
+      "title": "Laksanakan cadangan",
+      "description": "Benarkan pembantu melaksanakan perubahan yang dicadangkannya."
+    },
+    "services": {
+      "use": {
+        "title": "Gunakan AI dari ciri lain",
+        "description": "Ciri lain mungkin memanggil pembantu bagi pihak anda."
+      }
+    },
+    "secrets": {
+      "share": {
+        "title": "Kongsi kunci API",
+        "description": "Ciri lain mungkin menggunakan kunci API AI yang disimpan tanpa melihatnya."
+      }
+    },
+    "ops": {
+      "use": {
+        "title": "Jalankan arahan pada hos dengan pembantu AI",
+        "description": "Benarkan pembantu menjalankan sebarang arahan shell pada hos yang anda pilih. Hanya untuk pentadbir secara lalai."
+      }
+    },
+    "usage": {
+      "view_all": {
+        "title": "Lihat penggunaan AI semua orang",
+        "description": "Lihat token yang digunakan oleh panggilan AI setiap pengguna, bukan hanya milik anda. Hanya untuk pentadbir secara lalai."
+      }
+    },
+    "assets": {
+      "view": {
+        "title": "Lihat senarai aset",
+        "description": "Lihat hos, tetamu, kontena, zon dan sambungan yang dikumpulkan. Hanya untuk pentadbir secara lalai."
+      },
+      "manage": {
+        "title": "Urus senarai aset",
+        "description": "Mula pengumpulan, sunting peraturan zon, pin zon dan ubah jadual. Pengumpulan membaca hos secara baca-sahaja. Hanya untuk pentadbir secara lalai."
+      }
+    }
+  },
+  "settings": {
+    "assistantUnavailable": "Pembantu AI dimatikan pada pelayan ini.",
+    "providersNeedOptIn": "Hidupkan pembantu AI di atas untuk menambah penyedia.",
+    "providers": {
+      "label": "Penyedia",
+      "description": "Perkhidmatan AI yang boleh digunakan oleh pembantu dan ejen."
+    },
+    "admin": {
+      "globallyEnabled": {
+        "label": "Pembantu AI",
+        "description": "Benarkan pengguna menghidupkan pembantu AI. Apabila ini dimatikan, pembantu akan disembunyikan dan disekat untuk semua orang."
+      },
+      "privateEndpoints": {
+        "label": "Hos AI peribadi yang dibenarkan",
+        "description": "Hos pada rangkaian peribadi anda yang boleh dituju oleh penyedia, seperti Ollama yang dihoskan sendiri. Letakkan satu hos pada setiap baris."
+      },
+      "opsConcurrency": {
+        "label": "Hos selari pembantu AI",
+        "description": "Bilangan hos yang dijalankan oleh arahan pembantu pada masa yang sama."
+      },
+      "opsCommandTimeout": {
+        "label": "Had masa arahan pembantu AI (saat)",
+        "description": "Lama berapa lama arahan boleh berjalan pada hos sebelum dihentikan. Pembantu boleh meminta sehingga 600."
+      },
+      "opsOutputLimit": {
+        "label": "Output pembantu AI per hos (watak)",
+        "description": "Berapa banyak output setiap hos yang disimpan. Output yang lebih panjang akan menyimpan permulaan dan akhirnya."
+      },
+      "autoOpsPaused": {
+        "label": "Jeda auto-ops AI",
+        "description": "Menghentikan setiap tugas AI dan pelan yang diluluskan yang sedang berjalan dan menolak yang baru, sehingga dimatikan semula."
+      },
+      "autoOpsRunsPerHour": {
+        "label": "Tugas AI per automasi per jam",
+        "description": "Pencetus tambahan dalam jam yang sama akan dilangkau."
+      },
+      "autoOpsRunTokens": {
+        "label": "Bajet token per tugas AI",
+        "description": "Tugas yang menggunakan bilangan token ini akan dihentikan dan melaporkan apa yang ditemui."
+      },
+      "autoOpsDailyTokens": {
+        "label": "Bajet token AI harian per pengguna",
+        "description": "Sekali pengguna telah menggunakan bilangan token ini hari ini (UTC), tugas AI mereka akan dilangkau atau dihentikan."
+      },
+      "assetsDailyCollect": {
+        "label": "Kumpulkan senarai aset setiap hari",
+        "description": "Membaca setiap hos yang pengumpul boleh sambung sekali sehari dengan satu skrip baca-sahaja."
+      },
+      "assetsCollectTime": {
+        "label": "Masa pengumpulan aset (UTC)",
+        "description": "HH:MM, contohnya 03:00."
+      },
+      "assetsCollector": {
+        "label": "Pengumpul aset"
+      },
+      "assetsAnnotateAfterCollect": {
+        "label": "Anotasi aset selepas setiap pengumpulan",
+        "description": "Model menulis peranan, kepentingan dan sistem perniagaan setiap aset yang berubah, serta kebergantungan yang ditunjukkan oleh fakta."
+      },
+      "assetsAnnotateRunTokens": {
+        "label": "Bajet token setiap larian anotasi aset",
+        "description": "Larian berhenti sekali panggilan modelnya telah menggunakan sebanyak ini token; apa yang ditulisnya kekal."
+      },
+      "assetsAnnotateProvider": {
+        "label": "Pembekal anotasi aset"
+      },
+      "assetsAnnotateModel": {
+        "label": "Model anotasi aset"
+      },
+      "exposureRetentionDays": {
+        "label": "Penyimpanan sejarah pendedahan (hari)",
+        "description": "Menyimpan notis tertunda dan bukti yang dirujuk oleh entri semasa tanpa mengira usia."
+      }
+    },
+    "host": {
+      "enableAiAssistant": {
+        "label": "Hidupkan Pembantu AI",
+        "description": "Benarkan pembantu AI membantu dalam terminal hos ini. Dimatikan secara lalai, dan masih memerlukan AI dihidupkan untuk akaun anda."
+      },
+      "showPanel": {
+        "label": "Panel di sebelah terminal",
+        "description": "Menawarkan panel pembantu di sebelah terminal SSH hos ini."
+      }
+    },
+    "user": {
+      "autoOpsPreferences": {
+        "label": "Keutamaan auto-ops"
+      },
+      "companionAutoOpen": {
+        "label": "Buka panel pembantu bersama terminal",
+        "description": "Paparkan panel pembantu apabila terminal dibuka pada hos yang menyokongnya."
+      },
+      "companionSide": {
+        "label": "Sisi panel pembantu",
+        "description": "Di mana panel diletakkan bersebelahan dengan terminal.",
+        "right": "Kanan",
+        "left": "Kiri",
+        "bottom": "Bawah"
+      },
+      "companionSize": {
+        "label": "Saiz panel pembantu",
+        "description": "Lebar, atau tinggi di bahagian bawah, dalam piksel."
+      },
+      "companionEdgeButton": {
+        "label": "Butang tepi panel pembantu",
+        "description": "Paparkan butang kecil di tepi terminal untuk membuka panel."
+      }
+    }
+  },
+  "ai": {
+    "send": "Hantar",
+    "stop": "Henti",
+    "save": "Simpan",
+    "cancel": "Batal",
+    "running": "berjalan",
+    "approve": "Kelulusan",
+    "reject": "Tolak",
+    "selectProvider": "Pilih penyedia",
+    "addProvider": "Tambah penyedia",
+    "manageModels": "Urus model",
+    "editProvider": "Sunting penyedia",
+    "removeProvider": "Buang penyedia",
+    "providerType": "Penyedia",
+    "providerLabel": "Nama",
+    "providerLabelPlaceholder": "Contohnya: Ollama Tempatan",
+    "baseUrl": "Alamat pelayan",
+    "apiKey": "Kunci API",
+    "defaultModel": "Model lalai",
+    "defaultModelPlaceholder": "Contohnya: llama3.1 atau claude-opus-5",
+    "labelRequired": "Berikan nama kepada penyedia ini",
+    "providerSaveFailed": "Gagal menyimpan penyedia",
+    "providerUpdated": "Penyedia dikemas kini",
+    "providerDeleteFailed": "Gagal membuang penyedia",
+    "privateEndpointHint": "Alamat pada rangkaian peribadi anda memerlukan pentadbir untuk membenarkan hos terlebih dahulu.",
+    "providerOllama": "Ollama",
+    "providerAnthropic": "Anthropic",
+    "providerOpenai": "OpenAI",
+    "providerGemini": "Google Gemini",
+    "providerOpenaiCompatible": "Serasi dengan OpenAI",
+    "toolArguments": "Input",
+    "toolResult": "Keputusan",
+    "statusApplied": "Dilaksanakan",
+    "statusRejected": "Ditolak",
+    "proposalApplyFailed": "Gagal melaksanakan perubahan",
+    "proposalRejectFailed": "Gagal menolak perubahan",
+    "enableTitle": "Hidupkan pembantu AI",
+    "enableDescription": "Benarkan pembantu membaca tetapan anda dan mencadangkan perubahan untuk diluluskan.",
+    "readOnlyCommands": "Benarkan arahan diagnostik baca-sahaja",
+    "readOnlyCommandsDescription": "Pembantu boleh menjalankan senarai pendek arahan selamat seperti df dan uptime tanpa bertanya setiap kali. Sebarang tindakan yang mengubah pelayan akan dicadangkan terlebih dahulu.",
+    "modelDetectFailed": "Tidak dapat menghubungi penyedia, jadi ini adalah senarai umum. Anda boleh menaip sebarang nama model.",
+    "modelCustom": "Masukkan nama model",
+    "modelRefresh": "Muat semula senarai",
+    "modelPlaceholder": "Pilih atau taip nama model",
+    "runCommandTitle": "Jalankan arahan",
+    "assistant": "Pembantu AI",
+    "terminalPanelEmpty": "Tanya pembantu tentang hos ini. Sebarang perubahan keadaan memerlukan kelulusan anda terlebih dahulu.",
+    "terminalPanelPlaceholder": "Tanya tentang hos ini...",
+    "noProvidersConfigured": "Tiada penyedia AI dikonfigurasi lagi. Tambah satu dalam Tetapan.",
+    "runsInOpenTerminal": "Berjalan dalam sesi terminal terbuka anda.",
+    "runInTerminal": "Jalankan",
+    "terminalContextPrefill": "Berikut adalah output terminal saya:\n\n{{output}}\n\n",
+    "secrets": {
+      "shareApiKey": "Benarkan ciri lain menggunakan kunci API penyedia AI anda untuk permintaan mereka sendiri. Kunci ini tidak pernah disalin, dan anda boleh mencabut kebenaran ini pada bila-bila masa."
+    },
+    "removeProviderConfirm": "Buang penyedia {{name}}?",
+    "contextWindows": "Tetingkap konteks per model",
+    "contextWindowsHint": "Baca dari penyedia di mana ia melaporkan satu. Masukkan bilangan token untuk menindahnya untuk model, atau biarkan kosong untuk menggunakan apa yang dilaporkan oleh penyedia. Segarkan meminta penyedia sekali lagi.",
+    "contextWindowValue": "Tetingkap konteks: {{tokens}} ({{source}})",
+    "contextOverride": "Penindihan tetingkap konteks untuk {{model}}",
+    "contextSourceOverride": "ditetapkan oleh anda",
+    "contextSourceProvider": "dilaporkan oleh penyedia",
+    "contextSourceGuess": "diteka dari nama model",
+    "contextSourceDefault": "lalai untuk model yang tidak diketahui",
+    "contextLoadFailed": "Tidak dapat membaca tetingkap konteks",
+    "contextRefresh": "Segarkan",
+    "contextWindowInvalid": "Masukkan tetingkap konteks sebagai nombor bulat token, sekurang-kurangnya 1024.",
+    "advanced": "Lanjutan",
+    "advancedHint": "Biarkan tetapan pada Lalai untuk menggunakan nilai model sendiri.",
+    "advancedDefault": "Lalai",
+    "advancedDefaultAuto": "Lalai (auto)",
+    "advancedAuto": "Auto",
+    "advancedEndpoint": "Hujung titik",
+    "advancedEndpointResponses": "API Respons",
+    "advancedEndpointChat": "Penyiapan Sembang",
+    "advancedReasoningEffort": "Usaha penalaran",
+    "advancedReasoningSummary": "Ringkasan penalaran",
+    "advancedReasoningSummaryHint": "API Respons sahaja.",
+    "advancedVerbosity": "Kehalusan",
+    "advancedNone": "Tiada",
+    "advancedMinimal": "Minimum",
+    "advancedLow": "Rendah",
+    "advancedMedium": "Sederhana",
+    "advancedHigh": "Tinggi",
+    "advancedXhigh": "Sangat tinggi",
+    "advancedMax": "Maks",
+    "advancedConcise": "Ringkas",
+    "advancedDetailed": "Terperinci",
+    "advancedOff": "Mati",
+    "advancedMaxOutputTokens": "Token output maksimum",
+    "advancedMaxOutputTokensInvalid": "Masukkan nombor bulat dari 1 hingga 1,000,000.",
+    "advancedTemperature": "Suhu",
+    "advancedTemperatureHint": "Model penalaran OpenAI hanya menerima ini dengan usaha penalaran Tiada, jadi ia tidak dihantar dengan mana-mana usaha lain.",
+    "advancedTemperatureInvalid": "Masukkan nombor dari 0 hingga 2."
+  },
+  "nav": {
+    "ai": "Pembantu AI"
+  },
+  "onboarding": {
+    "aiTitle": "Pembantu AI",
+    "aiIntro": "Termix boleh menyertakan pembantu AI. Anda boleh mengubah ini kemudian dalam tetapan anda.",
+    "aiSkipTitle": "Biarkan ia dimatikan",
+    "aiSkipDesc": "Termix berfungsi seperti biasa. Pembantu kekal tersembunyi.",
+    "aiEnableTitle": "Hidupkannya",
+    "aiEnableDesc": "Menambah pembantu yang membaca persediaan anda dan mencadangkan perubahan yang diluluskan oleh anda. Memerlukan penyedia yang anda sediakan, seperti Ollama tempatan.",
+    "aiNote": "Tiada data dihantar ke mana-mana sehingga anda menambah penyedia dan menghantar mesej."
+  },
+  "agents": {
+    "working": "Sedang bekerja...",
+    "startingIndicator": "Memulakan ejen...",
+    "noCompatibleProvider": "Tiada penyedia AI anda yang serasi dengan {{agent}}. Claude Code memerlukan Anthropic dan Codex memerlukan OpenAI.",
+    "noProviders": "Tambah penyedia AI dalam Tetapan terlebih dahulu.",
+    "title": "Ejen AI",
+    "permissionTitle": "Jalankan ejen AI jauh",
+    "permissionDescription": "Mulakan ejen pengaturcaraan pada hos SSH menggunakan penyedia AI yang dikonfigurasi. Ejen boleh melaksanakan arahan dan mengubah fail sebagai pengguna SSH.",
+    "new": "Sesi baru",
+    "description": "Jalankan ejen dalam direktori pada hos ini menggunakan penyedia AI Termix.",
+    "runtime": "Ejen",
+    "provider": "Penyedia Termix",
+    "chooseProvider": "Pilih penyedia yang serasi",
+    "model": "Model",
+    "directory": "Direktori kerja",
+    "executable": "Fail boleh laksana (laluan mutlak pilihan)",
+    "requirements": "Hos memerlukan Node.js 22.19+ dan ejen yang dipilih dipasang. Penghalaan loopback jauh SSH mesti dibenarkan. Konfigurasi ejen sedia ada tidak ditimpa.",
+    "responsesRequired": "Codex memerlukan hujung API Respons. Hujung hanya Penyelesaian Sembang tidak boleh menjalankan Codex.",
+    "piPermissions": "Alat Pi berjalan dengan kebenaran akaun SSH ini. Hanya lancarkan dalam direktori yang anda benarkan ejen untuk mengubah suai.",
+    "start": "Mulakan ejen",
+    "resume": "Sambung semula",
+    "stop": "Hentikan sesi",
+    "interrupt": "Sekat giliran",
+    "send": "Hantar",
+    "prompt": "Minta ejen bekerja dalam direktori ini...",
+    "noSessions": "Tiada sesi ejen untuk hos ini.",
+    "approval": "Ejen memerlukan keputusan anda",
+    "answer": "Jawapan (JSON untuk soalan terstruktur)",
+    "allow": "Benarkan sekali",
+    "deny": "Tolak",
+    "tool": "Aktiviti alat",
+    "streamFailed": "Aliran ejen terputus. Buka semula sesi untuk menyambung semula.",
+    "status": {
+      "starting": "Memulakan",
+      "ready": "Sedia",
+      "running": "Sedang bekerja",
+      "stopped": "Berhenti",
+      "error": "Ralat"
+    },
+    "installRuntime": "Pasang ejen terpilih dan Node.js",
+    "installSource": "Sumber rasmi sahaja: nodejs.org (disahkan SHA-256) dan registry.npmjs.org (tegaskan integriti pakej). Dipasang untuk pengguna SSH di ~/.local/share/termix-agent-runtime; memerlukan curl, tar, dan Linux/macOS x64 atau arm64. Tidak mengubah dasar terusan SSH.",
+    "installSucceeded": "Pemasangan disahkan. Anda kini boleh memulakan ejen; terusan jauh loopback SSH juga mesti dibenarkan.",
+    "installFailed": "Pemasangan gagal. Semak log dan cuba lagi.",
+    "installLog": "Log pemasangan",
+    "enableForwarding": "Dayakan terusan Ejen",
+    "forwardingScope": "Linux dengan systemd/OpenSSH; memerlukan root atau sudo tanpa kata laluan. Menyimpan sandaran dan mengesahkan konfigurasi SSH, kemudian memuatnya semula. Hanya akaun SSH semasa dan sumber sambungan yang diperhatikan menerima terusan jauh loopback; terusan tempatan sedia ada dikekalkan. Perubahan yang gagal akan dikembalikan.",
+    "forwardingSucceeded": "Terusan jauh loopback SSH sedia. Mula atau sambung semula ejen untuk membuka sambungan SSH baharu.",
+    "forwardingFailed": "Konfigurasi terusan SSH gagal. Semak log; tiada konfigurasi yang tidak disahkan dikekalkan.",
+    "search": "Cari sesi",
+    "sessionName": "Nama sesi",
+    "rename": "Tukar nama",
+    "archive": "Arkib dan hentikan",
+    "restore": "Pulihkan sesi",
+    "queue": "Mesej dalam barisan",
+    "enqueue": "Bariskan mesej",
+    "continueQueue": "Sambung barisan",
+    "pauseQueue": "Jeda barisan",
+    "editQueued": "Sunting mesej dalam barisan",
+    "save": "Simpan",
+    "remove": "Buang",
+    "upload": "Muat naik lampiran",
+    "remoteFile": "Laluan fail di dalam direktori kerja",
+    "attach": "Lampirkan fail dari hos",
+    "attachments": "Gunakan semula lampiran awal",
+    "attachmentLimit": "Sehingga 4 lampiran, 1 MiB setiap satu",
+    "review": "Perubahan Git",
+    "gitStatus": "Segarkan semula status Git",
+    "diffFile": "Laluan fail untuk semakan",
+    "diff": "Lihat perbezaan",
+    "branch": "Nama cawangan baharu",
+    "createWorktree": "Cipta worktree",
+    "useWorktree": "Sesi baharu dalam worktree ini",
+    "worktreeHint": "Mencipta cawangan baharu dari HEAD. Perubahan yang belum disahkan kekal dalam direktori semasa. Worktree sedia ada tidak pernah dipadam secara automatik.",
+    "clean": "Tiada perubahan",
+    "reconnecting": "Menyambung semula dan memulihkan mesej…",
+    "unavailable": "Sesi tidak lagi boleh diakses. Semak kebenaran anda atau log masuk semula.",
+    "shortcuts": "Enter menghantar atau bariskan · Shift+Enter menambah baris · Esc mengganggu dan menjeda barisan",
+    "activeSessions": "Aktif",
+    "archivedSessions": "Diarkibkan",
+    "dismiss": "Tutup",
+    "changes": "Perubahan",
+    "close": "Tutup",
+    "cancel": "Batal",
+    "sessionSetup": "Sesi",
+    "hostSetup": "Persediaan hos",
+    "changedFiles": "Fail yang berubah",
+    "worktree": "Worktree",
+    "attachShort": "Lampirkan",
+    "emptyTranscript": "Hantar mesej untuk memulakan ejen."
+  },
+  "plugin": {
+    "name": "Pembantu AI",
+    "description": "Pembantu AI yang membaca persediaan anda dan mencadangkan perubahan untuk anda luluskan."
+  },
+  "ops": {
+    "searchHosts": "Cari hos",
+    "selectedCount": "{{count}} dipilih",
+    "clear": "Kosongkan",
+    "fleets": "Armada",
+    "folders": "Folder",
+    "tags": "Tag",
+    "allHosts": "Semua hos",
+    "noHosts": "Tiada hos",
+    "newConversation": "Perbualan baru",
+    "sendHint_other": "Berjalan pada {{count}} hos. Arahan berjalan tanpa bertanya dahulu.",
+    "runCommand": "Jalankan arahan",
+    "hostFacts": "Fakta hos",
+    "hostCount_other": "{{count}} hos",
+    "succeeded": "{{count}} berjaya",
+    "failed": "{{count}} gagal",
+    "exitCode": "keluar {{code}}",
+    "timedOut": "had masa tamat",
+    "stopped": "dihentikan",
+    "notRun": "tidak dijalankan",
+    "cached": "disimpan cache",
+    "duration": "{{seconds}}s",
+    "noOutput": "(tiada output)"
+  },
+  "assistant": {
+    "title": "Pembantu AI",
+    "moveHint": "Seret untuk bergerak. Klik dua kali untuk dok ke sisi.",
+    "toggle": "Togol pembantu AI",
+    "close": "Tutup",
+    "dock": "Lekatkan di sebelah kanan",
+    "float": "Melayang",
+    "openTab": "Buka pandangan penuh",
+    "history": "Perbualan",
+    "noConversations": "Belum ada perbualan",
+    "untitled": "Tanpa Tajuk",
+    "deleteConversation": "Padam perbualan",
+    "deleteConfirm": "Padam perbualan ini?",
+    "emptyTitle": "Tanya atau ubah apa sahaja dalam Termix",
+    "emptyHint": "Pembantu bertindak sebagai anda melalui CLI Termix dan menjalankan arahan pada hos sasaran anda. Taip @ untuk menambah hos, armada, folder atau tag sebagai sasaran.",
+    "inputPlaceholder": "Tanya pembantu. Taip @ untuk menambah sasaran.",
+    "noTargets": "Tiada hos sasaran. Taip @ untuk menambah beberapa.",
+    "sendHint": "Perubahan dan arahan dijalankan tanpa bertanya terlebih dahulu.",
+    "removeTarget": "Buang {{name}}",
+    "kind": {
+      "host": "Hos",
+      "fleet": "Armada",
+      "folder": "Folder",
+      "tag": "Tag"
+    },
+    "emptyHintBasic": "Pembantu bertindak sebagai anda melalui CLI Termix, dengan kebenaran anda.",
+    "inputPlaceholderBasic": "Tanya pembantu.",
+    "sendHintBasic": "Perubahan dijalankan tanpa bertanya terlebih dahulu.",
+    "thinking": "Berpikir",
+    "thinkingActive": "Berpikir...",
+    "compacted": "Konteks dipadatkan: mesej awal telah diringkaskan",
+    "compact": "Padatkan perbualan",
+    "nothingToCompact": "Perbualan ini terlalu pendek untuk dipadatkan.",
+    "contextMeter": "Konteks: {{used}} daripada {{window}} token digunakan oleh panggilan terkini",
+    "contextMeterSource": "Tetingkap adalah {{source}}.",
+    "contextMeterReserved": "{{tokens}} token disimpan kosong untuk balasan.",
+    "todayTokens": "Hari ini {{tokens}}",
+    "todayTitle": "Token yang anda gunakan hari ini. Klik untuk butiran.",
+    "usage": "Penggunaan token",
+    "conversationTokens": "{{tokens}} token",
+    "openFloating": "Panel melayang",
+    "openFloatingHint": "Buka pembantu dalam panel di atas mana-mana halaman. Tekan {{shortcut}} di mana sahaja untuk membuka atau menutupnya.",
+    "shortcutHint": "Tekan {{shortcut}} pada mana-mana halaman untuk membuka pembantu dalam panel melayang."
+  },
+  "usage": {
+    "title": "Penggunaan token",
+    "settingDescription": "Token yang digunakan oleh panggilan AI anda dalam 30 hari terakhir.",
+    "cardTitle": "Penggunaan token AI",
+    "today": "Hari ini",
+    "week": "7 hari",
+    "month": "30 hari",
+    "mine": "Milik saya",
+    "everyone": "Semua pengguna",
+    "mineCaption": "Token anda merentasi setiap ciri AI.",
+    "everyoneCaption": "Token merentasi setiap pengguna dan ciri AI.",
+    "byDay": "Setiap hari",
+    "byModel": "Setiap model",
+    "bySource": "Setiap ciri",
+    "byUser": "Setiap pengguna",
+    "model": "Model",
+    "feature": "Ciri",
+    "user": "Pengguna",
+    "calls": "Panggilan",
+    "prompt": "Input",
+    "completion": "Output",
+    "total": "Jumlah",
+    "empty": "Tiada penggunaan AI dalam 30 hari terakhir.",
+    "loadFailed": "Gagal memuatkan penggunaan",
+    "estimatedNote": "Beberapa angka adalah anggaran, kira-kira empat aksara per token, kerana penyedia tidak melaporkan penggunaannya.",
+    "source": {
+      "assistant": "Pembantu",
+      "terminal": "Panel terminal",
+      "compaction": "Pemadatan",
+      "assets": "Anotasi aset"
+    }
+  },
+  "autoOps": {
+    "viewAssistant": "Pembantu",
+    "viewAutoOps": "Auto-ops",
+    "intro": "Auto-ops membolehkan pembantu memeriksa hos anda secara automatik. Satu automasi memulakannya mengikut jadual atau apabila sesuatu berlaku, dan ia menulis laporan atau mencadangkan penyelesaian untuk anda kelulusan. Mulakan dengan pratetap.",
+    "sections": {
+      "tasks": "Tugas",
+      "approvals": "Kelulusan",
+      "presets": "Pratetap"
+    },
+    "provider": "Pembekal untuk tugas",
+    "providerDefault": "Pembekal pertama dengan model lalai",
+    "model": "Model untuk tugas",
+    "modelDefault": "Model lalai pembekal",
+    "saveModel": "Simpan model",
+    "preferencesHint": "Pembekal dan model yang digunakan oleh tugas latar belakang. Biarkan seperti sedia ada untuk menggunakan pembekal dan model lalai anda.",
+    "task": "Tugas",
+    "tokens": "{{tokens}} token",
+    "tokenUsage": "{{total}} token ({{prompt}} masuk, {{completion}} keluar)",
+    "dryRun": "Jalankan ujian",
+    "trigger": "Pencetus",
+    "noTasks": "Tiada tugas lagi",
+    "tasksHint": "Tugas ialah pelaksanaan automasi dengan langkah Tanya AI. Dayakan pratetap, atau bina sendiri dalam Automasi: tambah langkah Tanya AI ke mana-mana automasi. Pelaksanaan akan dipaparkan di sini.",
+    "openAutomations": "Buka Automasi",
+    "browsePresets": "Layari pratetap",
+    "noApprovals": "Tiada rancangan menunggu kelulusan",
+    "loadFailed": "Gagal memuatkan auto-ops",
+    "decideFailed": "Keputusan tidak dapat disimpan",
+    "openConversation": "Buka dalam pembantu",
+    "approve": "Luluskan dan jalankan",
+    "reject": "Tolak",
+    "expires": "Tamat tempoh {{time}}",
+    "enabled": "Didayakan",
+    "updateAvailable": "Kemas kini tersedia",
+    "shared": "Dikongsi",
+    "needsAutomations": "Memerlukan Automasi",
+    "enableAgain": "Dayakan semula",
+    "deletePreset": "Padam pratetap",
+    "autonomy": {
+      "report": "Laporan sahaja",
+      "propose": "Cadangkan rancangan"
+    },
+    "status": {
+      "running": "Sedang berjalan",
+      "reported": "Dilaporkan",
+      "proposed": "Menunggu kelulusan",
+      "approved": "Diluluskan",
+      "rejected": "Ditolak",
+      "expired": "Tamat tempoh",
+      "executing": "Menjalankan rancangan",
+      "done": "Selesai",
+      "failed": "Gagal",
+      "skipped": "Dilangkau"
+    },
+    "severity": {
+      "info": "Maklumat",
+      "warning": "Amaran",
+      "critical": "Kritikal"
+    },
+    "plan": {
+      "title": "Rancangan dicadangkan",
+      "commands": "Arahan",
+      "rationale": "Sebab",
+      "risk": "Risiko",
+      "rollback": "Pemulangan",
+      "verify": "Pengesahan",
+      "progress": "Kemajuan"
+    },
+    "enable": {
+      "title": "Dayakan {{name}}",
+      "submit": "Dayakan",
+      "name": "Nama",
+      "targets": "Hos",
+      "targetAll": "Semua hos",
+      "targetTrigger": "Hos yang mencetuskan ia",
+      "targetHosts": "Hos yang dipilih",
+      "noHosts": "Pilih sekurang-kurangnya satu hos.",
+      "threshold": "Ambang (%)",
+      "forSeconds": "Selama sekurang-kurangnya (saat)",
+      "time": "Masa hari",
+      "cron": "Jadual (cron)",
+      "dockerEvent": "Peristiwa kontena",
+      "dockerEvents": {
+        "exited": "Keluar",
+        "unhealthy": "Tidak sihat",
+        "restarting": "Memulakan semula"
+      },
+      "badTime": "Masukkan masa sebagai HH:MM.",
+      "autonomy": "Apa yang boleh dilakukan oleh pembantu",
+      "maxRunSeconds": "Had masa (saat)",
+      "runbook": "Buku operasi",
+      "runbookHint": "Apa yang perlu dilakukan oleh pembantu, dalam kata-kata biasa. Bahasa Inggeris paling berkesan.",
+      "shared": "Kongsi apabila disimpan sebagai pratetap",
+      "sharedHint": "Semua orang yang boleh menggunakan auto-ops kemudian boleh mengaktifkannya.",
+      "saveAsPreset": "Simpan sebagai pratetap",
+      "savedPreset": "Disimpan",
+      "failed": "Automasi tidak dapat dicipta",
+      "saveFailed": "Pratetap tidak dapat disimpan"
+    },
+    "presets": {
+      "daily-patrol": {
+        "title": "Patroli harian",
+        "description": "Setiap pagi pada 09:00, menyemak cakera, memori, beban, perkhidmatan yang gagal, kontena, sijil, kemas kini, but semula yang tertunda dan penyegerakan masa setiap hos, dan melaporkan mengikut tahap keparahan."
+      },
+      "disk-cleanup": {
+        "title": "Pembersihan ruang cakera",
+        "description": "Apabila cakera kekal pada 85% atau lebih selama 5 minit, mencari apa yang mengisinya dan mencadangkan pembersihan selamat untuk anda kelulusan. Data perniagaan tidak pernah disentuh."
+      },
+      "host-down-triage": {
+        "title": "Triase hos turun",
+        "description": "Apabila hos menjadi luar talian, mengujinya dari hos lain dan Proxmox, dan melaporkan sama ada ia adalah rangkaian, mesin yang berhenti atau SSH."
+      },
+      "service-failure": {
+        "title": "Kegagalan perkhidmatan",
+        "description": "Apabila pemeriksaan kesihatan mula gagal, mencari unit systemd di sebaliknya, membaca status dan lognya, dan mencadangkan satu but semula untuk anda kelulusan apabila ia boleh membantu. Konfigurasi tidak pernah diubah."
+      },
+      "container-anomaly": {
+        "title": "Anomali kontena",
+        "description": "Apabila kontena keluar, menjadi tidak sihat atau terus memulakan semula, membaca keadaan, kod keluar, log dan memorinya, dan mencadangkan memulakan atau memulakan semula ia sekali untuk anda kelulusan. Tiada apa-apa yang dialih keluar."
+      },
+      "resource-overload-cpu": {
+        "title": "Beban terlampau CPU",
+        "description": "Apabila CPU kekal pada 95% atau lebih selama 15 minit, mencari proses, perkhidmatan dan kontena di sebaliknya dan melaporkan apa yang perlu dilakukan. Tiada apa-apa yang diubah."
+      },
+      "resource-overload-memory": {
+        "title": "Beban terlampau memori",
+        "description": "Apabila memori kekal pada 95% atau lebih selama 10 minit, mencari apa yang menggunakannya, pertukaran dan pembunuhan kehabisan memori, dan melaporkan apa yang perlu dilakukan. Tiada apa-apa yang diubah."
+      },
+      "security-updates-weekly": {
+        "title": "Kemas kini keselamatan mingguan",
+        "description": "Setiap Isnin pada 09:30, menyenaraikan kemas kini keselamatan yang tertunda mengikut tahap keparahan, but semula yang tertunda dan pakej di sebaliknya, kernel yang berjalan dan dipasang serta hari sejak kemas kini terakhir, dalam satu jadual untuk semua hos."
+      },
+      "cert-expiry-weekly": {
+        "title": "Tempoh tamat sijil mingguan",
+        "description": "Setiap Isnin pada 09:45, membaca tempoh tamat sijil Let's Encrypt, pelayan web dan Kubernetes pada setiap hos dan menandakan yang bawah 30 hari, kritikal bawah 7."
+      },
+      "failing-drive": {
+        "title": "Pemacu rosak",
+        "description": "Apabila Kesihatan Storaj menemui pemacu yang rosak atau haus, kolam atau susunan yang terjejas, atau kolam nipis yang hampir penuh, ia akan membaca SMART, keadaan susunan dan kolam, serta melaporkan tahap kecemasan dan tindakan yang perlu diambil. Tiada perubahan dibuat."
+      }
+    },
+    "report": {
+      "verdict": "Hukuman",
+      "evidence": "Bukti",
+      "actionsTaken": "Tindakan yang diambil",
+      "recommendations": "Cadangan",
+      "nothingFound": "Tiada apa-apa ditemui sebelum operasi berakhir.",
+      "noChanges": "Tiada perubahan dibuat.",
+      "openConversation": "Buka perbualan dalam pembantu untuk melihat setiap langkah dan bertanya soalan susulan.",
+      "noFurtherAction": "Tiada tindakan lanjut diperlukan.",
+      "stoppedBudgetRun": "Berhenti: operasi ini menggunakan bajet {{tokens}} tokennya.",
+      "stoppedBudgetDaily": "Berhenti: bajet harian pemilik {{tokens}} token telah habis.",
+      "stoppedDeadline": "Berhenti: had masa automasi telah dicapai.",
+      "stoppedPaused": "Berhenti: pentadbir telah menjeda auto-ops AI.",
+      "stoppedAborted": "Berhenti: operasi automasi telah dibatalkan.",
+      "providerFailed": "Pembekal AI gagal: {{error}}",
+      "noHosts": "Tiada hos sasaran yang boleh dicapai oleh pemilik automasi.",
+      "noProvider": "Pemilik automasi tiada pembekal AI dengan model untuk menjalankan tugas.",
+      "needsOpsUse": "Pemilik automasi tidak mempunyai kebenaran ai.ops.use.",
+      "assistantOff": "Pembantu AI dimatikan untuk pemilik automasi.",
+      "skippedPaused": "Auto-ops AI dijeda oleh pentadbir.",
+      "skippedDuplicate": "Tugas untuk automasi dan hos yang sama masih berjalan atau menunggu kelulusan.",
+      "skippedRate": "Automasi ini telah memulakan {{count}} tugas AI dalam jam terakhir.",
+      "hostNotRun": "Tidak dijalankan: rancangan dihentikan.",
+      "hostNoAccess": "Tidak dijalankan: pemilik tidak lagi boleh menyambung ke hos ini.",
+      "hostUnreachable": "Tidak dijalankan: hos tidak dapat dicapai.",
+      "hostStopped": "Dihentikan pada arahan yang gagal pertama.",
+      "executionDone": "Rancangan yang diluluskan dijalankan pada {{count}} hos dan setiap arahan serta pemeriksaan berjaya.",
+      "executionFailed": "Rancangan yang diluluskan tidak selesai pada setiap hos.",
+      "executionStopped": "Rancangan yang diluluskan dihentikan sebelum ia selesai.",
+      "approvedBy": "Rancangan yang diluluskan dijalankan seperti yang ditulis. Diluluskan oleh {{user}}.",
+      "noticeReported": "Laporan AI: {{title}}",
+      "noticeProposed": "Rancangan AI menunggu kelulusan: {{title}}",
+      "noticeExecuted": "Rancangan AI dilaksanakan: {{title}}",
+      "noticeFailed": "Tugas AI gagal: {{title}}",
+      "noticeAssetsAnnotationFailed": "Anotasi aset gagal"
+    }
+  },
+  "assets": {
+    "title": "Aset",
+    "search": "Cari nama, kunci atau alamat",
+    "allZones": "Semua zon",
+    "showRemoved": "Papar yang dialih keluar",
+    "collectNow": "Kumpulkan sekarang",
+    "collecting": "Mengumpulkan…",
+    "collectFailed": "Tidak dapat memulakan pengumpulan",
+    "neverRun": "Belum dikumpulkan",
+    "lastRun": "Terakhir dikumpulkan {{time}}: {{ok}} daripada {{total}} hos",
+    "lastRunFailed": "Pengumpulan pada {{time}} gagal",
+    "hostsFailed_other": "{{count}} hos gagal",
+    "loadFailed": "Tidak dapat memuatkan senarai",
+    "saveFailed": "Tidak dapat menyimpan",
+    "empty": "Tiada aset lagi",
+    "emptyHint": "Kumpulkan sekarang untuk membaca setiap hos yang pengumpul boleh sambung.",
+    "emptyHintView": "Seseorang dengan kebenaran ai.assets.manage perlu mengumpulkan dahulu.",
+    "removed": "Dialih keluar",
+    "pinned": "Dipin",
+    "multiZone": "Multi-zon",
+    "multiZoneHint": "Memiliki alamat dalam lebih daripada satu zon, jadi ia boleh mencapai kedua-duanya: potensi pivot.",
+    "columns": {
+      "name": "Nama",
+      "kind": "Jenis",
+      "zone": "Zon",
+      "ips": "Alamat",
+      "listening": "Port",
+      "outbound": "Keluar",
+      "services": "Perkhidmatan",
+      "collected": "Terakhir dikumpulkan",
+      "role": "Peranan",
+      "importance": "Kepentingan",
+      "system": "Sistem"
+    },
+    "kind": {
+      "host": "Hos",
+      "guest": "Tetamu",
+      "container": "Kontena",
+      "external": "Luaran"
+    },
+    "zone": {
+      "internal": "Dalaman",
+      "dmz": "DMZ",
+      "external": "Luaran",
+      "cloud": "Awan",
+      "overlay": "Overlay"
+    },
+    "sections": {
+      "os": "Sistem pengendalian",
+      "hostname": "Nama hos",
+      "uptimeSec": "Masa beroperasi (saat)",
+      "interfaces": "Antara muka",
+      "routes": "Laluan",
+      "listening": "Port mendengar",
+      "connections": "Sambungan yang ditubuhkan",
+      "services": "Perkhidmatan yang berjalan",
+      "containers": "Kontena",
+      "kubernetes": "Kubernetes",
+      "guests": "Tetamu Proxmox",
+      "cloud": "Awan",
+      "missing": "Bahagian tanpa output",
+      "guest": "Tetamu Proxmox",
+      "container": "Kontena"
+    },
+    "outgoing": "Keluar",
+    "incoming": "Masuk",
+    "noEdges": "Tiada",
+    "stale": "Tidak dilihat dalam pengumpulan terkini",
+    "pinZone": "Zon",
+    "rulesDecide": "Ditentukan oleh peraturan",
+    "settingsTitle": "Zon dan jadual",
+    "scheduleTitle": "Pengumpulan",
+    "daily": "Kumpulkan setiap hari",
+    "dailyHint": "Hos juga dikumpulkan semula apabila ditambah atau diubah.",
+    "time": "Masa (UTC)",
+    "save": "Simpan",
+    "collector": "Mengumpul sebagai {{collector}}, mencapai hos yang boleh disambungkan oleh akaun tersebut.",
+    "collectorMe": "anda",
+    "collectorOther": "pengurus lain",
+    "collectorNone": "tiada siapa lagi",
+    "collectAsMe": "Kumpulkan sebagai saya",
+    "zonesTitle": "Peraturan zon",
+    "zonesHint": "Peraturan memetakan CIDR ke zon, sebelum yang terbina dalam. Prefiks paling spesifik menang, kemudian keutamaan yang lebih tinggi. Aset dizon semula apabila anda menyimpan.",
+    "zoneName": "Nama",
+    "zoneNameExample": "LAN pusat data",
+    "zoneKind": "Jenis",
+    "cidr": "CIDR",
+    "priority": "Keutamaan",
+    "addZone": "Tambah peraturan",
+    "deleteZone": "Padam peraturan",
+    "cancelEdit": "Batal",
+    "annotating": "Mencatatkan…",
+    "neverAnnotated": "Belum dicatatkan",
+    "lastAnnotation": "Dicatatkan terakhir {{time}}: {{ok}} daripada {{total}} aset, {{tokens}} token",
+    "annotationFailed": "gagal: {{reason}}",
+    "annotateNow": "Catatkan sekarang",
+    "annotateFailed": "Tidak dapat memulakan pencatatan",
+    "modeTable": "Jadual",
+    "modeGraph": "Graf",
+    "importance": {
+      "critical": "Kritikal",
+      "high": "Tinggi",
+      "medium": "Sederhana",
+      "low": "Rendah"
+    },
+    "importanceUnknown": "Tidak dinilai",
+    "importanceReason": "Mengapa",
+    "sourceAi": "AI",
+    "sourceAiHint": "Ditulis oleh anotasi; larian seterusnya mungkin mengubahnya.",
+    "sourceUser": "Dikunci",
+    "sourceUserHint": "Ditetapkan oleh pengguna; larian anotasi membiarkannya sehingga dibuka kunci.",
+    "unlock": "Buka kunci: benarkan anotasi mengisi ini semula",
+    "unlockField": "Buka kunci {{field}}",
+    "editAnnotation": "Sunting",
+    "lockHint": "Medan yang anda ubah dikunci daripada operasi anotasi kemudian.",
+    "factsTitle": "Fakta",
+    "closePanel": "Tutup",
+    "impact": "Kesan",
+    "clearImpact": "Kosongkan",
+    "impactSummary_other": "Jika gagal, {{count}} aset akan turun bersamanya ({{critical}} kritikal, {{high}} tinggi), {{weak}} lagi hanya menyambung kepada mereka.",
+    "impactTruncated": "Dipotong pada 6 lompatan atau 300 aset.",
+    "impactDirect": "Secara langsung",
+    "impactTransitive": "Melalui yang lain",
+    "impactWeak": "Hanya menyambung kepada mereka",
+    "expandContainers": "Paparkan bekas",
+    "showExternal": "Paparkan alamat luaran",
+    "graphCounts": "{{nodes}} aset, {{edges}} hubungan",
+    "graphTitle": "Graf aset",
+    "noZone": "Tiada zon",
+    "annotationTitle": "Anotasi AI",
+    "annotateAfterCollect": "Anotasi selepas setiap pengumpulan",
+    "annotateAfterCollectHint": "Hanya aset yang berubah sejak anotasi terakhir mereka, dan jiran mereka, dihantar ke model.",
+    "annotateProvider": "Pembekal",
+    "annotateProviderDefault": "Pilihan auto-ops pengumpul",
+    "annotateModel": "Model",
+    "annotateModelDefault": "Model lalai pembekal",
+    "annotationHint": "Anotasi berjalan sebagai pengumpul, dengan pembekal pengumpul. Ringkasan tidak mengandungi persekitaran, baris arahan atau alamat luaran.",
+    "annotateAll": "Anotasi semuanya semula"
+  },
+  "exposure": {
+    "title": "Entri internet",
+    "disclaimer": "Inventori konfigurasi sahaja. Pengikatan awam dan peraturan penerusan tidak membuktikan kebolehcapaian internet. Pendengar peribadi dikekalkan sebagai bukti backend.",
+    "loadFailed": "Tidak dapat memuatkan inventori pendedahan.",
+    "saveFailed": "Tidak dapat menyimpan keutamaan.",
+    "search": "Tapis alamat, hos, nama atau laluan",
+    "allPriority": "Semua keutamaan",
+    "allZones": "Semua zon",
+    "allSources": "Semua sumber",
+    "high": "Tinggi",
+    "medium": "Sederhana",
+    "low": "Rendah",
+    "active": "Aktif",
+    "stale": "Kusam",
+    "resolved": "Tidak lagi diperhatikan",
+    "all": "Semua",
+    "refresh": "Segarkan",
+    "loading": "Memuatkan…",
+    "empty": "Tiada entri sepadan. Semak liputan pengumpulan di bawah sebelum membuat kesimpulan.",
+    "never": "Belum dikumpulkan. Kumpulkan aset untuk menginventori entri.",
+    "endpoint": "Entri",
+    "source": "Sumber",
+    "priority": "Keutamaan semakan",
+    "pathState": "Laluan konfigurasi",
+    "freshness": "Kesegaran",
+    "details": "Butiran bukti",
+    "close": "Tutup",
+    "notTested": "Kebolehcapaian luaran: tidak diuji.",
+    "priorityReason": "Keutamaan adalah petua semakan, bukan keputusan kerentanan. Port pengurusan awam dan perkhidmatan data diberi keutamaan; identiti perkhidmatan dan dasar akses masih memerlukan pengesahan.",
+    "tls": "Konfigurasi TLS",
+    "restrictions": "Sekatan akses",
+    "observed": "Terakhir diperhatikan",
+    "rulePriority": "Keutamaan peraturan (buka kunci)",
+    "evidence": "Pemerhatian",
+    "coverage": "Liputan pengumpulan",
+    "changes": "Perubahan terkini",
+    "current": "Semasa",
+    "partial": "Tidak lengkap",
+    "complete": "Persatuan konfigurasi lengkap",
+    "conflicting": "Ambigu atau kitaran",
+    "configured": "Dinyatakan dalam konfigurasi",
+    "unknown": "Tidak diketahui",
+    "status_ok": "Dikumpul",
+    "status_unsupported": "Alat tidak tersedia",
+    "status_denied": "Kebenaran ditolak",
+    "status_failed": "Pengumpulan atau penguraian gagal",
+    "status_truncated": "Dipotong",
+    "change_baseline": "Garis dasar ditetapkan",
+    "change_added": "Entri ditambah",
+    "change_changed": "Konfigurasi berubah",
+    "change_removed": "Entri tidak lagi diperhatikan",
+    "change_coverage": "Liputan merosot",
+    "explain": "Terangkan bukti",
+    "explaining": "Menjelaskan…",
+    "explainFailed": "Penjelasan gagal atau bukti berubah.",
+    "aiLabel": "Tafsiran AI · bukan penemuan yang disahkan",
+    "previous": "Sebelumnya",
+    "next": "Seterusnya",
+    "binding": "Skop pengikatan",
+    "binding_public": "Calon entri awam",
+    "binding_local": "Backend peribadi/tempatan",
+    "binding_unknown": "Pengikatan tidak diselesaikan",
+    "ruleGaps": "Peraturan tidak diuraikan: {{count}}",
+    "unsupportedRule": "Peraturan tidak disokong; bukti sebelumnya dikekalkan",
+    "scope": "Paparan",
+    "scope_internet": "Calon entri internet",
+    "scope_all": "Semua bukti",
+    "scope_unknown": "Pendedahan tidak diketahui",
+    "inventorySummary": "{{internet}} calon entri internet · {{all}} peraturan jumlah · {{unknown}} dengan pendedahan tidak diketahui",
+    "bindingCount": "{{count}} pengikatan diperhatikan",
+    "pathsTruncated": "Pengembangan laluan mencapai hadnya. Ini adalah bukti separa.",
+    "pathBranch": "Laluan {{index}}",
+    "branched": "Cawangan bersyarat",
+    "reason_sensitive": "Semak port perkhidmatan {{port}} (entri atau backend)",
+    "reason_public-address": "Pengikatan alamat awam diperhatikan",
+    "reason_wan-zone": "Zon sumber WAN OpenWrt; penerimaan firewall tidak disahkan",
+    "reason_configured-public-tunnel": "Terowong awam dikonfigurasi; kebolehcapaian luaran tidak diuji",
+    "reason_internal-only": "Hanya pengikatan dalaman atau tempatan diperhatikan",
+    "reason_exposure-unknown": "Bukti tidak mencukupi untuk mengklasifikasikan pendedahan",
+    "reason_critical-asset": "Aset ditandakan kritikal",
+    "reason_manual": "Keutamaan dipilih oleh pengguna"
+  },
+  "companion": {
+    "toggle": "Panel pembantu"
+  },
+  "widget": {
+    "loading": "Memuatkan...",
+    "empty": "Tiada tugas lagi",
+    "pending_other": "{{count}} pelan menunggu kelulusan",
+    "maxItems": "Tugas untuk dipaparkan"
+  }
+}

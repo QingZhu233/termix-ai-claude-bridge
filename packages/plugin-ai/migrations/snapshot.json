@@ -1,0 +1,1180 @@
+{
+  "version": 1,
+  "tables": {
+    "exposure_observations": {
+      "columns": {
+        "id": {
+          "type": "varchar",
+          "length": 64,
+          "primaryKey": true,
+          "notNull": true
+        },
+        "hostId": {
+          "type": "integer",
+          "notNull": true
+        },
+        "ownerId": {
+          "type": "varchar",
+          "length": 255,
+          "notNull": true
+        },
+        "source": {
+          "type": "varchar",
+          "length": 32,
+          "notNull": true
+        },
+        "at": {
+          "type": "timestamp",
+          "notNull": true
+        },
+        "payload": {
+          "type": "text",
+          "notNull": true
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_exposure_observation_source",
+          "columns": [
+            "hostId",
+            "ownerId",
+            "source"
+          ]
+        }
+      ]
+    },
+    "exposure_entries": {
+      "columns": {
+        "key": {
+          "type": "varchar",
+          "length": 64,
+          "primaryKey": true,
+          "notNull": true
+        },
+        "hostId": {
+          "type": "integer",
+          "notNull": true
+        },
+        "ownerId": {
+          "type": "varchar",
+          "length": 255,
+          "notNull": true
+        },
+        "source": {
+          "type": "varchar",
+          "length": 32,
+          "notNull": true
+        },
+        "payload": {
+          "type": "text",
+          "notNull": true
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_exposure_entry_source",
+          "columns": [
+            "hostId",
+            "ownerId",
+            "source"
+          ]
+        }
+      ]
+    },
+    "exposure_changes": {
+      "columns": {
+        "id": {
+          "type": "varchar",
+          "length": 64,
+          "primaryKey": true,
+          "notNull": true
+        },
+        "hostId": {
+          "type": "integer",
+          "notNull": true
+        },
+        "ownerId": {
+          "type": "varchar",
+          "length": 255,
+          "notNull": true
+        },
+        "at": {
+          "type": "timestamp",
+          "notNull": true
+        },
+        "noticeStatus": {
+          "type": "varchar",
+          "length": 16,
+          "notNull": true
+        },
+        "payload": {
+          "type": "text",
+          "notNull": true
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_exposure_notices",
+          "columns": [
+            "noticeStatus",
+            "ownerId"
+          ]
+        }
+      ]
+    },
+    "providers": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "syncId": {
+          "type": "varchar",
+          "length": 255,
+          "unique": true
+        },
+        "userId": {
+          "type": "refUser",
+          "length": 255,
+          "notNull": true
+        },
+        "providerType": {
+          "type": "text",
+          "notNull": true
+        },
+        "label": {
+          "type": "varchar",
+          "length": 255,
+          "notNull": true
+        },
+        "baseUrl": {
+          "type": "text"
+        },
+        "apiKeyPrefix": {
+          "type": "text"
+        },
+        "defaultModel": {
+          "type": "text"
+        },
+        "contextWindow": {
+          "type": "integer"
+        },
+        "modelOverrides": {
+          "type": "text"
+        },
+        "advanced": {
+          "type": "text"
+        },
+        "enabled": {
+          "type": "boolean",
+          "notNull": true,
+          "defaultValue": true
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        },
+        "updatedAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_providers_user_label",
+          "columns": [
+            "userId",
+            "label"
+          ],
+          "unique": true
+        }
+      ],
+      "adopts": "ai_providers"
+    },
+    "conversations": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "type": "refUser",
+          "length": 255,
+          "notNull": true
+        },
+        "title": {
+          "type": "text"
+        },
+        "providerId": {
+          "type": "integer"
+        },
+        "model": {
+          "type": "text"
+        },
+        "mode": {
+          "type": "varchar",
+          "length": 16,
+          "notNull": true,
+          "defaultValue": "chat"
+        },
+        "targets": {
+          "type": "text"
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        },
+        "updatedAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_conversations_user",
+          "columns": [
+            "userId",
+            "updatedAt"
+          ]
+        }
+      ],
+      "adopts": "ai_conversations"
+    },
+    "messages": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "conversationId": {
+          "type": "integer",
+          "notNull": true
+        },
+        "role": {
+          "type": "text",
+          "notNull": true
+        },
+        "content": {
+          "type": "text",
+          "notNull": true,
+          "defaultValue": ""
+        },
+        "toolCalls": {
+          "type": "text"
+        },
+        "reasoning": {
+          "type": "text"
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_messages_conversation",
+          "columns": [
+            "conversationId",
+            "createdAt"
+          ]
+        }
+      ],
+      "adopts": "ai_messages"
+    },
+    "proposals": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "conversationId": {
+          "type": "integer",
+          "notNull": true
+        },
+        "userId": {
+          "type": "refUser",
+          "length": 255,
+          "notNull": true
+        },
+        "kind": {
+          "type": "varchar",
+          "length": 255,
+          "notNull": true
+        },
+        "summary": {
+          "type": "text"
+        },
+        "payload": {
+          "type": "text",
+          "notNull": true,
+          "defaultValue": "{}"
+        },
+        "status": {
+          "type": "varchar",
+          "length": 32,
+          "notNull": true,
+          "defaultValue": "pending"
+        },
+        "appliedAt": {
+          "type": "text"
+        },
+        "resultSummary": {
+          "type": "text"
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_proposals_user",
+          "columns": [
+            "userId",
+            "status"
+          ]
+        },
+        {
+          "name": "idx_ai_proposals_conversation",
+          "columns": [
+            "conversationId"
+          ]
+        }
+      ],
+      "adopts": "ai_proposals"
+    },
+    "agent_sessions": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "sessionId": {
+          "type": "varchar",
+          "length": 36,
+          "notNull": true,
+          "unique": true
+        },
+        "userId": {
+          "type": "refUser",
+          "length": 255,
+          "notNull": true
+        },
+        "hostId": {
+          "type": "integer",
+          "notNull": true
+        },
+        "providerId": {
+          "type": "integer",
+          "notNull": true
+        },
+        "agent": {
+          "type": "varchar",
+          "length": 32,
+          "notNull": true
+        },
+        "model": {
+          "type": "text",
+          "notNull": true
+        },
+        "cwd": {
+          "type": "text",
+          "notNull": true
+        },
+        "executable": {
+          "type": "text",
+          "notNull": true
+        },
+        "nativeId": {
+          "type": "text"
+        },
+        "title": {
+          "type": "text"
+        },
+        "archived": {
+          "type": "boolean",
+          "notNull": true,
+          "defaultValue": false
+        },
+        "queuePaused": {
+          "type": "boolean",
+          "notNull": true,
+          "defaultValue": false
+        },
+        "draft": {
+          "type": "text"
+        },
+        "attachments": {
+          "type": "text",
+          "notNull": true,
+          "defaultValue": "[]"
+        },
+        "updatedAt": {
+          "type": "text",
+          "notNull": true
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_agent_sessions_user",
+          "columns": [
+            "userId"
+          ]
+        }
+      ]
+    },
+    "agent_events": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "sessionId": {
+          "type": "varchar",
+          "length": 36,
+          "notNull": true
+        },
+        "userId": {
+          "type": "refUser",
+          "length": 255,
+          "notNull": true
+        },
+        "seq": {
+          "type": "integer",
+          "notNull": true
+        },
+        "kind": {
+          "type": "varchar",
+          "length": 16,
+          "notNull": true
+        },
+        "text": {
+          "type": "text",
+          "notNull": true
+        },
+        "requestId": {
+          "type": "text"
+        },
+        "choices": {
+          "type": "text"
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_agent_events_session_seq",
+          "columns": [
+            "sessionId",
+            "seq"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    "agent_queue": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "sessionId": {
+          "type": "varchar",
+          "length": 36,
+          "notNull": true
+        },
+        "userId": {
+          "type": "refUser",
+          "length": 255,
+          "notNull": true
+        },
+        "promptId": {
+          "type": "varchar",
+          "length": 36,
+          "notNull": true
+        },
+        "position": {
+          "type": "integer",
+          "notNull": true
+        },
+        "text": {
+          "type": "text",
+          "notNull": true
+        },
+        "attachmentIds": {
+          "type": "text",
+          "notNull": true,
+          "defaultValue": "[]"
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_agent_queue_session",
+          "columns": [
+            "sessionId",
+            "position"
+          ]
+        }
+      ]
+    },
+    "ops_runs": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "conversationId": {
+          "type": "integer",
+          "notNull": true
+        },
+        "userId": {
+          "type": "refUser",
+          "length": 255,
+          "notNull": true
+        },
+        "hostId": {
+          "type": "integer",
+          "notNull": true
+        },
+        "command": {
+          "type": "text",
+          "notNull": true
+        },
+        "exitCode": {
+          "type": "integer"
+        },
+        "durationMs": {
+          "type": "integer",
+          "notNull": true
+        },
+        "output": {
+          "type": "text",
+          "notNull": true,
+          "defaultValue": ""
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_ops_runs_conversation",
+          "columns": [
+            "conversationId"
+          ]
+        }
+      ]
+    },
+    "cli_runs": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "conversationId": {
+          "type": "integer",
+          "notNull": true
+        },
+        "userId": {
+          "type": "refUser",
+          "length": 255,
+          "notNull": true
+        },
+        "args": {
+          "type": "text",
+          "notNull": true
+        },
+        "exitCode": {
+          "type": "integer"
+        },
+        "durationMs": {
+          "type": "integer",
+          "notNull": true
+        },
+        "output": {
+          "type": "text",
+          "notNull": true,
+          "defaultValue": ""
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_cli_runs_conversation",
+          "columns": [
+            "conversationId"
+          ]
+        }
+      ]
+    },
+    "usage": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "type": "refUser",
+          "length": 255,
+          "notNull": true
+        },
+        "providerId": {
+          "type": "integer"
+        },
+        "model": {
+          "type": "text",
+          "notNull": true
+        },
+        "conversationId": {
+          "type": "integer"
+        },
+        "source": {
+          "type": "varchar",
+          "length": 16,
+          "notNull": true
+        },
+        "promptTokens": {
+          "type": "integer",
+          "notNull": true,
+          "defaultValue": 0
+        },
+        "completionTokens": {
+          "type": "integer",
+          "notNull": true,
+          "defaultValue": 0
+        },
+        "estimated": {
+          "type": "boolean",
+          "notNull": true,
+          "defaultValue": false
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_usage_user",
+          "columns": [
+            "userId",
+            "createdAt"
+          ]
+        },
+        {
+          "name": "idx_ai_usage_created",
+          "columns": [
+            "createdAt"
+          ]
+        },
+        {
+          "name": "idx_ai_usage_conversation",
+          "columns": [
+            "conversationId"
+          ]
+        }
+      ]
+    },
+    "task_runs": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "type": "refUser",
+          "length": 255,
+          "notNull": true
+        },
+        "automationId": {
+          "type": "integer",
+          "notNull": true
+        },
+        "automationRunId": {
+          "type": "integer"
+        },
+        "presetId": {
+          "type": "varchar",
+          "length": 64
+        },
+        "title": {
+          "type": "text",
+          "notNull": true
+        },
+        "autonomy": {
+          "type": "varchar",
+          "length": 16,
+          "notNull": true
+        },
+        "hostIds": {
+          "type": "text",
+          "notNull": true
+        },
+        "trigger": {
+          "type": "text",
+          "notNull": true
+        },
+        "dryRun": {
+          "type": "boolean",
+          "notNull": true,
+          "defaultValue": false
+        },
+        "status": {
+          "type": "varchar",
+          "length": 16,
+          "notNull": true
+        },
+        "severity": {
+          "type": "varchar",
+          "length": 16
+        },
+        "summary": {
+          "type": "text"
+        },
+        "report": {
+          "type": "text"
+        },
+        "plan": {
+          "type": "text"
+        },
+        "decidedBy": {
+          "type": "varchar",
+          "length": 255
+        },
+        "decidedAt": {
+          "type": "timestamp"
+        },
+        "expiresAt": {
+          "type": "timestamp"
+        },
+        "conversationId": {
+          "type": "integer"
+        },
+        "promptTokens": {
+          "type": "integer",
+          "notNull": true,
+          "defaultValue": 0
+        },
+        "completionTokens": {
+          "type": "integer",
+          "notNull": true,
+          "defaultValue": 0
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        },
+        "finishedAt": {
+          "type": "timestamp"
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_task_runs_user",
+          "columns": [
+            "userId",
+            "createdAt"
+          ]
+        },
+        {
+          "name": "idx_ai_task_runs_automation",
+          "columns": [
+            "automationId",
+            "createdAt"
+          ]
+        },
+        {
+          "name": "idx_ai_task_runs_status",
+          "columns": [
+            "status"
+          ]
+        }
+      ]
+    },
+    "preset_links": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "type": "refUser",
+          "length": 255,
+          "notNull": true
+        },
+        "presetId": {
+          "type": "varchar",
+          "length": 64,
+          "notNull": true
+        },
+        "presetVersion": {
+          "type": "integer",
+          "notNull": true
+        },
+        "automationId": {
+          "type": "integer",
+          "notNull": true
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_preset_links_user",
+          "columns": [
+            "userId"
+          ]
+        }
+      ]
+    },
+    "task_presets": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "type": "refUser",
+          "length": 255,
+          "notNull": true
+        },
+        "name": {
+          "type": "varchar",
+          "length": 120,
+          "notNull": true
+        },
+        "description": {
+          "type": "text"
+        },
+        "shared": {
+          "type": "boolean",
+          "notNull": true,
+          "defaultValue": false
+        },
+        "config": {
+          "type": "text",
+          "notNull": true
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_task_presets_user",
+          "columns": [
+            "userId"
+          ]
+        },
+        {
+          "name": "idx_ai_task_presets_shared",
+          "columns": [
+            "shared"
+          ]
+        }
+      ]
+    },
+    "assets": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "key": {
+          "type": "varchar",
+          "length": 255,
+          "notNull": true,
+          "unique": true
+        },
+        "kind": {
+          "type": "varchar",
+          "length": 16,
+          "notNull": true
+        },
+        "hostId": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "text",
+          "notNull": true
+        },
+        "ips": {
+          "type": "text",
+          "notNull": true,
+          "defaultValue": "[]"
+        },
+        "zone": {
+          "type": "varchar",
+          "length": 120
+        },
+        "zoneSource": {
+          "type": "varchar",
+          "length": 16
+        },
+        "multiZone": {
+          "type": "boolean",
+          "notNull": true,
+          "defaultValue": false
+        },
+        "facts": {
+          "type": "text"
+        },
+        "collectedAt": {
+          "type": "timestamp"
+        },
+        "removedAt": {
+          "type": "timestamp"
+        },
+        "role": {
+          "type": "text"
+        },
+        "roleSource": {
+          "type": "varchar",
+          "length": 16
+        },
+        "importance": {
+          "type": "varchar",
+          "length": 16
+        },
+        "importanceSource": {
+          "type": "varchar",
+          "length": 16
+        },
+        "importanceReason": {
+          "type": "text"
+        },
+        "system": {
+          "type": "varchar",
+          "length": 120
+        },
+        "systemSource": {
+          "type": "varchar",
+          "length": 16
+        },
+        "annotatedAt": {
+          "type": "timestamp"
+        },
+        "annotationFingerprint": {
+          "type": "varchar",
+          "length": 64
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        },
+        "updatedAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_assets_host",
+          "columns": [
+            "hostId"
+          ]
+        },
+        {
+          "name": "idx_ai_assets_zone",
+          "columns": [
+            "zone"
+          ]
+        }
+      ]
+    },
+    "asset_edges": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fromAsset": {
+          "type": "integer",
+          "notNull": true
+        },
+        "toAsset": {
+          "type": "integer",
+          "notNull": true
+        },
+        "type": {
+          "type": "varchar",
+          "length": 32,
+          "notNull": true
+        },
+        "detail": {
+          "type": "text"
+        },
+        "evidence": {
+          "type": "text"
+        },
+        "source": {
+          "type": "varchar",
+          "length": 16,
+          "notNull": true
+        },
+        "firstSeen": {
+          "type": "timestamp",
+          "notNull": true
+        },
+        "lastSeen": {
+          "type": "timestamp",
+          "notNull": true
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_asset_edges_pair",
+          "columns": [
+            "fromAsset",
+            "toAsset",
+            "type"
+          ],
+          "unique": true
+        },
+        {
+          "name": "idx_ai_asset_edges_to",
+          "columns": [
+            "toAsset"
+          ]
+        }
+      ]
+    },
+    "asset_runs": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "kind": {
+          "type": "varchar",
+          "length": 16,
+          "notNull": true,
+          "defaultValue": "collect"
+        },
+        "trigger": {
+          "type": "varchar",
+          "length": 16,
+          "notNull": true
+        },
+        "startedAt": {
+          "type": "timestamp",
+          "notNull": true
+        },
+        "finishedAt": {
+          "type": "timestamp"
+        },
+        "status": {
+          "type": "varchar",
+          "length": 16,
+          "notNull": true
+        },
+        "hostsTotal": {
+          "type": "integer",
+          "notNull": true,
+          "defaultValue": 0
+        },
+        "hostsOk": {
+          "type": "integer",
+          "notNull": true,
+          "defaultValue": 0
+        },
+        "hostsFailed": {
+          "type": "integer",
+          "notNull": true,
+          "defaultValue": 0
+        },
+        "errorSummary": {
+          "type": "text"
+        },
+        "tokens": {
+          "type": "integer",
+          "notNull": true,
+          "defaultValue": 0
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_ai_asset_runs_started",
+          "columns": [
+            "startedAt"
+          ]
+        }
+      ]
+    },
+    "zones": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "type": "varchar",
+          "length": 120,
+          "notNull": true
+        },
+        "kind": {
+          "type": "varchar",
+          "length": 16,
+          "notNull": true
+        },
+        "cidr": {
+          "type": "varchar",
+          "length": 64,
+          "notNull": true
+        },
+        "priority": {
+          "type": "integer",
+          "notNull": true,
+          "defaultValue": 0
+        },
+        "createdBy": {
+          "type": "varchar",
+          "length": 255,
+          "notNull": true
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        }
+      },
+      "indexes": []
+    }
+  }
+}

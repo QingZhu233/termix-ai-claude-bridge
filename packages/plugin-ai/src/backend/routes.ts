@@ -1,0 +1,1637 @@
+import type { Request, Response, Router } from "express";
+import { randomUUID } from "node:crypto";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import type { PluginContext } from "@termix-ssh/plugin-sdk/backend";
+import { createApprovalHub } from "./approvals.js";
+import { buildSystemPrompt } from "./context.js";
+import { normalizeEngine, runAssistant } from "./runtime/index.js";
+import { readClaudeConfig } from "./runtime/claude-config.js";
+import {
+  persistImages,
+  readImageDataUrls,
+  splitImages,
+  storeContent,
+  withImages,
+} from "./runtime/images.js";
+import { getErrorMessage } from "./errors.js";
+import {
+  createAiGate,
+  isAiGloballyEnabled,
+  readPrivateAllowlist,
+  resolveAiAccess,
+} from "./gating.js";
+import { toChatHistory, toStoredMessage } from "./history.js";
+import type { ModelOverrides } from "./context-window.js";
+import { contextPlanFor, type ModelInfoCache } from "./model-info.js";
+import {
+  createProviderFetch,
+  describeProviderError,
+} from "./providers/http.js";
+import {
+  FALLBACK_MODELS,
+  getAdapter,
+  REQUIRES_API_KEY,
+  REQUIRES_BASE_URL,
+} from "./providers/registry.js";
+import type {
+  AiProviderType,
+  ProviderAdvanced,
+  ProviderConfig,
+} from "./providers/types.js";
+import { isAiProviderType } from "./providers/types.js";
+import type { AiRepository } from "./repository.js";
+import { serviceAvailable } from "./services.js";
+import { openEventStream } from "./sse.js";
+import { availableTools } from "./tools/catalog.js";
+import { applyProposal } from "./tools/executor.js";
+import type { ToolDeps } from "./tools/types.js";
+
+/** Model turns a terminal panel run may take. */
+const TERMINAL_MAX_TURNS = 8;
+
+/** The largest context window a provider may be set to, in tokens. */
+const MAX_CONTEXT_WINDOW = 10_000_000;
+
+/** A context window override: null when empty, false when not sensible. */
+function parseContextWindow(raw: unknown): number | null | false {
+  if (raw === undefined || raw === null || raw === "") return null;
+  const value = Number(raw);
+  return Number.isInteger(value) && value >= 1024 && value <= MAX_CONTEXT_WINDOW
+    ? value
+    : false;
+}
+
+/**
+ * Per-model overrides from a request body, replacing the stored ones:
+ * undefined when absent, false when invalid. A model whose window is empty
+ * is dropped, back to what the provider reports.
+ */
+function parseModelOverrides(raw: unknown): ModelOverrides | undefined | false {
+  if (raw === undefined) return undefined;
+  if (raw === null) return {};
+  if (typeof raw !== "object" || Array.isArray(raw)) return false;
+  const overrides: ModelOverrides = {};
+  for (const [model, value] of Object.entries(raw)) {
+    const contextWindow = parseContextWindow(
+      (value as { contextWindow?: unknown } | null)?.contextWindow,
+    );
+    if (contextWindow === false || !model.trim()) return false;
+    if (contextWindow) overrides[model.trim()] = { contextWindow };
+  }
+  return overrides;
+}
+
+/** Advanced settings replace the stored ones; null clears them. */
+function parseAdvanced(raw: unknown): ProviderAdvanced | undefined | false {
+  if (raw === undefined) return undefined;
+  if (raw === null) return {};
+  if (typeof raw !== "object" || Array.isArray(raw)) return false;
+  const advanced: ProviderAdvanced = {};
+  for (const [key, value] of Object.entries(raw)) {
+    const empty = value === undefined || value === null || value === "";
+    switch (key) {
+      case "endpoint":
+        if (empty) break;
+        if (value !== "auto" && value !== "responses" && value !== "chat")
+          return false;
+        advanced.endpoint = value;
+        break;
+      case "reasoningEffort":
+        if (empty) break;
+        if (
+          value !== "none" &&
+          value !== "minimal" &&
+          value !== "low" &&
+          value !== "medium" &&
+          value !== "high" &&
+          value !== "xhigh" &&
+          value !== "max"
+        )
+          return false;
+        advanced.reasoningEffort = value;
+        break;
+      case "reasoningSummary":
+        if (empty) break;
+        if (
+          value !== "auto" &&
+          value !== "concise" &&
+          value !== "detailed" &&
+          value !== "off"
+        )
+          return false;
+        advanced.reasoningSummary = value;
+        break;
+      case "verbosity":
+        if (empty) break;
+        if (value !== "low" && value !== "medium" && value !== "high")
+          return false;
+        advanced.verbosity = value;
+        break;
+      case "maxOutputTokens":
+        if (empty) break;
+        if (
+          typeof value !== "number" ||
+          !Number.isInteger(value) ||
+          value < 1 ||
+          value > 1_000_000
+        )
+          return false;
+        advanced.maxOutputTokens = value;
+        break;
+      case "temperature":
+        if (empty) break;
+        if (
+          typeof value !== "number" ||
+          !Number.isFinite(value) ||
+          value < 0 ||
+          value > 2
+        )
+          return false;
+        advanced.temperature = value;
+        break;
+      default:
+        return false;
+    }
+  }
+  return advanced;
+}
+
+function parseId(raw: unknown): number | null {
+  const id = typeof raw === "string" ? parseInt(raw, 10) : Number(raw);
+  return Number.isInteger(id) && id > 0 ? id : null;
+}
+
+function actor(ctx: PluginContext): string {
+  // Core's plugin router authenticates every request and runs it as that user.
+  return ctx.currentActor() as string;
+}
+
+/**
+ * Mounts every assistant route on the plugin's router, served at
+ * /plugin-api/ai. Everything but /status sits behind the AI gate: the admin
+ * switch and the user's own opt-in.
+ */
+export function registerAiRoutes(
+  router: Router,
+  repository: AiRepository,
+  ctx: PluginContext,
+  modelInfo: ModelInfoCache,
+): void {
+  const aiGate = createAiGate(ctx.settings, () => ctx.currentActor());
+  // Permission requests from a running Claude turn, answered in the panel.
+  const approvals = createApprovalHub();
+  const gate = aiGate as never;
+  const toolDeps: ToolDeps = {
+    hosts: ctx.hosts,
+    services: ctx.services,
+    notify: ctx.notify,
+    rbac: ctx.rbac,
+    ssh: ctx.ssh,
+    audit: ctx.audit,
+    operations: ctx.operations,
+  };
+
+  const logError = (message: string, error: unknown) =>
+    ctx.log.error(
+      message,
+      error instanceof Error ? error : new Error(String(error)),
+    );
+
+  const audit = (entry: Parameters<PluginContext["audit"]["record"]>[0]) =>
+    ctx.audit.record(entry).catch(() => undefined);
+
+  /** The provider config for an outbound call, with the egress-checked fetch. */
+  async function providerConfig(input: {
+    providerType: string;
+    baseUrl: string | null;
+    apiKey: string | null;
+    advanced?: ProviderAdvanced;
+  }): Promise<ProviderConfig> {
+    const allowlist = await readPrivateAllowlist(ctx.settings);
+    return {
+      providerType: input.providerType as ProviderConfig["providerType"],
+      baseUrl: input.baseUrl,
+      apiKey: input.apiKey,
+      advanced: input.advanced,
+      fetch: createProviderFetch(ctx.fetch, allowlist),
+      log: ctx.log,
+    };
+  }
+
+  /**
+   * @openapi
+   * /plugin-api/ai/status:
+   *   get:
+   *     summary: Whether the AI assistant is available to this user
+   *     description: >
+   *       Deliberately not behind the AI gate: the frontend calls this to decide
+   *       whether to render any AI surface at all, and needs a plain answer rather
+   *       than a 403 when the feature is off.
+   *     tags:
+   *       - AI
+   *     responses:
+   *       200:
+   *         description: The effective enablement state.
+   */
+  router.get(
+    "/host-conversations",
+    ctx.rbac.require("use") as never,
+    async (req: Request, res: Response) => {
+      const userId = actor(ctx);
+      const hostId = Number(req.query.hostId);
+      if (!Number.isFinite(hostId)) {
+        return res.status(400).json({ error: "hostId is required" });
+      }
+      const recent = await repository.listConversations(userId, 50, "chat");
+      const conversations = recent
+        .filter((row) => {
+          try {
+            const bound = JSON.parse(row.targets ?? "[]");
+            return (
+              Array.isArray(bound) &&
+              bound.length === 1 &&
+              String(bound[0]) === String(hostId)
+            );
+          } catch {
+            return false;
+          }
+        })
+        .map((row) => ({ id: row.id, title: row.title }));
+      res.json({ conversations });
+    },
+  );
+
+  /**
+   * @openapi
+   * /plugin-api/ai/host-conversation:
+   *   get:
+   *     summary: The newest chat thread bound to one host, with its messages
+   *     tags:
+   *       - AI
+   *     responses:
+   *       200:
+   *         description: The conversation id (null when the host has none) and its messages
+   */
+  router.get(
+    "/host-conversation",
+    ctx.rbac.require("use") as never,
+    async (req: Request, res: Response) => {
+      const userId = actor(ctx);
+      const hostId = Number(req.query.hostId);
+      if (!Number.isFinite(hostId)) {
+        return res.status(400).json({ error: "hostId is required" });
+      }
+      const recent = await repository.listConversations(userId, 50, "chat");
+      const found =
+        recent.find((row) => {
+          try {
+            const bound = JSON.parse(row.targets ?? "[]");
+            return (
+              Array.isArray(bound) &&
+              bound.length === 1 &&
+              String(bound[0]) === String(hostId)
+            );
+          } catch {
+            return false;
+          }
+        }) ?? null;
+      if (!found) return res.json({ conversationId: null, messages: [] });
+      const rows = await repository.listMessages(found.id);
+      res.json({
+        conversationId: found.id,
+        messages: rows
+          .filter((row) => row.role === "user" || row.role === "assistant")
+          .map((row) => {
+            const { text, names } = splitImages(row.content);
+            return {
+              role: row.role,
+              content: text,
+              images: readImageDataUrls(names),
+            };
+          }),
+      });
+    },
+  );
+
+  // Permission bridge: the MCP approval tool authenticates with the per-run
+  // session token instead of a user session, so these sit outside RBAC.
+  router.post("/approvals", async (req: Request, res: Response) => {
+    const session = String(req.get("x-approval-session") ?? "");
+    if (!session) {
+      return res.status(401).json({ error: "Missing approval session" });
+    }
+    const { toolName, input, reason } = req.body ?? {};
+    const approval = approvals.request({
+      session,
+      toolName: String(toolName ?? "tool"),
+      input,
+      reason: typeof reason === "string" ? reason : undefined,
+    });
+    res.status(201).json({ id: approval.id });
+  });
+
+  router.get("/approvals/:id", async (req: Request, res: Response) => {
+    const session = String(req.get("x-approval-session") ?? "");
+    if (!session) {
+      return res.status(401).json({ error: "Missing approval session" });
+    }
+    const decision = await approvals.wait(req.params.id, session, 20_000);
+    if (!decision) return res.status(408).json({ status: "pending" });
+    res.json({ decision });
+  });
+
+  router.post(
+    "/approvals/:id/decide",
+    ctx.rbac.require("use") as never,
+    async (req: Request, res: Response) => {
+      const decision = req.body?.decision === "allow" ? "allow" : "deny";
+      if (!approvals.decide(String(req.params.id), decision)) {
+        return res.status(404).json({ error: "Unknown approval" });
+      }
+      res.json({ ok: true });
+    },
+  );
+
+  router.get("/status", async (_req: Request, res: Response) => {
+    const userId = actor(ctx);
+    try {
+      const [globallyEnabled, access] = await Promise.all([
+        isAiGloballyEnabled(ctx.settings),
+        resolveAiAccess(ctx.settings, userId),
+      ]);
+      res.json({
+        globallyEnabled,
+        enabled: access.enabled,
+        allowReadOnlyCommands: access.allowReadOnlyCommands,
+      });
+    } catch (err) {
+      logError("Failed to read AI status", err);
+      res.status(500).json({ error: "Failed to read AI status" });
+    }
+  });
+
+  /**
+   * @openapi
+   * /plugin-api/ai/opt-in:
+   *   put:
+   *     summary: Turn the assistant on or off for the current user
+   *     description: >
+   *       The same value as the user setting "enabled", for the onboarding
+   *       step and the panel, which set it outside the settings form. Refused
+   *       while the assistant is off for the whole server.
+   *     tags:
+   *       - AI
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               enabled:
+   *                 type: boolean
+   *     responses:
+   *       200:
+   *         description: The user's new choice.
+   *       400:
+   *         description: enabled is not a boolean.
+   *       403:
+   *         description: The assistant is off for the whole server.
+   */
+  router.put(
+    "/opt-in",
+    ctx.rbac.require("use") as never,
+    async (req: Request, res: Response) => {
+      const { enabled } = req.body ?? {};
+      if (typeof enabled !== "boolean") {
+        return res.status(400).json({ error: "enabled must be a boolean" });
+      }
+      try {
+        // Turning it off is always allowed; turning it on needs the switch.
+        if (enabled && !(await isAiGloballyEnabled(ctx.settings))) {
+          return res
+            .status(403)
+            .json({ error: "The AI assistant is not enabled" });
+        }
+        await ctx.settings.setUser(actor(ctx), "enabled", enabled);
+        res.json({ enabled });
+      } catch (err) {
+        logError("Failed to save the AI opt-in", err);
+        res.status(500).json({ error: "Failed to save the setting" });
+      }
+    },
+  );
+
+  /**
+   * @openapi
+   * /plugin-api/ai/providers:
+   *   get:
+   *     summary: List the user's configured AI providers
+   *     tags:
+   *       - AI
+   *     responses:
+   *       200:
+   *         description: Providers, with API keys masked.
+   *       403:
+   *         description: The AI assistant is not enabled.
+   */
+  router.get(
+    "/providers",
+    ctx.rbac.require("use") as never,
+    gate,
+    async (_req: Request, res: Response) => {
+      try {
+        const providers = await repository.listProviders(actor(ctx));
+        res.json({ providers });
+      } catch (err) {
+        logError("Failed to list AI providers", err);
+        res.status(500).json({ error: "Failed to list providers" });
+      }
+    },
+  );
+
+  /**
+   * @openapi
+   * /plugin-api/ai/providers:
+   *   post:
+   *     summary: Add an AI provider
+   *     tags:
+   *       - AI
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               providerType:
+   *                 type: string
+   *               label:
+   *                 type: string
+   *               baseUrl:
+   *                 type: string
+   *               apiKey:
+   *                 type: string
+   *               defaultModel:
+   *                 type: string
+   *               modelOverrides:
+   *                 type: object
+   *                 description: >
+   *                   Per model id, a contextWindow in tokens that replaces
+   *                   what the provider reports.
+   *                 additionalProperties:
+   *                   type: object
+   *                   properties:
+   *                     contextWindow:
+   *                       type: integer
+   *               advanced:
+   *                 type: object
+   *                 nullable: true
+   *                 additionalProperties: false
+   *                 description: Optional provider request settings. Null clears them.
+   *                 properties:
+   *                   endpoint:
+   *                     type: string
+   *                     enum: [auto, responses, chat]
+   *                   reasoningEffort:
+   *                     type: string
+   *                     enum: [none, minimal, low, medium, high, xhigh, max]
+   *                   reasoningSummary:
+   *                     type: string
+   *                     enum: [auto, concise, detailed, off]
+   *                   verbosity:
+   *                     type: string
+   *                     enum: [low, medium, high]
+   *                   maxOutputTokens:
+   *                     type: integer
+   *                     minimum: 1
+   *                     maximum: 1000000
+   *                   temperature:
+   *                     type: number
+   *                     minimum: 0
+   *                     maximum: 2
+   *     responses:
+   *       201:
+   *         description: Provider created.
+   *       400:
+   *         description: Invalid request body.
+   */
+  router.post(
+    "/providers",
+    ctx.rbac.require("manage_providers") as never,
+    gate,
+    async (req: Request, res: Response) => {
+      const userId = actor(ctx);
+      const { providerType, label, baseUrl, apiKey, defaultModel } =
+        req.body ?? {};
+      const modelOverrides = parseModelOverrides(req.body?.modelOverrides);
+      const advanced = parseAdvanced(req.body?.advanced);
+
+      if (!isAiProviderType(providerType)) {
+        return res.status(400).json({ error: "Unknown provider type" });
+      }
+      if (modelOverrides === false) {
+        return res.status(400).json({ error: "Invalid context window" });
+      }
+      if (advanced === false) {
+        return res.status(400).json({ error: "Invalid advanced settings" });
+      }
+      if (typeof label !== "string" || !label.trim()) {
+        return res.status(400).json({ error: "label is required" });
+      }
+      if (REQUIRES_BASE_URL.includes(providerType) && !baseUrl?.trim()) {
+        return res
+          .status(400)
+          .json({ error: "This provider needs a base URL" });
+      }
+      if (REQUIRES_API_KEY.includes(providerType) && !apiKey?.trim()) {
+        return res
+          .status(400)
+          .json({ error: "This provider needs an API key" });
+      }
+
+      try {
+        const created = await repository.createProvider(userId, {
+          providerType,
+          label: label.trim(),
+          baseUrl: typeof baseUrl === "string" ? baseUrl.trim() : null,
+          apiKey: typeof apiKey === "string" ? apiKey.trim() : null,
+          defaultModel:
+            typeof defaultModel === "string" ? defaultModel.trim() : null,
+          modelOverrides,
+          advanced,
+        });
+
+        await audit({
+          action: "create_ai_provider",
+          resourceType: "ai_provider",
+          resourceId: String(created.id),
+          resourceName: created.label,
+          success: true,
+        });
+
+        res.status(201).json({ provider: created });
+      } catch (err) {
+        logError("Failed to create AI provider", err);
+        res.status(500).json({ error: "Failed to create provider" });
+      }
+    },
+  );
+
+  /**
+   * @openapi
+   * /plugin-api/ai/providers/{id}:
+   *   patch:
+   *     summary: Update an AI provider
+   *     tags:
+   *       - AI
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *     requestBody:
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               label:
+   *                 type: string
+   *               baseUrl:
+   *                 type: string
+   *               apiKey:
+   *                 type: string
+   *               defaultModel:
+   *                 type: string
+   *               enabled:
+   *                 type: boolean
+   *               modelOverrides:
+   *                 type: object
+   *                 description: >
+   *                   Replaces every override. Per model id, a contextWindow
+   *                   in tokens; null or a model left out goes back to what
+   *                   the provider reports.
+   *                 additionalProperties:
+   *                   type: object
+   *                   properties:
+   *                     contextWindow:
+   *                       type: integer
+   *               advanced:
+   *                 type: object
+   *                 nullable: true
+   *                 additionalProperties: false
+   *                 description: Replaces every advanced setting. Null clears them.
+   *                 properties:
+   *                   endpoint:
+   *                     type: string
+   *                     enum: [auto, responses, chat]
+   *                   reasoningEffort:
+   *                     type: string
+   *                     enum: [none, minimal, low, medium, high, xhigh, max]
+   *                   reasoningSummary:
+   *                     type: string
+   *                     enum: [auto, concise, detailed, off]
+   *                   verbosity:
+   *                     type: string
+   *                     enum: [low, medium, high]
+   *                   maxOutputTokens:
+   *                     type: integer
+   *                     minimum: 1
+   *                     maximum: 1000000
+   *                   temperature:
+   *                     type: number
+   *                     minimum: 0
+   *                     maximum: 2
+   *     responses:
+   *       200:
+   *         description: Provider updated.
+   *       400:
+   *         description: Invalid request body.
+   *       404:
+   *         description: Provider not found.
+   */
+  router.patch(
+    "/providers/:id",
+    ctx.rbac.require("manage_providers") as never,
+    gate,
+    async (req: Request, res: Response) => {
+      const userId = actor(ctx);
+      const id = parseId(req.params.id);
+      if (!id) return res.status(400).json({ error: "Invalid provider id" });
+
+      const body = (req.body ?? {}) as Record<string, unknown>;
+      if (
+        body.providerType !== undefined &&
+        !isAiProviderType(body.providerType)
+      ) {
+        return res.status(400).json({ error: "Unknown provider type" });
+      }
+      const modelOverrides = parseModelOverrides(body.modelOverrides);
+      const advanced = parseAdvanced(body.advanced);
+      if (modelOverrides === false) {
+        return res.status(400).json({ error: "Invalid context window" });
+      }
+      if (advanced === false) {
+        return res.status(400).json({ error: "Invalid advanced settings" });
+      }
+
+      const text = (value: unknown) =>
+        typeof value === "string" ? value.trim() : undefined;
+
+      try {
+        const updated = await repository.updateProvider(id, userId, {
+          providerType: body.providerType as string | undefined,
+          label: text(body.label) || undefined,
+          baseUrl:
+            body.baseUrl === null ? null : (text(body.baseUrl) ?? undefined),
+          apiKey: body.apiKey === null ? "" : text(body.apiKey),
+          defaultModel:
+            body.defaultModel === null
+              ? null
+              : (text(body.defaultModel) ?? undefined),
+          modelOverrides,
+          advanced,
+          enabled: typeof body.enabled === "boolean" ? body.enabled : undefined,
+        });
+        if (!updated)
+          return res.status(404).json({ error: "Provider not found" });
+        // A new base URL or key can mean other models with other limits.
+        modelInfo.invalidate(id);
+
+        await audit({
+          action: "update_ai_provider",
+          resourceType: "ai_provider",
+          resourceId: String(id),
+          resourceName: updated.label,
+          success: true,
+        });
+
+        res.json({ provider: updated });
+      } catch (err) {
+        logError("Failed to update AI provider", err);
+        res.status(500).json({ error: "Failed to update provider" });
+      }
+    },
+  );
+
+  /**
+   * @openapi
+   * /plugin-api/ai/providers/{id}:
+   *   delete:
+   *     summary: Delete an AI provider
+   *     tags:
+   *       - AI
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: Provider deleted.
+   *       404:
+   *         description: Provider not found.
+   */
+  router.delete(
+    "/providers/:id",
+    ctx.rbac.require("manage_providers") as never,
+    gate,
+    async (req: Request, res: Response) => {
+      const userId = actor(ctx);
+      const id = parseId(req.params.id);
+      if (!id) return res.status(400).json({ error: "Invalid provider id" });
+
+      try {
+        const deleted = await repository.deleteProvider(id, userId);
+        if (!deleted)
+          return res.status(404).json({ error: "Provider not found" });
+        modelInfo.invalidate(id);
+
+        await audit({
+          action: "delete_ai_provider",
+          resourceType: "ai_provider",
+          resourceId: String(id),
+          success: true,
+        });
+
+        res.json({ success: true });
+      } catch (err) {
+        logError("Failed to delete AI provider", err);
+        res.status(500).json({ error: "Failed to delete provider" });
+      }
+    },
+  );
+
+  /**
+   * @openapi
+   * /plugin-api/ai/probe-models:
+   *   post:
+   *     summary: List models for a provider that has not been saved yet
+   *     description: >
+   *       Lets the add-provider form fill its model picker before the provider
+   *       exists, so nobody has to go and look up model names by hand.
+   *     tags:
+   *       - AI
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               providerType:
+   *                 type: string
+   *               baseUrl:
+   *                 type: string
+   *               apiKey:
+   *                 type: string
+   *               providerId:
+   *                 type: integer
+   *     responses:
+   *       200:
+   *         description: Model ids, possibly a curated fallback list.
+   *       400:
+   *         description: Unknown provider type.
+   */
+  router.post(
+    "/probe-models",
+    ctx.rbac.require("manage_providers") as never,
+    gate,
+    async (req: Request, res: Response) => {
+      const userId = actor(ctx);
+      const { providerType, baseUrl, apiKey, providerId } = req.body ?? {};
+
+      if (!isAiProviderType(providerType)) {
+        return res.status(400).json({ error: "Unknown provider type" });
+      }
+
+      try {
+        // Editing an existing provider sends no key, so fall back to the
+        // stored one rather than making the user retype it.
+        let resolvedKey =
+          typeof apiKey === "string" && apiKey.trim() ? apiKey.trim() : null;
+        const storedId = parseId(providerId);
+        if (!resolvedKey && storedId) {
+          const stored = await repository.findProviderWithSecret(
+            storedId,
+            userId,
+          );
+          resolvedKey = stored?.apiKey ?? null;
+        }
+
+        const models = await getAdapter(providerType).listModels(
+          await providerConfig({
+            providerType,
+            baseUrl: typeof baseUrl === "string" ? baseUrl.trim() : null,
+            apiKey: resolvedKey,
+          }),
+        );
+
+        res.json({ models, source: "live" });
+      } catch (err) {
+        const warning = describeProviderError(
+          err,
+          "Could not reach the provider",
+        );
+        ctx.log.warn(`Model detection failed: ${warning}`);
+        // A provider that cannot be reached yet still gets a usable list, so
+        // the form is never a blank text box the user has to guess into.
+        const fallback = FALLBACK_MODELS[providerType as AiProviderType] ?? [];
+        res.json({
+          models: fallback,
+          source: fallback.length ? "fallback" : "none",
+          warning,
+        });
+      }
+    },
+  );
+
+  /**
+   * @openapi
+   * /plugin-api/ai/providers/{id}/models:
+   *   get:
+   *     summary: List models available from a provider
+   *     tags:
+   *       - AI
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: Model ids.
+   *       502:
+   *         description: The provider could not be reached.
+   */
+  router.get(
+    "/providers/:id/models",
+    ctx.rbac.require("use") as never,
+    gate,
+    async (req: Request, res: Response) => {
+      const userId = actor(ctx);
+      const id = parseId(req.params.id);
+      if (!id) return res.status(400).json({ error: "Invalid provider id" });
+
+      try {
+        // The Claude engine's models come from cc-switch, not from a provider.
+        if (normalizeEngine(await ctx.settings.get("engine")) === "claude") {
+          const live = readClaudeConfig();
+          if (live) return res.json({ models: live.models.map((m) => m.label) });
+        }
+
+        const provider = await repository.findProviderWithSecret(id, userId);
+        if (!provider)
+          return res.status(404).json({ error: "Provider not found" });
+
+        const models = await getAdapter(provider.providerType).listModels(
+          await providerConfig(provider),
+        );
+        res.json({ models });
+      } catch (err) {
+        // The message can carry the allowlist hint, which the user needs.
+        const message = describeProviderError(
+          err,
+          "Could not reach the provider",
+        );
+        ctx.log.warn(`Failed to list provider models: ${message}`);
+        res.status(502).json({ error: message });
+      }
+    },
+  );
+
+  /**
+   * @openapi
+   * /plugin-api/ai/providers/{id}/context:
+   *   get:
+   *     summary: The context window of a provider's models, and where it came from
+   *     description: >
+   *       For the provider's default model, every model with an override,
+   *       every model the user has called through it, and any named in
+   *       models. source is override, provider (reported by the provider),
+   *       guess (from the model's family) or default (128k). refresh asks the
+   *       provider again instead of using what it said in the last six hours.
+   *     tags:
+   *       - AI
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *       - in: query
+   *         name: models
+   *         schema:
+   *           type: string
+   *         description: More model ids, comma separated.
+   *       - in: query
+   *         name: refresh
+   *         schema:
+   *           type: boolean
+   *     responses:
+   *       200:
+   *         description: One entry per model.
+   *       404:
+   *         description: Provider not found.
+   */
+  router.get(
+    "/providers/:id/context",
+    ctx.rbac.require("use") as never,
+    gate,
+    async (req: Request, res: Response) => {
+      const userId = actor(ctx);
+      const id = parseId(req.params.id);
+      if (!id) return res.status(400).json({ error: "Invalid provider id" });
+
+      try {
+        const provider = await repository.findProviderWithSecret(id, userId);
+        if (!provider)
+          return res.status(404).json({ error: "Provider not found" });
+        if (req.query.refresh === "1" || req.query.refresh === "true") {
+          modelInfo.invalidate(id);
+        }
+
+        const requested =
+          typeof req.query.models === "string"
+            ? req.query.models.split(",")
+            : [];
+        const models = [
+          ...new Set(
+            [
+              provider.defaultModel ?? "",
+              ...requested,
+              ...Object.keys(provider.modelOverrides),
+              ...(await repository.providerModels(id, userId)),
+            ]
+              .map((model) => model.trim())
+              .filter(Boolean),
+          ),
+        ];
+        const config = await providerConfig(provider);
+        res.json({
+          models: await Promise.all(
+            models.map(async (model) => {
+              const plan = await contextPlanFor(
+                modelInfo,
+                provider,
+                config,
+                model,
+              );
+              return {
+                model,
+                contextWindow: plan.contextWindow,
+                source: plan.source,
+                reservedOutput: plan.reservedOutput,
+                reportedWindow: plan.reported.contextWindow ?? null,
+                override: provider.modelOverrides[model]?.contextWindow ?? null,
+              };
+            }),
+          ),
+        });
+      } catch (err) {
+        logError("Failed to read context windows", err);
+        res.status(500).json({ error: "Failed to read context windows" });
+      }
+    },
+  );
+
+  /**
+   * @openapi
+   * /plugin-api/ai/conversations:
+   *   get:
+   *     summary: List the user's AI conversations
+   *     tags:
+   *       - AI
+   *     responses:
+   *       200:
+   *         description: Conversations, newest first.
+   */
+  router.get(
+    "/conversations",
+    ctx.rbac.require("use") as never,
+    gate,
+    async (_req: Request, res: Response) => {
+      try {
+        const conversations = await repository.listConversations(actor(ctx));
+        res.json({ conversations });
+      } catch (err) {
+        logError("Failed to list AI conversations", err);
+        res.status(500).json({ error: "Failed to list conversations" });
+      }
+    },
+  );
+
+  /**
+   * @openapi
+   * /plugin-api/ai/conversations/{id}:
+   *   get:
+   *     summary: Get one conversation with its messages and proposals
+   *     tags:
+   *       - AI
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: The conversation.
+   *       404:
+   *         description: Conversation not found.
+   */
+  router.get(
+    "/conversations/:id",
+    ctx.rbac.require("use") as never,
+    gate,
+    async (req: Request, res: Response) => {
+      const userId = actor(ctx);
+      const id = parseId(req.params.id);
+      if (!id)
+        return res.status(400).json({ error: "Invalid conversation id" });
+
+      try {
+        const conversation = await repository.findConversation(id, userId);
+        if (!conversation) {
+          return res.status(404).json({ error: "Conversation not found" });
+        }
+
+        const [messages, proposals] = await Promise.all([
+          repository.listMessages(id),
+          repository.listProposals(userId, id),
+        ]);
+
+        res.json({
+          conversation,
+          messages: messages.map((row) => {
+            const { text, names } = splitImages(row.content);
+            return { ...row, content: text, images: readImageDataUrls(names) };
+          }),
+          proposals,
+        });
+      } catch (err) {
+        logError("Failed to load AI conversation", err);
+        res.status(500).json({ error: "Failed to load conversation" });
+      }
+    },
+  );
+
+  /**
+   * @openapi
+   * /plugin-api/ai/conversations/{id}:
+   *   delete:
+   *     summary: Delete a conversation
+   *     tags:
+   *       - AI
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: Conversation deleted.
+   */
+  router.delete(
+    "/conversations/:id",
+    ctx.rbac.require("use") as never,
+    gate,
+    async (req: Request, res: Response) => {
+      const id = parseId(req.params.id);
+      if (!id)
+        return res.status(400).json({ error: "Invalid conversation id" });
+
+      try {
+        const deleted = await repository.deleteConversation(id, actor(ctx));
+        if (!deleted) {
+          return res.status(404).json({ error: "Conversation not found" });
+        }
+        res.json({ success: true });
+      } catch (err) {
+        logError("Failed to delete AI conversation", err);
+        res.status(500).json({ error: "Failed to delete conversation" });
+      }
+    },
+  );
+
+  /**
+   * @openapi
+   * /plugin-api/ai/chat/stream:
+   *   post:
+   *     summary: Send a message and stream the assistant's reply
+   *     description: >
+   *       Server-sent events. Emits conversation, token, tool_call,
+   *       tool_result, proposal, done and error frames.
+   *     tags:
+   *       - AI
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               conversationId:
+   *                 type: integer
+   *               providerId:
+   *                 type: integer
+   *               model:
+   *                 type: string
+   *               message:
+   *                 type: string
+   *               activeTab:
+   *                 type: string
+   *     responses:
+   *       200:
+   *         description: An event stream.
+   *       400:
+   *         description: Invalid request body.
+   */
+  router.post(
+    "/chat/stream",
+    ctx.rbac.require("use") as never,
+    gate,
+    async (req: Request, res: Response) => {
+      const userId = actor(ctx);
+      const {
+        conversationId,
+        providerId,
+        model,
+        message,
+        activeTab,
+        hostId,
+        newThread,
+        mode,
+        images,
+      } = req.body ?? {};
+
+      if (typeof message !== "string" || !message.trim()) {
+        return res.status(400).json({ error: "message is required" });
+      }
+
+      const resolvedProviderId = parseId(providerId);
+      if (!resolvedProviderId) {
+        return res.status(400).json({ error: "providerId is required" });
+      }
+
+      try {
+        // Which loop answers this turn. The Claude engine carries its own
+        // model through cc-switch, so a Termix model is not required for it.
+        const engine = normalizeEngine(await ctx.settings.get("engine"));
+
+        const provider = await repository.findProviderWithSecret(
+          resolvedProviderId,
+          userId,
+        );
+        if (!provider) {
+          return res.status(404).json({ error: "Provider not found" });
+        }
+
+        const chosenModel =
+          (typeof model === "string" && model.trim()) ||
+          provider.defaultModel ||
+          (engine === "claude" ? "claude" : "");
+        if (!chosenModel) {
+          return res.status(400).json({ error: "No model selected" });
+        }
+
+        // Resolve or create the conversation before the stream opens, so a
+        // failure here is still a normal JSON error the client can render.
+        let conversation = conversationId
+          ? await repository.findConversation(Number(conversationId), userId)
+          : null;
+        // An assistant conversation can run commands; it never continues here.
+        if (conversation?.mode === "ops") conversation = null;
+        // A terminal panel belongs to one host: come back to that host and the
+        // same thread continues, while another host keeps its own.
+        if (!conversation && hostId && !newThread) {
+          const recent = await repository.listConversations(userId, 50, "chat");
+          conversation =
+            recent.find((row) => {
+              try {
+                const bound = JSON.parse(row.targets ?? "[]");
+                return (
+                  Array.isArray(bound) &&
+                  bound.length === 1 &&
+                  String(bound[0]) === String(hostId)
+                );
+              } catch {
+                return false;
+              }
+            }) ?? null;
+        }
+        if (!conversation) {
+          conversation = await repository.createConversation({
+            userId,
+            title: message.trim().slice(0, 60),
+            providerId: resolvedProviderId,
+            model: chosenModel,
+            targets: hostId ? [Number(hostId)] : undefined,
+          });
+        }
+
+        const history = await repository.listMessages(conversation.id);
+        // The files are kept, the names ride along hidden in the stored text.
+        const stored = persistImages(images);
+        await repository.appendMessage({
+          conversationId: conversation.id,
+          role: "user",
+          content: storeContent(message.trim(), stored),
+        });
+
+        const access = (
+          req as Request & { aiAccess?: { allowReadOnlyCommands: boolean } }
+        ).aiAccess ?? { allowReadOnlyCommands: false };
+        const hosts = await ctx.hosts.list();
+        const config = await providerConfig(provider);
+        const plan = await contextPlanFor(
+          modelInfo,
+          provider,
+          config,
+          chosenModel,
+        );
+        const tools = availableTools(
+          (service) => serviceAvailable(ctx.services, service),
+          { allowReadOnlyCommands: access.allowReadOnlyCommands },
+        );
+
+        const { send, signal, stopHeartbeat } = openEventStream(res);
+
+        send({ type: "conversation", conversationId: conversation.id });
+
+        // One token carries this run's permission requests; the panel answers
+        // them, and the CLI is told where to ask.
+        const approvalSession = randomUUID();
+        approvals.attach(approvalSession, (event) => send(event));
+
+        const chatHistory = toChatHistory(history);
+        // Images ride in the prompt as paths: the CLI reads them locally.
+        chatHistory.push({
+          role: "user",
+          content: withImages(message.trim(), stored),
+        });
+
+        try {
+          for await (const event of runAssistant({
+            engine,
+            mode:
+              mode === "manual" || mode === "guard" || mode === "auto"
+                ? mode
+                : "auto",
+            approval: {
+              url: `${req.protocol}://${req.get("host")}/plugin-api/ai`,
+              session: approvalSession,
+              // Auto mode: read-only commands run without a card.
+              auto: (await ctx.settings.get("claudeAutoApprove")) !== false,
+            },
+            // Survives a restart: the session id is what makes a host's thread
+            // remember, not the replayed transcript.
+            sessionStore: {
+              get: (key) => ctx.kv.get(key),
+              set: (key, value) => ctx.kv.set(key, value),
+            },
+            config,
+            model: chosenModel,
+            system: buildSystemPrompt({
+              hostCount: hosts.length,
+              activeTab: typeof activeTab === "string" ? activeTab : null,
+              allowReadOnlyCommands: access.allowReadOnlyCommands,
+            }),
+            history: chatHistory,
+            context: {
+              userId,
+              conversationId: conversation.id,
+              allowReadOnlyCommands: access.allowReadOnlyCommands,
+              deps: toolDeps,
+            },
+            tools,
+            signal,
+            // The terminal panel keeps its short leash, and no compaction.
+            maxTurns: TERMINAL_MAX_TURNS,
+            contextWindow: plan.contextWindow,
+            compact: false,
+            source: "terminal",
+            onUsage: (usage) =>
+              repository.recordUsage({
+                userId,
+                providerId: provider.id,
+                model: chosenModel,
+                conversationId: conversation.id,
+                ...usage,
+              }),
+          })) {
+            if (event.type === "message") {
+              // Every step is kept, tool results included, so the next message
+              // replays the run verbatim. Gemini rejects a turn whose
+              // functionCall parts lost their thoughtSignature.
+              await repository.appendMessage({
+                conversationId: conversation.id,
+                ...toStoredMessage(event.message),
+              });
+              continue;
+            }
+
+            if (event.type === "proposal") {
+              const stored = await repository.createProposal({
+                conversationId: conversation.id,
+                userId,
+                kind: event.draft.kind,
+                summary: event.draft.summary,
+                payload: JSON.stringify(event.draft.payload),
+              });
+
+              await audit({
+                action: "ai_proposal_created",
+                resourceType: "ai_proposal",
+                resourceId: String(stored.id),
+                resourceName: event.draft.kind,
+                success: true,
+              });
+
+              send({ type: "proposal", proposal: stored });
+              continue;
+            }
+
+            send(event);
+          }
+        } finally {
+          approvals.detach(approvalSession);
+          stopHeartbeat();
+        }
+        await repository.touchConversation(conversation.id);
+
+        send({ type: "done" });
+        res.end();
+      } catch (err) {
+        logError("AI chat stream failed", err);
+        if (res.writableEnded || res.destroyed) return;
+        if (res.headersSent) {
+          res.write(
+            `data: ${JSON.stringify({ type: "error", message: "The assistant stopped unexpectedly" })}\n\n`,
+          );
+          res.end();
+        } else {
+          res.status(500).json({ error: "Failed to start the assistant" });
+        }
+      }
+    },
+  );
+
+  /**
+   * @openapi
+   * /plugin-api/ai/proposals/{id}/apply:
+   *   post:
+   *     summary: Apply a pending proposal
+   *     description: >
+   *       Re-validates the stored payload and applies it as the approving user,
+   *       through the same core APIs and plugin services a manual action uses.
+   *     tags:
+   *       - AI
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: Proposal applied.
+   *       400:
+   *         description: The proposal could not be applied.
+   *       404:
+   *         description: Proposal not found.
+   */
+  router.post(
+    "/proposals/:id/apply",
+    ctx.rbac.require("apply_proposals") as never,
+    gate,
+    async (req: Request, res: Response) => {
+      const userId = actor(ctx);
+      const id = parseId(req.params.id);
+      if (!id) return res.status(400).json({ error: "Invalid proposal id" });
+
+      try {
+        const stored = await repository.findProposal(id, userId);
+        if (!stored)
+          return res.status(404).json({ error: "Proposal not found" });
+        if (stored.status !== "pending") {
+          return res
+            .status(400)
+            .json({ error: `This proposal was already ${stored.status}` });
+        }
+
+        let payload: Record<string, unknown>;
+        try {
+          payload = JSON.parse(stored.payload) as Record<string, unknown>;
+        } catch {
+          return res
+            .status(400)
+            .json({ error: "The proposal payload is invalid" });
+        }
+
+        const result = await applyProposal(stored.kind, payload, toolDeps);
+        await repository.setProposalStatus(
+          id,
+          userId,
+          "applied",
+          result.summary,
+        );
+
+        await audit({
+          action: "ai_proposal_applied",
+          resourceType: "ai_proposal",
+          resourceId: String(id),
+          resourceName: stored.kind,
+          success: true,
+        });
+
+        res.json({ success: result.ok, summary: result.summary });
+      } catch (err) {
+        const message = getErrorMessage(err, "Failed to apply the proposal");
+        logError("Failed to apply AI proposal", err);
+
+        await audit({
+          action: "ai_proposal_applied",
+          resourceType: "ai_proposal",
+          resourceId: String(id),
+          success: false,
+          errorMessage: message,
+        });
+
+        res.status(400).json({ error: message });
+      }
+    },
+  );
+
+  /**
+   * @openapi
+   * /plugin-api/ai/proposals/{id}/mark-run-in-terminal:
+   *   post:
+   *     summary: Record that a run_command proposal was executed in an open terminal
+   *     description: >
+   *       For the terminal-docked assistant only. The command is typed into the
+   *       user's already-open SSH session client-side, not re-run over a pooled
+   *       connection here; this just marks the proposal applied with the output
+   *       the client captured, so the card and the /apply path stay in sync
+   *       without running the command twice.
+   *     tags:
+   *       - AI
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               hostId:
+   *                 type: integer
+   *               summary:
+   *                 type: string
+   *     responses:
+   *       200:
+   *         description: Proposal marked applied.
+   *       400:
+   *         description: The proposal is not a run_command proposal, or the hostId does not match.
+   *       404:
+   *         description: Proposal not found.
+   */
+  router.post(
+    "/proposals/:id/mark-run-in-terminal",
+    ctx.rbac.require("apply_proposals") as never,
+    gate,
+    async (req: Request, res: Response) => {
+      const userId = actor(ctx);
+      const id = parseId(req.params.id);
+      if (!id) return res.status(400).json({ error: "Invalid proposal id" });
+
+      const { hostId, summary } = req.body ?? {};
+      const resolvedHostId = parseId(hostId);
+      if (!resolvedHostId) {
+        return res.status(400).json({ error: "hostId is required" });
+      }
+
+      try {
+        const stored = await repository.findProposal(id, userId);
+        if (!stored)
+          return res.status(404).json({ error: "Proposal not found" });
+        if (stored.kind !== "propose_run_command") {
+          return res.status(400).json({
+            error: "Only run_command proposals can be marked this way",
+          });
+        }
+        if (stored.status !== "pending") {
+          return res
+            .status(400)
+            .json({ error: `This proposal was already ${stored.status}` });
+        }
+
+        let payload: Record<string, unknown>;
+        try {
+          payload = JSON.parse(stored.payload) as Record<string, unknown>;
+        } catch {
+          return res
+            .status(400)
+            .json({ error: "The proposal payload is invalid" });
+        }
+        if (parseId(payload.hostId) !== resolvedHostId) {
+          return res
+            .status(400)
+            .json({ error: "This proposal is for a different host" });
+        }
+
+        const resultSummary =
+          typeof summary === "string" && summary.trim()
+            ? summary.trim().slice(0, 2000)
+            : "Run in the open terminal session";
+        await repository.setProposalStatus(
+          id,
+          userId,
+          "applied",
+          resultSummary,
+        );
+
+        await audit({
+          action: "ai_proposal_applied",
+          resourceType: "ai_proposal",
+          resourceId: String(id),
+          resourceName: stored.kind,
+          success: true,
+        });
+
+        res.json({ success: true, summary: resultSummary });
+      } catch (err) {
+        logError("Failed to mark AI proposal applied in terminal", err);
+        res.status(400).json({
+          error: getErrorMessage(err, "Failed to mark the proposal applied"),
+        });
+      }
+    },
+  );
+
+  /**
+   * @openapi
+   * /plugin-api/ai/proposals/{id}/reject:
+   *   post:
+   *     summary: Reject a pending proposal
+   *     tags:
+   *       - AI
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: Proposal rejected.
+   *       404:
+   *         description: Proposal not found.
+   */
+  router.post(
+    "/proposals/:id/reject",
+    ctx.rbac.require("use") as never,
+    gate,
+    async (req: Request, res: Response) => {
+      const id = parseId(req.params.id);
+      if (!id) return res.status(400).json({ error: "Invalid proposal id" });
+
+      try {
+        const updated = await repository.setProposalStatus(
+          id,
+          actor(ctx),
+          "rejected",
+        );
+        if (!updated) {
+          return res
+            .status(404)
+            .json({ error: "Proposal not found or already resolved" });
+        }
+
+        await audit({
+          action: "ai_proposal_rejected",
+          resourceType: "ai_proposal",
+          resourceId: String(id),
+          success: true,
+        });
+
+        res.json({ success: true });
+      } catch (err) {
+        logError("Failed to reject AI proposal", err);
+        res.status(500).json({ error: "Failed to reject the proposal" });
+      }
+    },
+  );
+}

@@ -1,0 +1,867 @@
+{
+  "permissions": {
+    "use": {
+      "title": "使用助理",
+      "description": "開啟助理並向其提問。"
+    },
+    "manage_providers": {
+      "title": "管理提供者",
+      "description": "新增、編輯和移除 AI 提供者及其 API 金鑰。"
+    },
+    "apply_proposals": {
+      "title": "套用建議",
+      "description": "允許助理執行其所建議的變更。"
+    },
+    "services": {
+      "use": {
+        "title": "在其他功能中使用 AI",
+        "description": "其他功能可能會代表您呼叫助理。"
+      }
+    },
+    "secrets": {
+      "share": {
+        "title": "分享 API 金鑰",
+        "description": "其他功能可能會使用儲存的 AI API 金鑰，但無法查看其內容。"
+      }
+    },
+    "ops": {
+      "use": {
+        "title": "透過 AI 助理在主機上執行指令",
+        "description": "允許助理在你選擇的主機上執行任意 shell 指令。預設僅管理員擁有。"
+      }
+    },
+    "usage": {
+      "view_all": {
+        "title": "檢視所有人的 AI 用量",
+        "description": "檢視每位使用者的 AI 呼叫所用的 token，而不只是你自己的。預設僅管理員擁有。"
+      }
+    },
+    "assets": {
+      "view": {
+        "title": "檢視資產清單",
+        "description": "檢視採集到的主機、來賓、容器、區域和連線。預設僅管理員擁有。"
+      },
+      "manage": {
+        "title": "管理資產清單",
+        "description": "發起採集、編輯區域規則、固定區域和修改排程。採集只以唯讀方式讀取主機。預設僅管理員擁有。"
+      }
+    }
+  },
+  "settings": {
+    "assistantUnavailable": "此伺服器已關閉 AI 助理。",
+    "providersNeedOptIn": "請在上方開啟 AI 助理以新增提供者。",
+    "providers": {
+      "label": "提供者",
+      "description": "助理和代理程式可使用的 AI 服務。"
+    },
+    "admin": {
+      "globallyEnabled": {
+        "label": "AI 助理",
+        "description": "允許使用者開啟 AI 助理。關閉時，助理將對所有人隱藏且無法使用。"
+      },
+      "privateEndpoints": {
+        "label": "允許的私人 AI 主機",
+        "description": "您私人網路上的主機，使用者可將提供者指向這些主機，例如自行架設的 Ollama。每行輸入一個主機。"
+      },
+      "opsConcurrency": {
+        "label": "AI 助理平行主機數",
+        "description": "助理的指令同時在多少台主機上執行。"
+      },
+      "opsCommandTimeout": {
+        "label": "AI 助理指令逾時（秒）",
+        "description": "指令在一台主機上執行多久後會被停止。助理最多可要求 600 秒。"
+      },
+      "opsOutputLimit": {
+        "label": "AI 助理每台主機輸出（字元）",
+        "description": "每台主機保留多少輸出。較長的輸出會保留開頭和結尾。"
+      },
+      "autoOpsPaused": {
+        "label": "暫停 AI 自動運維",
+        "description": "立即停止所有執行中的 AI 任務和已核准的方案，並拒絕新任務，直到關閉此項。"
+      },
+      "autoOpsRunsPerHour": {
+        "label": "每個自動化每小時的 AI 任務數",
+        "description": "同一小時內更多的觸發會被略過。"
+      },
+      "autoOpsRunTokens": {
+        "label": "單個 AI 任務的 token 預算",
+        "description": "任務用到這麼多 token 時會停止，並報告已發現的內容。"
+      },
+      "autoOpsDailyTokens": {
+        "label": "每個使用者每天的 AI token 預算",
+        "description": "使用者今天（UTC）用到這麼多 token 後，其 AI 任務會被略過或停止。"
+      },
+      "assetsDailyCollect": {
+        "label": "每天採集資產清單",
+        "description": "每天用一個唯讀腳本讀取採集帳號能連線的所有主機。"
+      },
+      "assetsCollectTime": {
+        "label": "資產採集時間（UTC）",
+        "description": "格式為 HH:MM，例如 03:00。"
+      },
+      "assetsCollector": {
+        "label": "資產採集帳號"
+      },
+      "assetsAnnotateAfterCollect": {
+        "label": "每次採集後標註資產",
+        "description": "由模型為每個有變動的資產寫出作用、重要程度和所屬業務系統，以及事實能證明的相依關係。"
+      },
+      "assetsAnnotateRunTokens": {
+        "label": "每次資產標註的 token 預算",
+        "description": "模型呼叫用滿這麼多 token 後執行停止，已寫入的保留。"
+      },
+      "assetsAnnotateProvider": {
+        "label": "資產標註提供者"
+      },
+      "assetsAnnotateModel": {
+        "label": "資產標註模型"
+      },
+      "exposureRetentionDays": {
+        "label": "暴露面歷史保留天數",
+        "description": "待傳送通知及目前入口引用的證據不隨歷史到期清理。"
+      }
+    },
+    "host": {
+      "enableAiAssistant": {
+        "label": "啟用 AI 助理",
+        "description": "允許 AI 助理在此主機的終端機中提供協助。預設為關閉，且仍需為您的帳戶啟用 AI。"
+      },
+      "showPanel": {
+        "label": "終端機旁的面板",
+        "description": "在此主機的 SSH 終端機旁提供助理面板。"
+      }
+    },
+    "user": {
+      "autoOpsPreferences": {
+        "label": "值守偏好"
+      },
+      "companionAutoOpen": {
+        "label": "開啟終端機時顯示助理面板",
+        "description": "當開啟具有此功能的主機終端機時，顯示助理面板。"
+      },
+      "companionSide": {
+        "label": "助理面板位置",
+        "description": "面板相對於終端機的位置。",
+        "right": "右側",
+        "left": "左側",
+        "bottom": "底部"
+      },
+      "companionSize": {
+        "label": "助理面板大小",
+        "description": "寬度，或位於底部時的高度（單位：像素）。"
+      },
+      "companionEdgeButton": {
+        "label": "助理面板邊緣按鈕",
+        "description": "在終端機邊緣顯示小按鈕以開啟面板。"
+      }
+    }
+  },
+  "ai": {
+    "send": "傳送",
+    "stop": "停止",
+    "save": "儲存",
+    "cancel": "取消",
+    "running": "執行中",
+    "approve": "核准",
+    "reject": "拒絕",
+    "selectProvider": "選擇提供者",
+    "addProvider": "新增提供者",
+    "manageModels": "管理模型",
+    "editProvider": "編輯提供者",
+    "removeProvider": "移除提供者",
+    "providerType": "提供者",
+    "providerLabel": "名稱",
+    "providerLabelPlaceholder": "例如：Local Ollama",
+    "baseUrl": "伺服器位址",
+    "apiKey": "API 金鑰",
+    "defaultModel": "預設模型",
+    "defaultModelPlaceholder": "例如：llama3.1 或 claude-opus-5",
+    "labelRequired": "請為此提供者指定名稱",
+    "providerSaveFailed": "無法儲存提供者",
+    "providerUpdated": "提供者已更新",
+    "providerDeleteFailed": "無法移除提供者",
+    "privateEndpointHint": "私人網路上的位址需要管理員先允許該主機。",
+    "providerOllama": "Ollama",
+    "providerAnthropic": "Anthropic",
+    "providerOpenai": "OpenAI",
+    "providerGemini": "Google Gemini",
+    "providerOpenaiCompatible": "相容於 OpenAI",
+    "toolArguments": "輸入",
+    "toolResult": "結果",
+    "statusApplied": "已套用",
+    "statusRejected": "已拒絕",
+    "proposalApplyFailed": "無法套用變更",
+    "proposalRejectFailed": "無法拒絕變更",
+    "enableTitle": "啟用 AI 助理",
+    "enableDescription": "允許助理讀取您的設定並建議變更供您核准。",
+    "readOnlyCommands": "允許唯讀診斷命令",
+    "readOnlyCommandsDescription": "助理可能會自動執行一小部分安全指令（如 df 和 uptime），無需每次都詢問。任何會變更伺服器狀態的操作，都會先提出建議供您確認。",
+    "modelDetectFailed": "無法連線至服務提供者，因此顯示一般列表。您可以輸入任何模型名稱。",
+    "modelCustom": "輸入模型名稱",
+    "modelRefresh": "重新整理列表",
+    "modelPlaceholder": "選擇或輸入模型",
+    "runCommandTitle": "執行指令",
+    "assistant": "AI 助理",
+    "terminalPanelEmpty": "向助理詢問關於此主機的問題。任何會變更狀態的操作都需要您先批准。",
+    "terminalPanelPlaceholder": "詢問關於此主機的問題...",
+    "noProvidersConfigured": "尚未設定任何 AI 服務供應商。請前往設定中新增一個。",
+    "runsInOpenTerminal": "在您開啟的終端機工作階段中執行。",
+    "runInTerminal": "執行",
+    "terminalContextPrefill": "以下是我的終端機輸出：\n\n{{output}}\n\n",
+    "secrets": {
+      "shareApiKey": "允許其他功能使用您的 AI 服務提供者 API 金鑰來進行各自的請求。金鑰絕不會被複製，且您可以隨時撤銷此授權。"
+    },
+    "removeProviderConfirm": "要移除服務提供者 {{name}} 嗎？",
+    "contextWindows": "各模型的上下文視窗",
+    "contextWindowsHint": "供應商有回報就以其為準。為某個模型填寫 token 數可覆寫它，留空則使用供應商回報的值。重新整理會再次詢問供應商。",
+    "contextWindowValue": "上下文視窗：{{tokens}}（{{source}}）",
+    "contextOverride": "{{model}} 的上下文視窗覆寫值",
+    "contextSourceOverride": "由你設定",
+    "contextSourceProvider": "由供應商回報",
+    "contextSourceGuess": "依模型名稱推測",
+    "contextSourceDefault": "未知模型的預設值",
+    "contextLoadFailed": "無法讀取上下文視窗",
+    "contextRefresh": "重新整理",
+    "contextWindowInvalid": "上下文視窗需填寫一個整數 token 數，至少 1024。",
+    "advanced": "進階",
+    "advancedHint": "將設定保留為「預設」以使用模型自身的設定。",
+    "advancedDefault": "預設",
+    "advancedDefaultAuto": "預設（自動）",
+    "advancedAuto": "自動",
+    "advancedEndpoint": "端點",
+    "advancedEndpointResponses": "Responses API",
+    "advancedEndpointChat": "Chat Completions",
+    "advancedReasoningEffort": "推理強度",
+    "advancedReasoningSummary": "推理摘要",
+    "advancedReasoningSummaryHint": "僅適用於 Responses API。",
+    "advancedVerbosity": "詳細程度",
+    "advancedNone": "無",
+    "advancedMinimal": "最少",
+    "advancedLow": "低",
+    "advancedMedium": "中",
+    "advancedHigh": "高",
+    "advancedXhigh": "超高",
+    "advancedMax": "最高",
+    "advancedConcise": "簡潔",
+    "advancedDetailed": "詳細",
+    "advancedOff": "關閉",
+    "advancedMaxOutputTokens": "最大輸出 tokens",
+    "advancedMaxOutputTokensInvalid": "請輸入 1 到 1,000,000 之間的整數。",
+    "advancedTemperature": "溫度",
+    "advancedTemperatureHint": "OpenAI 推理模型僅在推理強度為「無」時接受此參數，因此若設定其他強度則不會傳送此參數。",
+    "advancedTemperatureInvalid": "請輸入 0 到 2 之間的數字。"
+  },
+  "nav": {
+    "ai": "AI 助手"
+  },
+  "onboarding": {
+    "aiTitle": "AI 助理",
+    "aiIntro": "Termix 可以包含 AI 助理。您可以稍後在設定中更改此選項。",
+    "aiSkipTitle": "關閉",
+    "aiSkipDesc": "Termix 將維持現狀運作。助理將保持隱藏。",
+    "aiEnableTitle": "開啟",
+    "aiEnableDesc": "新增一個會讀取您的設定並建議變更（需您批准）的助理。需要您提供服務提供者，例如本機 Ollama。",
+    "aiNote": "在您新增服務提供者並傳送訊息之前，不會將任何資料傳送至外部。"
+  },
+  "agents": {
+    "working": "處理中...",
+    "startingIndicator": "正在啟動代理程式...",
+    "noCompatibleProvider": "您的 AI 服務提供者皆不支援 {{agent}}。Claude Code 需要 Anthropic，Codex 需要 OpenAI。",
+    "noProviders": "請先在設定中新增 AI 服務提供者。",
+    "title": "AI 代理程式",
+    "permissionTitle": "執行遠端 AI 代理程式",
+    "permissionDescription": "使用已設定的 AI 服務提供者，在 SSH 主機上啟動程式碼代理程式。代理程式可以以 SSH 使用者的身分執行指令並修改檔案。",
+    "new": "新增工作階段",
+    "description": "使用 Termix AI 服務提供者，在此主機的目錄中執行代理程式。",
+    "runtime": "代理程式",
+    "provider": "Termix 服務提供者",
+    "chooseProvider": "選擇相容的服務提供者",
+    "model": "模型",
+    "directory": "工作目錄",
+    "executable": "可執行檔（選填絕對路徑）",
+    "requirements": "主機需要安裝 Node.js 22.19+ 以及所選的代理程式。必須允許 SSH 遠端回送轉發。現有的代理程式設定不會被覆蓋。",
+    "responsesRequired": "Codex 需要 Responses API 端點。僅支援 Chat Completions 的端點無法執行 Codex。",
+    "piPermissions": "Pi 工具會以該 SSH 帳號的權限執行。請僅在您授權代理程式修改的目錄中啟動。",
+    "start": "啟動代理程式",
+    "resume": "恢復",
+    "stop": "停止工作階段",
+    "interrupt": "中斷回合",
+    "send": "傳送",
+    "prompt": "要求代理程式在此目錄中工作...",
+    "noSessions": "此主機沒有代理程式工作階段。",
+    "approval": "代理程式需要您的決定",
+    "answer": "回答（結構化問題請使用 JSON）",
+    "allow": "允許一次",
+    "deny": "拒絕",
+    "tool": "工具活動",
+    "streamFailed": "代理程式串流已斷開。請重新開啟工作階段以重新連線。",
+    "status": {
+      "starting": "啟動中",
+      "ready": "就緒",
+      "running": "運作中",
+      "stopped": "已停止",
+      "error": "錯誤"
+    },
+    "installRuntime": "安裝選定的代理程式與 Node.js",
+    "installSource": "僅限官方來源：nodejs.org（經 SHA-256 驗證）與 registry.npmjs.org（鎖定套件完整性）。安裝至 SSH 使用者的 ~/.local/share/termix-agent-runtime；需要 curl、tar，以及 Linux/macOS x64 或 arm64 環境。不會變更 SSH 轉發政策。",
+    "installSucceeded": "安裝驗證完成。您現在可以啟動代理程式；也必須允許 SSH 迴環遠端轉發。",
+    "installFailed": "安裝失敗。請檢視日誌並重試。",
+    "installLog": "安裝日誌",
+    "enableForwarding": "啟用代理程式轉發",
+    "forwardingScope": "適用於搭配 systemd/OpenSSH 的 Linux；需要 root 權限或免密碼 sudo。會備份並驗證 SSH 設定，然後重新載入。僅當前 SSH 帳戶與觀察到的連線來源可接收迴環遠端轉發；現有的本地轉發將保留。失敗的變更會自動復原。",
+    "forwardingSucceeded": "SSH 迴環遠端轉發已就緒。啟動或恢復代理程式以開啟新的 SSH 連線。",
+    "forwardingFailed": "SSH 轉發設定失敗。請檢視日誌；不會保留任何未經驗證的設定。",
+    "search": "搜尋工作階段",
+    "sessionName": "工作階段名稱",
+    "rename": "重新命名",
+    "archive": "封存並停止",
+    "restore": "還原工作階段",
+    "queue": "排隊訊息",
+    "enqueue": "將訊息排入佇列",
+    "continueQueue": "繼續佇列",
+    "pauseQueue": "暫停佇列",
+    "editQueued": "編輯排隊中的訊息",
+    "save": "儲存",
+    "remove": "移除",
+    "upload": "上傳附件",
+    "remoteFile": "工作目錄內的檔案路徑",
+    "attach": "從主機附加檔案",
+    "attachments": "重複使用先前的附件",
+    "attachmentLimit": "最多 4 個附件，每個 1 MiB",
+    "review": "Git 變更",
+    "gitStatus": "重新整理 Git 狀態",
+    "diffFile": "要檢視的檔案路徑",
+    "diff": "檢視差異",
+    "branch": "新分支名稱",
+    "createWorktree": "建立工作樹",
+    "useWorktree": "在此工作樹中開啟新工作階段",
+    "worktreeHint": "從 HEAD 建立新分支。未提交的變更將保留在目前目錄中。現有的工作樹絕不會自動刪除。",
+    "clean": "無變更",
+    "reconnecting": "正在重新連線並恢復訊息…",
+    "unavailable": "工作階段已無法存取。請檢查您的權限或重新登入。",
+    "shortcuts": "Enter 發送或排入佇列 · Shift+Enter 換行 · Esc 中斷並暫停佇列",
+    "activeSessions": "使用中",
+    "archivedSessions": "已封存",
+    "dismiss": "關閉",
+    "changes": "變更",
+    "close": "關閉",
+    "cancel": "取消",
+    "sessionSetup": "工作階段",
+    "hostSetup": "主機設定",
+    "changedFiles": "已變更的檔案",
+    "worktree": "工作樹",
+    "attachShort": "附加",
+    "emptyTranscript": "發送訊息以啟動代理程式。"
+  },
+  "plugin": {
+    "name": "AI 助手",
+    "description": "讀取你的設定並提出修改建議供你核准的 AI 助理。"
+  },
+  "ops": {
+    "searchHosts": "搜尋主機",
+    "selectedCount": "已選擇 {{count}} 台",
+    "clear": "清除",
+    "fleets": "機群",
+    "folders": "資料夾",
+    "tags": "標籤",
+    "allHosts": "所有主機",
+    "noHosts": "沒有主機",
+    "newConversation": "新對話",
+    "sendHint_other": "將在 {{count}} 台主機上執行。指令會直接執行，不會事先詢問。",
+    "runCommand": "執行指令",
+    "hostFacts": "主機資訊",
+    "hostCount_other": "{{count}} 台主機",
+    "succeeded": "{{count}} 成功",
+    "failed": "{{count}} 失敗",
+    "exitCode": "結束碼 {{code}}",
+    "timedOut": "已逾時",
+    "stopped": "已停止",
+    "notRun": "未執行",
+    "cached": "已快取",
+    "duration": "{{seconds}} 秒",
+    "noOutput": "（無輸出）"
+  },
+  "assistant": {
+    "title": "AI 助理",
+    "moveHint": "拖曳可移動，按兩下可停靠到側邊。",
+    "toggle": "開啟或關閉 AI 助理",
+    "close": "關閉",
+    "dock": "停靠到右側",
+    "float": "浮動",
+    "openTab": "開啟完整檢視",
+    "history": "對話",
+    "noConversations": "還沒有對話",
+    "untitled": "未命名",
+    "deleteConversation": "刪除對話",
+    "deleteConfirm": "刪除這個對話？",
+    "emptyTitle": "詢問或修改 Termix 中的任何內容",
+    "emptyHint": "助理以你的身分透過 Termix CLI 工作，並在目標主機上執行命令。輸入 @ 可以把主機、機群、資料夾或標籤加為目標。",
+    "inputPlaceholder": "向助理提問。輸入 @ 新增目標。",
+    "noTargets": "沒有目標主機。輸入 @ 新增。",
+    "sendHint": "修改和命令會直接執行，不再詢問。",
+    "removeTarget": "移除 {{name}}",
+    "kind": {
+      "host": "主機",
+      "fleet": "機群",
+      "folder": "資料夾",
+      "tag": "標籤"
+    },
+    "emptyHintBasic": "助理以你的身分、依你的權限透過 Termix CLI 工作。",
+    "inputPlaceholderBasic": "向助理提問。",
+    "sendHintBasic": "修改會直接執行，不再詢問。",
+    "thinking": "思考過程",
+    "thinkingActive": "正在思考...",
+    "compacted": "上下文已壓縮：較早的訊息已被摘要",
+    "compact": "壓縮對話",
+    "nothingToCompact": "對話還太短，暫時無需壓縮。",
+    "contextMeter": "上下文：最近一次呼叫使用了 {{window}} 個 token 中的 {{used}} 個",
+    "contextMeterSource": "視窗{{source}}。",
+    "contextMeterReserved": "為回覆預留 {{tokens}} 個 token。",
+    "todayTokens": "今日 {{tokens}}",
+    "todayTitle": "你今天使用的 token。點擊查看詳情。",
+    "usage": "Token 用量",
+    "conversationTokens": "{{tokens}} token",
+    "openFloating": "浮動面板",
+    "openFloatingHint": "在任何頁面上方開啟助手面板。在任何位置按下 {{shortcut}} 即可開啟或關閉。",
+    "shortcutHint": "在任何頁面按下 {{shortcut}} 即可在浮動面板中開啟助手。"
+  },
+  "usage": {
+    "title": "Token 用量",
+    "settingDescription": "過去 30 天你的 AI 呼叫所用的 token。",
+    "cardTitle": "AI token 用量",
+    "today": "今日",
+    "week": "7 天",
+    "month": "30 天",
+    "mine": "我的",
+    "everyone": "所有使用者",
+    "mineCaption": "你在所有 AI 功能中使用的 token。",
+    "everyoneCaption": "所有使用者在所有 AI 功能中使用的 token。",
+    "byDay": "按天",
+    "byModel": "按模型",
+    "bySource": "按功能",
+    "byUser": "按使用者",
+    "model": "模型",
+    "feature": "功能",
+    "user": "使用者",
+    "calls": "呼叫次數",
+    "prompt": "輸入",
+    "completion": "輸出",
+    "total": "合計",
+    "empty": "過去 30 天沒有 AI 用量。",
+    "loadFailed": "無法載入用量",
+    "estimatedNote": "部分數字為估算值（約每四個字元一個 token），因為提供者沒有回報用量。",
+    "source": {
+      "assistant": "助理",
+      "terminal": "終端機面板",
+      "compaction": "上下文壓縮",
+      "assets": "資產標註"
+    }
+  },
+  "autoOps": {
+    "viewAssistant": "助手",
+    "viewAutoOps": "值守",
+    "intro": "自動運維讓助手能自動檢查您的主機。自動化流程會依排程或在發生問題時啟動，並撰寫報告或提出修復建議供您核准。建議從預設方案開始。",
+    "sections": {
+      "tasks": "任務",
+      "approvals": "待審批",
+      "presets": "預設"
+    },
+    "provider": "任務使用的提供商",
+    "providerDefault": "第一個設定了預設模型的提供商",
+    "model": "任務使用的模型",
+    "modelDefault": "提供商的預設模型",
+    "saveModel": "儲存模型",
+    "preferencesHint": "背景任務所使用的供應商與模型。保留現狀即可使用您的預設供應商與模型。",
+    "task": "任務",
+    "tokens": "{{tokens}} tokens",
+    "tokenUsage": "{{total}} tokens（輸入 {{prompt}}，輸出 {{completion}}）",
+    "dryRun": "測試執行",
+    "trigger": "觸發",
+    "noTasks": "還沒有任務",
+    "tasksHint": "任務是包含「詢問 AI」步驟的自動化執行記錄。啟用預設方案，或在自動化中建立自己的方案：為任何自動化新增「詢問 AI」步驟。執行記錄會顯示在此。",
+    "openAutomations": "開啟自動化",
+    "browsePresets": "瀏覽預設項目",
+    "noApprovals": "沒有待審批的方案",
+    "loadFailed": "載入值守失敗",
+    "decideFailed": "無法儲存審批結果",
+    "openConversation": "在助手中開啟",
+    "approve": "核准並執行",
+    "reject": "拒絕",
+    "expires": "{{time}} 過期",
+    "enabled": "已啟用",
+    "updateAvailable": "有新版本",
+    "shared": "共享",
+    "needsAutomations": "需要 Automations 外掛",
+    "enableAgain": "再次啟用",
+    "deletePreset": "刪除預設",
+    "autonomy": {
+      "report": "只報告",
+      "propose": "提方案"
+    },
+    "status": {
+      "running": "執行中",
+      "reported": "已報告",
+      "proposed": "待審批",
+      "approved": "已核准",
+      "rejected": "已拒絕",
+      "expired": "已過期",
+      "executing": "執行中",
+      "done": "已完成",
+      "failed": "失敗",
+      "skipped": "已略過"
+    },
+    "severity": {
+      "info": "資訊",
+      "warning": "警告",
+      "critical": "嚴重"
+    },
+    "plan": {
+      "title": "方案",
+      "commands": "指令",
+      "rationale": "理由",
+      "risk": "風險",
+      "rollback": "回復",
+      "verify": "驗證",
+      "progress": "進度"
+    },
+    "enable": {
+      "title": "啟用{{name}}",
+      "submit": "啟用",
+      "name": "名稱",
+      "targets": "主機",
+      "targetAll": "全部主機",
+      "targetTrigger": "觸發的主機",
+      "targetHosts": "選定的主機",
+      "noHosts": "請至少選擇一台主機。",
+      "threshold": "閾值（%）",
+      "forSeconds": "持續至少（秒）",
+      "time": "每天時間",
+      "cron": "排程（cron）",
+      "dockerEvent": "容器事件",
+      "dockerEvents": {
+        "exited": "已結束",
+        "unhealthy": "不健康",
+        "restarting": "重新啟動中"
+      },
+      "badTime": "請按 HH:MM 輸入時間。",
+      "autonomy": "助手可以做什麼",
+      "maxRunSeconds": "時間上限（秒）",
+      "runbook": "運維手冊",
+      "runbookHint": "用平實的語言寫助手該做什麼，英文效果最好。",
+      "shared": "另存為預設時共享",
+      "sharedHint": "所有能使用值守的人都可以啟用它。",
+      "saveAsPreset": "另存為預設",
+      "savedPreset": "已儲存",
+      "failed": "無法建立自動化",
+      "saveFailed": "無法儲存預設"
+    },
+    "presets": {
+      "daily-patrol": {
+        "title": "每日巡檢",
+        "description": "每天 09:00 檢查所有主機的磁碟、記憶體、負載、失敗的服務、容器、憑證、更新、待重新啟動和時間同步，並按嚴重程度彙總報告。"
+      },
+      "disk-cleanup": {
+        "title": "磁碟空間處理",
+        "description": "磁碟使用率持續 5 分鐘不低於 85% 時，找出佔用並提出安全的清理方案，由你核准後執行。業務資料一律不碰。"
+      },
+      "host-down-triage": {
+        "title": "主機離線排查",
+        "description": "主機離線時，從其他主機和 Proxmox 探測它，判斷是網路、機器停止還是 SSH 的問題。"
+      },
+      "service-failure": {
+        "title": "服務故障處理",
+        "description": "健康檢查開始失敗時，找出背後的 systemd 單元，查看狀態和日誌，在重新啟動有幫助時提出一次重新啟動，由你核准後執行。設定一律不改。"
+      },
+      "container-anomaly": {
+        "title": "容器異常處理",
+        "description": "容器結束、變為不健康或反覆重新啟動時，查看其狀態、結束代碼、日誌和記憶體，提出一次啟動或重新啟動，由你核准後執行。不刪除任何東西。"
+      },
+      "resource-overload-cpu": {
+        "title": "CPU 過載",
+        "description": "CPU 持續 15 分鐘不低於 95% 時，找出背後的程序、服務和容器，並報告處理建議。不做任何變更。"
+      },
+      "resource-overload-memory": {
+        "title": "記憶體過載",
+        "description": "記憶體持續 10 分鐘不低於 95% 時，找出佔用、置換和 OOM 終止情況，並報告處理建議。不做任何變更。"
+      },
+      "security-updates-weekly": {
+        "title": "每週安全更新",
+        "description": "每週一 09:30 彙總待安裝的安全更新（按嚴重程度）、待重新啟動及其相關套件、執行中與已安裝核心、距上次更新天數，所有主機一張表。"
+      },
+      "cert-expiry-weekly": {
+        "title": "每週憑證到期",
+        "description": "每週一 09:45 讀取每台主機上 Let's Encrypt、網頁伺服器和 Kubernetes 憑證的到期時間，30 天內到期標為警告，7 天內為嚴重。"
+      },
+      "failing-drive": {
+        "title": "硬碟故障",
+        "description": "當 Storage Health 發現硬碟故障或磨損、儲存池或陣列降級、精簡池即將寫滿時，讀取 SMART、陣列和儲存池狀態，並回報緊急程度與處理建議。不會變更任何內容。"
+      }
+    },
+    "report": {
+      "verdict": "結論",
+      "evidence": "證據",
+      "actionsTaken": "已做的事",
+      "recommendations": "建議",
+      "nothingFound": "執行結束前沒有發現任何內容。",
+      "noChanges": "沒有做任何變更。",
+      "openConversation": "在助手中開啟對應對話，可以查看每一步並繼續追問。",
+      "noFurtherAction": "無需進一步操作。",
+      "stoppedBudgetRun": "已停止：本次執行已用完 {{tokens}} tokens 的預算。",
+      "stoppedBudgetDaily": "已停止：擁有者今天 {{tokens}} tokens 的預算已用完。",
+      "stoppedDeadline": "已停止：已到達自動化的時間上限。",
+      "stoppedPaused": "已停止：管理員暫停了 AI 自動運維。",
+      "stoppedAborted": "已停止：自動化執行被取消。",
+      "providerFailed": "AI 提供商出錯：{{error}}",
+      "noHosts": "自動化擁有者無法連線任何目標主機。",
+      "noProvider": "自動化擁有者沒有可用於執行任務的 AI 提供商和模型。",
+      "needsOpsUse": "自動化擁有者沒有 ai.ops.use 權限。",
+      "assistantOff": "自動化擁有者沒有啟用 AI 助手。",
+      "skippedPaused": "AI 自動運維已被管理員暫停。",
+      "skippedDuplicate": "同一自動化和主機已有任務在執行或等待審批。",
+      "skippedRate": "這個自動化在過去一小時內已啟動 {{count}} 個 AI 任務。",
+      "hostNotRun": "未執行：方案已被停止。",
+      "hostNoAccess": "未執行：擁有者已無法連線這台主機。",
+      "hostUnreachable": "未執行：無法連線這台主機。",
+      "hostStopped": "在第一條失敗的指令處停止。",
+      "executionDone": "已核准的方案在 {{count}} 台主機上執行完畢，所有指令和驗證均成功。",
+      "executionFailed": "已核准的方案沒有在所有主機上完成。",
+      "executionStopped": "已核准的方案在完成前被停止。",
+      "approvedBy": "已按原樣執行核准的方案。核准人：{{user}}。",
+      "noticeReported": "AI 報告：{{title}}",
+      "noticeProposed": "AI 方案待審批：{{title}}",
+      "noticeExecuted": "AI 方案已執行：{{title}}",
+      "noticeFailed": "AI 任務失敗：{{title}}",
+      "noticeAssetsAnnotationFailed": "資產標註失敗"
+    }
+  },
+  "assets": {
+    "title": "資產",
+    "search": "搜尋名稱、鍵或位址",
+    "allZones": "全部區域",
+    "showRemoved": "顯示已移除",
+    "collectNow": "立即採集",
+    "collecting": "採集中…",
+    "collectFailed": "無法開始採集",
+    "neverRun": "尚未採集",
+    "lastRun": "上次採集 {{time}}：{{total}} 台主機中 {{ok}} 台成功",
+    "lastRunFailed": "{{time}} 的採集失敗",
+    "hostsFailed_other": "{{count}} 台失敗",
+    "loadFailed": "無法載入資產清單",
+    "saveFailed": "無法儲存",
+    "empty": "還沒有資產",
+    "emptyHint": "點擊立即採集，讀取採集帳號能連線的所有主機。",
+    "emptyHintView": "需要擁有 ai.assets.manage 權限的人先進行採集。",
+    "removed": "已移除",
+    "pinned": "已固定",
+    "multiZone": "跨區域",
+    "multiZoneHint": "在多個區域都有位址，能同時存取兩邊，是潛在的跳板。",
+    "columns": {
+      "name": "名稱",
+      "kind": "類型",
+      "zone": "區域",
+      "ips": "位址",
+      "listening": "連接埠",
+      "outbound": "出站",
+      "services": "服務",
+      "collected": "上次採集",
+      "role": "作用",
+      "importance": "重要程度",
+      "system": "所屬系統"
+    },
+    "kind": {
+      "host": "主機",
+      "guest": "來賓",
+      "container": "容器",
+      "external": "外部"
+    },
+    "zone": {
+      "internal": "內網",
+      "dmz": "DMZ",
+      "external": "外網",
+      "cloud": "雲端",
+      "overlay": "Overlay"
+    },
+    "sections": {
+      "os": "作業系統",
+      "hostname": "主機名稱",
+      "uptimeSec": "運行時間（秒）",
+      "interfaces": "網路介面",
+      "routes": "路由",
+      "listening": "監聽連接埠",
+      "connections": "已建立連線",
+      "services": "執行中的服務",
+      "containers": "容器",
+      "kubernetes": "Kubernetes",
+      "guests": "Proxmox 虛擬機與容器",
+      "cloud": "雲端",
+      "missing": "沒有輸出的部分",
+      "guest": "Proxmox 來賓",
+      "container": "容器"
+    },
+    "outgoing": "出向關係",
+    "incoming": "入向關係",
+    "noEdges": "無",
+    "stale": "最近一次採集未再出現",
+    "pinZone": "區域",
+    "rulesDecide": "由規則決定",
+    "settingsTitle": "區域與排程",
+    "scheduleTitle": "採集",
+    "daily": "每天採集",
+    "dailyHint": "主機新增或修改時也會重新採集。",
+    "time": "時間（UTC）",
+    "save": "儲存",
+    "collector": "以{{collector}}的身分採集，只涵蓋該帳號能連線的主機。",
+    "collectorMe": "你",
+    "collectorOther": "另一位管理者",
+    "collectorNone": "（尚未設定）",
+    "collectAsMe": "改為以我的身分採集",
+    "zonesTitle": "區域規則",
+    "zonesHint": "規則把 CIDR 對應到區域，優先於內建規則。前綴最長的規則優先，其次是優先順序高的。儲存後會立即重新劃分資產區域。",
+    "zoneName": "名稱",
+    "zoneNameExample": "機房內網",
+    "zoneKind": "類型",
+    "cidr": "CIDR",
+    "priority": "優先順序",
+    "addZone": "新增規則",
+    "deleteZone": "刪除規則",
+    "cancelEdit": "取消",
+    "annotating": "正在標註…",
+    "neverAnnotated": "尚未標註",
+    "lastAnnotation": "上次標註 {{time}}：{{total}} 個資產中 {{ok}} 個，{{tokens}} tokens",
+    "annotationFailed": "失敗：{{reason}}",
+    "annotateNow": "立即標註",
+    "annotateFailed": "無法開始標註",
+    "modeTable": "表格",
+    "modeGraph": "圖譜",
+    "importance": {
+      "critical": "關鍵",
+      "high": "高",
+      "medium": "中",
+      "low": "低"
+    },
+    "importanceUnknown": "未評級",
+    "importanceReason": "理由",
+    "sourceAi": "AI",
+    "sourceAiHint": "由標註產生，下次執行可能會更新。",
+    "sourceUser": "已鎖定",
+    "sourceUserHint": "由人工設定，解鎖前標註執行不會改動。",
+    "unlock": "解鎖：交還給標註重新填寫",
+    "unlockField": "解鎖{{field}}",
+    "editAnnotation": "編輯",
+    "lockHint": "你修改的欄位會被鎖定，之後的標註執行不會覆蓋。",
+    "factsTitle": "事實",
+    "closePanel": "關閉",
+    "impact": "影響分析",
+    "clearImpact": "清除",
+    "impactSummary_other": "它掛了會波及 {{count}} 個資產（關鍵 {{critical}}，高 {{high}}），另有 {{weak}} 個只是連線到它們。",
+    "impactTruncated": "已在 6 跳或 300 個資產處截斷。",
+    "impactDirect": "直接",
+    "impactTransitive": "間接",
+    "impactWeak": "僅連線",
+    "expandContainers": "顯示容器",
+    "showExternal": "顯示外部位址",
+    "graphCounts": "{{nodes}} 個資產，{{edges}} 條關係",
+    "graphTitle": "資產圖譜",
+    "noZone": "無區域",
+    "annotationTitle": "AI 標註",
+    "annotateAfterCollect": "每次採集後標註",
+    "annotateAfterCollectHint": "只把上次標註後有變動的資產及其相鄰資產傳給模型。",
+    "annotateProvider": "提供者",
+    "annotateProviderDefault": "採集人的自動維運選擇",
+    "annotateModel": "模型",
+    "annotateModelDefault": "提供者的預設模型",
+    "annotationHint": "標註以採集人的身分、用採集人的提供者執行。摘要不含環境變數、命令列和外部位址。",
+    "annotateAll": "全部重新標註"
+  },
+  "exposure": {
+    "title": "網際網路入口",
+    "disclaimer": "僅展示設定證據。公網綁定及轉送規則不代表網際網路可達；私網監聽保留作為後端關聯證據。",
+    "loadFailed": "無法載入入口清單。",
+    "saveFailed": "無法儲存優先級。",
+    "search": "篩選位址、主機、網域或路徑",
+    "allPriority": "全部優先級",
+    "allZones": "全部區域",
+    "allSources": "全部來源",
+    "high": "高",
+    "medium": "中",
+    "low": "低",
+    "active": "目前入口",
+    "stale": "已過期",
+    "resolved": "不再觀測到",
+    "all": "全部",
+    "refresh": "重新整理",
+    "loading": "載入中…",
+    "empty": "沒有符合的入口。請先檢查下方採集覆蓋，不能據此判斷沒有暴露。",
+    "never": "尚未採集。採集資產後將產生入口清單。",
+    "endpoint": "入口",
+    "source": "來源",
+    "priority": "複核優先級",
+    "pathState": "設定路徑",
+    "freshness": "新鮮度",
+    "details": "證據詳情",
+    "close": "關閉",
+    "notTested": "外部可達性：未驗證。",
+    "priorityReason": "優先級僅供複核，不是漏洞結論。公網管理及資料服務連接埠優先複核，服務身分和存取控制仍需驗證。",
+    "tls": "TLS 設定",
+    "restrictions": "存取限制",
+    "observed": "最近觀測",
+    "rulePriority": "按規則計算（解除鎖定）",
+    "evidence": "觀測紀錄",
+    "coverage": "採集覆蓋",
+    "changes": "最近變化",
+    "current": "目前",
+    "partial": "不完整",
+    "complete": "設定關聯完整",
+    "conflicting": "歧義或循環",
+    "configured": "設定已宣告",
+    "unknown": "未知",
+    "status_ok": "已採集",
+    "status_unsupported": "工具不可用",
+    "status_denied": "權限不足",
+    "status_failed": "採集或解析失敗",
+    "status_truncated": "結果截斷",
+    "change_baseline": "已建立基線",
+    "change_added": "新增入口",
+    "change_changed": "設定變化",
+    "change_removed": "不再觀測到入口",
+    "change_coverage": "覆蓋退化",
+    "explain": "解釋證據",
+    "explaining": "解釋中…",
+    "explainFailed": "解釋失敗或證據已變更。",
+    "aiLabel": "AI 解讀 · 不代表已驗證結論",
+    "previous": "上一頁",
+    "next": "下一頁",
+    "binding": "綁定範圍",
+    "binding_public": "公網入口候選",
+    "binding_local": "私網／本機後端",
+    "binding_unknown": "未確定綁定",
+    "ruleGaps": "未解析規則：{{count}}",
+    "unsupportedRule": "規則暫不支援，保留上次證據",
+    "scope": "檢視",
+    "scope_internet": "網際網路入口候選",
+    "scope_all": "全部證據",
+    "scope_unknown": "暴露範圍未知",
+    "inventorySummary": "{{internet}} 個網際網路入口候選 · 共 {{all}} 條規則 · {{unknown}} 條暴露範圍未知",
+    "bindingCount": "{{count}} 個觀測綁定位址",
+    "pathsTruncated": "鏈路展開已達上限，目前僅為部分證據。",
+    "pathBranch": "路徑 {{index}}",
+    "branched": "依條件分支",
+    "reason_sensitive": "入口或後端使用需重點複核的服務連接埠 {{port}}",
+    "reason_public-address": "觀測到公網位址綁定",
+    "reason_wan-zone": "OpenWrt 來源區域為 WAN，防火牆是否放行尚未驗證",
+    "reason_configured-public-tunnel": "設定了公網隧道，外部可達性尚未驗證",
+    "reason_internal-only": "僅觀測到內網或本地綁定",
+    "reason_exposure-unknown": "證據不足，尚不能判定暴露範圍",
+    "reason_critical-asset": "資產被標為關鍵資產",
+    "reason_manual": "使用者指定的優先級"
+  },
+  "companion": {
+    "toggle": "助理面板"
+  },
+  "widget": {
+    "loading": "載入中...",
+    "empty": "尚無工作項目",
+    "pending_other": "{{count}} 個計畫等待核准",
+    "maxItems": "要顯示的工作項目數"
+  }
+}

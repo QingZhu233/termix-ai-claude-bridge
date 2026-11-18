@@ -1,0 +1,872 @@
+{
+  "permissions": {
+    "use": {
+      "title": "Käytä avustajaa",
+      "description": "Avaa avustaja ja kysy siltä asioita."
+    },
+    "manage_providers": {
+      "title": "Hallinnoi palveluntarjoajia",
+      "description": "Lisää, muokkaa ja poista tekoälypalveluntarjoajia sekä niiden API-avaimia."
+    },
+    "apply_proposals": {
+      "title": "Hyväksy ehdotukset",
+      "description": "Anna avustajan toteuttaa sen ehdottamat muutokset."
+    },
+    "services": {
+      "use": {
+        "title": "Käytä tekoälyä muissa ominaisuuksissa",
+        "description": "Muut ominaisuudet voivat kutsua avustajaa puolestasi."
+      }
+    },
+    "secrets": {
+      "share": {
+        "title": "Jaa API-avain",
+        "description": "Muut ominaisuudet voivat käyttää tallennettua tekoälyn API-avainta näkemättä sitä."
+      }
+    },
+    "ops": {
+      "use": {
+        "title": "Suorita komentoja isäntäkonioissa tekoälyavustajan avulla",
+        "description": "Salli avustajan suorittaa mitä tahansa shell-komentoa valitsemillasi isäntäkonioilla. Oletuksena vain ylläpitäjille."
+      }
+    },
+    "usage": {
+      "view_all": {
+        "title": "Näytä kaikkien tekoälyn käyttö",
+        "description": "Näe, kuinka monta tokenia jokaisen käyttäjän tekoälykutsut käyttivät, ei vain omiasi. Oletuksena vain ylläpitäjille."
+      }
+    },
+    "assets": {
+      "view": {
+        "title": "Näytä omaisuuskanta",
+        "description": "Näytä kerätyt isäntäpalvelimet, vieraskoneet, kontit, vyöhykkeet ja yhteydet. Oletuksena vain ylläpitäjille."
+      },
+      "manage": {
+        "title": "Hallitse omaisuuskantaa",
+        "description": "Aloita keräyksiä, muokkaa vyöhykesääntöjä, kiinnitä vyöhykkeitä ja muuta aikataulua. Keräys lukee isäntäpalvelimia vain lukuoikeudella. Oletuksena vain ylläpitäjille."
+      }
+    }
+  },
+  "settings": {
+    "assistantUnavailable": "Tekoälyavustaja on poissa käytöstä tässä palvelimessa.",
+    "providersNeedOptIn": "Ota tekoälyavustaja käyttöön yllä voidaksesi lisätä palveluntarjoajia.",
+    "providers": {
+      "label": "Palveluntarjoajat",
+      "description": "Tekoälypalvelut, joita avustaja ja agentit voivat käyttää."
+    },
+    "admin": {
+      "globallyEnabled": {
+        "label": "Tekoälyavustaja",
+        "description": "Anna käyttäjien ottaa tekoälyavustaja käyttöön. Kun tämä on pois päältä, avustaja on piilotettu ja estetty kaikilta."
+      },
+      "privateEndpoints": {
+        "label": "Sallitut yksityiset tekoälypalvelimet",
+        "description": "Palvelimet yksityisessä verkossasi, joihin käyttäjät voivat osoittaa palveluntarjoajan, kuten itse isännöityn Ollaman. Kirjoita yksi palvelin per rivi."
+      },
+      "opsConcurrency": {
+        "label": "Tekoälyavustajan rinnakkaiset isäntäkoneet",
+        "description": "Kuinka monta isäntäkoneita avustajan komento suorittaa samanaikaisesti."
+      },
+      "opsCommandTimeout": {
+        "label": "Tekoälyavustajan komennon aikakatkaisu (sekuntia)",
+        "description": "Kuinka kauan komento saa suorittua isäntäkoneella ennen sen keskeyttämistä. Avustaja voi pyytää enintään 600 sekuntia."
+      },
+      "opsOutputLimit": {
+        "label": "Tekoälyavustajan tuotos isäntäkoneetta kohti (merkkiä)",
+        "description": "Kuinka paljon jokaisen isäntäkoneen tuotosta tallennetaan. Pitkät tuotokset säilyttävät alku- ja lopputiedot."
+      },
+      "autoOpsPaused": {
+        "label": "Keskeytä tekoälyn automaattitoiminnot",
+        "description": "Keskeyttää kaikki käynnissä olevat tekoälytehtävät ja hyväksytyt suunnitelmat sekä hylkää uudet, kunnes toiminto otetaan uudelleen käyttöön."
+      },
+      "autoOpsRunsPerHour": {
+        "label": "Tehtäviä tekoälyautomaatiota kohti tunnissa",
+        "description": "Samana tuntina tapahtuvat lisäaktivointitapahtumat ohitetaan."
+      },
+      "autoOpsRunTokens": {
+        "label": "Tokenbudjetti per tekoälytehtävä",
+        "description": "Tehtävä, joka käyttää tämän määrän tokeneja, keskeytetään ja se raportoi löydöksensä."
+      },
+      "autoOpsDailyTokens": {
+        "label": "Päivittäinen tekoälytokenbudjetti käyttäjää kohti",
+        "description": "Kun käyttäjä on käyttänyt tämän määrän tokeneja tänään (UTC), hänen tekoälytehtävänsä ohitetaan tai keskeytetään."
+      },
+      "assetsDailyCollect": {
+        "label": "Kerää omaisuuskanta päivittäin",
+        "description": "Lukukerran jokaisen isäntäpalvelimen, johon kerääjä pystyy muodostamaan yhteyden, kerran päivässä yhdellä vain lukuoikeudella toimivalla skriptillä."
+      },
+      "assetsCollectTime": {
+        "label": "Omaisuuskannan keräysaika (UTC)",
+        "description": "TT:MM, esimerkiksi 03:00."
+      },
+      "assetsCollector": {
+        "label": "Omaisuuskannan kerääjä"
+      },
+      "assetsAnnotateAfterCollect": {
+        "label": "Merkitse omaisuudet jokaisen keräyksen jälkeen",
+        "description": "Malli kirjoittaa jokaisen muuttuneen omaisuuden roolin, tärkeyden ja liiketoimintajärjestelmän sekä faktojen osoittamat riippuvuudet."
+      },
+      "assetsAnnotateRunTokens": {
+        "label": "Tokenbudjetti per omaisuuden merkintäsuoritus",
+        "description": "Suoritus pysähtyy, kun mallikutsut ovat käyttäneet tämän määrän tokeneja; kirjoitettu sisältö säilyy."
+      },
+      "assetsAnnotateProvider": {
+        "label": "Omaisuuden merkintäpalveluntarjoaja"
+      },
+      "assetsAnnotateModel": {
+        "label": "Omaisuuden merkintämalli"
+      },
+      "exposureRetentionDays": {
+        "label": "Altistushistorian säilytysaika (päivää)",
+        "description": "Säilyttää odottavat ilmoitukset ja todisteet, joihin nykyiset merkinnät viittaavat, riippumatta iästä."
+      }
+    },
+    "host": {
+      "enableAiAssistant": {
+        "label": "Ota tekoälyavustaja käyttöön",
+        "description": "Salli tekoälyavustajan auttaa tämän palvelimen pääteikkunassa. Oletuksena pois päältä, ja edellyttää myös tekoälyn olevan käytössä tililläsi."
+      },
+      "showPanel": {
+        "label": "Paneeli terminaalin vieressä",
+        "description": "Tarjoa avustajan paneeli tämän isäntäpalvelimen SSH-terminaalin vieressä."
+      }
+    },
+    "user": {
+      "autoOpsPreferences": {
+        "label": "Automaattitoimintojen asetukset"
+      },
+      "companionAutoOpen": {
+        "label": "Avaa avustajan paneeli terminaalin kanssa",
+        "description": "Näytä avustajan paneeli, kun terminaali avautuu isäntäpalvelimella, jossa se on käytössä."
+      },
+      "companionSide": {
+        "label": "Avustajan paneelin sijainti",
+        "description": "Missä paneeli sijaitsee terminaalin vieressä.",
+        "right": "Oikealla",
+        "left": "Vasemmalla",
+        "bottom": "Alareunassa"
+      },
+      "companionSize": {
+        "label": "Avustajan paneelin koko",
+        "description": "Leveys tai alareunan korkeus pikseleinä."
+      },
+      "companionEdgeButton": {
+        "label": "Avustajan paneelin reunapainike",
+        "description": "Näytä pieni painike terminaalin reunassa paneelin avaamiseksi."
+      }
+    }
+  },
+  "ai": {
+    "send": "Lähetä",
+    "stop": "Pysäytä",
+    "save": "Tallenna",
+    "cancel": "Peruuta",
+    "running": "käsittelyssä",
+    "approve": "Hyväksy",
+    "reject": "Hylkää",
+    "selectProvider": "Valitse palveluntarjoaja",
+    "addProvider": "Lisää palveluntarjoaja",
+    "manageModels": "Hallitse malleja",
+    "editProvider": "Muokkaa palveluntarjoajaa",
+    "removeProvider": "Poista palveluntarjoaja",
+    "providerType": "Palveluntarjoaja",
+    "providerLabel": "Nimi",
+    "providerLabelPlaceholder": "Esimerkiksi: Paikallinen Ollama",
+    "baseUrl": "Palvelimen osoite",
+    "apiKey": "API-avain",
+    "defaultModel": "Oletusmalli",
+    "defaultModelPlaceholder": "Esimerkiksi: llama3.1 tai claude-opus-5",
+    "labelRequired": "Anna palveluntarjoajalle nimi",
+    "providerSaveFailed": "Palveluntarjoajaa ei voitu tallentaa",
+    "providerUpdated": "Palveluntarjoaja päivitetty",
+    "providerDeleteFailed": "Palveluntarjoajaa ei voitu poistaa",
+    "privateEndpointHint": "Yksityisen verkon osoitteet vaativat ylläpitäjän sallimaan palvelimen ensin.",
+    "providerOllama": "Ollama",
+    "providerAnthropic": "Anthropic",
+    "providerOpenai": "OpenAI",
+    "providerGemini": "Google Gemini",
+    "providerOpenaiCompatible": "OpenAI-yhteensopiva",
+    "toolArguments": "Syöte",
+    "toolResult": "Tulos",
+    "statusApplied": "Toteutettu",
+    "statusRejected": "Hylätty",
+    "proposalApplyFailed": "Muutosta ei voitu toteuttaa",
+    "proposalRejectFailed": "Muutosta ei voitu hylätä",
+    "enableTitle": "Ota tekoälyavustaja käyttöön",
+    "enableDescription": "Anna avustajan lukea asetuksesi ja ehdottaa muutoksia, jotka voit hyväksyä.",
+    "readOnlyCommands": "Salli vain lukuun tarkoitetut diagnostiikkakomennot",
+    "readOnlyCommandsDescription": "Avustaja voi suorittaa lyhyen luettelon turvallisia komentoja, kuten df ja uptime, kysymättä joka kerta. Kaikki palvelinta muuttavat toimet ehdotetaan aina ensin.",
+    "modelDetectFailed": "Palveluntarjoajaan ei saatu yhteyttä, joten tämä on yleinen lista. Voit kirjoittaa minkä tahansa mallin nimen.",
+    "modelCustom": "Syötä mallin nimi",
+    "modelRefresh": "Päivitä lista",
+    "modelPlaceholder": "Valitse tai kirjoita malli",
+    "runCommandTitle": "Suorita komento",
+    "assistant": "Teekohtainen avustaja",
+    "terminalPanelEmpty": "Kysy avustajalta tästä isännästä. Kaikki tilaa muuttavat toimet vaativat ensin hyväksyntäsi.",
+    "terminalPanelPlaceholder": "Kysy tästä isännästä...",
+    "noProvidersConfigured": "Yhtään tekoälypalveluntarjoajaa ei ole vielä määritetty. Lisää yksi Asetuksista.",
+    "runsInOpenTerminal": "Suoritetaan avoimessa terminaalisessiossasi.",
+    "runInTerminal": "Suorita",
+    "terminalContextPrefill": "Tässä on terminaalin tuotanto:\n\n{{output}}\n\n",
+    "secrets": {
+      "shareApiKey": "Salli muiden ominaisuuksien käyttää teekohtaisen palveluntarjoajasi API-avainta omiin pyyntöihinsä. Avainta ei koskaan kopioida, ja voit peruuttaa tämän milloin tahansa."
+    },
+    "removeProviderConfirm": "Poista palveluntarjoaja {{name}}?",
+    "contextWindows": "Kontekstikkoko per malli",
+    "contextWindowsHint": "Lue palveluntarjoajalta, jos se ilmoittaa arvon. Syötä tokenien määrä, jos haluat ohittaa arvon tietylle mallille, tai jätä tyhjäksi käyttääksesi palveluntarjoajan ilmoittamaa arvoa. Päivityspainike kysyy palveluntarjoajalta uudestaan.",
+    "contextWindowValue": "Kontekstikkoko: {{tokens}} ({{source}})",
+    "contextOverride": "Kontekstikokoa ohittava arvo mallille {{model}}",
+    "contextSourceOverride": "asettanut sinä",
+    "contextSourceProvider": "ilmoittanut palveluntarjoaja",
+    "contextSourceGuess": "arvioitu mallin nimen perusteella",
+    "contextSourceDefault": "oletus tuntemattomille malleille",
+    "contextLoadFailed": "Kontekstikokojen lukeminen epäonnistui",
+    "contextRefresh": "Päivitä",
+    "contextWindowInvalid": "Syötä kontekstikkokoona kokonaisluku tokenina, vähintään 1024.",
+    "advanced": "Lisäasetukset",
+    "advancedHint": "Jätä asetus oletusarvoon käyttääksesi mallin omia arvoja.",
+    "advancedDefault": "Oletus",
+    "advancedDefaultAuto": "Oletus (automaattinen)",
+    "advancedAuto": "Automaattinen",
+    "advancedEndpoint": "Päätepiste",
+    "advancedEndpointResponses": "Responses API",
+    "advancedEndpointChat": "Chat Completions",
+    "advancedReasoningEffort": "Pohdintatyö",
+    "advancedReasoningSummary": "Pohdinnan yhteenveto",
+    "advancedReasoningSummaryHint": "Vain Responses API.",
+    "advancedVerbosity": "Yksityiskohtaisuus",
+    "advancedNone": "Ei mitään",
+    "advancedMinimal": "Minimaalinen",
+    "advancedLow": "Matala",
+    "advancedMedium": "Keskitaso",
+    "advancedHigh": "Korkea",
+    "advancedXhigh": "Erittäin korkea",
+    "advancedMax": "Maksimiarvo",
+    "advancedConcise": "Tiivis",
+    "advancedDetailed": "Yksityiskohtainen",
+    "advancedOff": "Pois päältä",
+    "advancedMaxOutputTokens": "Maksimimäärä tuotettavia tokenia",
+    "advancedMaxOutputTokensInvalid": "Syötä kokonaisluku väliltä 1–1 000 000.",
+    "advancedTemperature": "Lämpötila",
+    "advancedTemperatureHint": "OpenAI:n pohdintamallit hyväksyvät tämän vain, kun pohdintatyö on arvo Ei mitään, joten muilla arvoilla sitä ei lähetetä.",
+    "advancedTemperatureInvalid": "Syötä luku väliltä 0–2."
+  },
+  "nav": {
+    "ai": "Te keinoinen avustaja"
+  },
+  "onboarding": {
+    "aiTitle": "Teekohtainen avustaja",
+    "aiIntro": "Termixiin voi sisällyttää teekohtaisen avustajan. Voit muuttaa tätä myöhemmin asetuksissasi.",
+    "aiSkipTitle": "Jätä pois päältä",
+    "aiSkipDesc": "Termix toimii kuten nyt. Avustaja pysyy piilossa.",
+    "aiEnableTitle": "Ota käyttöön",
+    "aiEnableDesc": "Lisää avustaja, joka lukee asetuksesi ja ehdottaa muutoksia, jotka hyväksyt. Vaatii palveluntarjoajan, jonka tarjoat, kuten paikallisen Ollaman.",
+    "aiNote": "Mitään ei lähetetä mihinkään, ennen kuin lisäät palveluntarjoajan ja lähetät viestin."
+  },
+  "agents": {
+    "working": "Työskentelee...",
+    "startingIndicator": "Agentin käynnistäminen...",
+    "noCompatibleProvider": "Yksikään teekohtaisista palveluntarjoajistasi ei toimi {{agent}}:n kanssa. Claude Code tarvitsee Anthropicin ja Codex tarvitsee OpenAIn.",
+    "noProviders": "Lisää ensin teekohtainen palveluntarjoaja asetuksiin.",
+    "title": "Teekohtainen agentti",
+    "permissionTitle": "Suorita etä-teekohtaisia agenteja",
+    "permissionDescription": "Käynnistä koodausagentteja SSH-isännissä käyttäen määritettyjä teekohtaisia palveluntarjoajia. Agentit voivat suorittaa komentoja ja muuttaa tiedostoja SSH-käyttäjän oikeuksin.",
+    "new": "Uusi istunto",
+    "description": "Suorita agentti hakemistossa tässä isännässä käyttäen Termixin teekohtaista palveluntarjoajaa.",
+    "runtime": "Agentti",
+    "provider": "Termix-palveluntarjoaja",
+    "chooseProvider": "Valitse yhteensopiva palveluntarjoaja",
+    "model": "Malli",
+    "directory": "Työhakemisto",
+    "executable": "Suoritettava ohjelma (valinnainen absoluuttinen polku)",
+    "requirements": "Isännän tarvitsee Node.js 22.19+ ja valitun agentin asennettuna. SSH-etäloopback-välityksen on oltava sallittu. Olemassa olevia agenttiasetuksia ei ylitiedetä.",
+    "responsesRequired": "Codex vaatii Responses API -päätepisteen. Vain Chat Completions -päätepiste ei voi suorittaa Codexia.",
+    "piPermissions": "Pi-työkalut suoritetaan tämän SSH-tilin oikeuksin. Käynnistä vain hakemistossa, jonka olet valtuuttanut agentin muuttamaan.",
+    "start": "Käynnistä agentti",
+    "resume": "Jatka",
+    "stop": "Pysäytä istunto",
+    "interrupt": "Keskeytä vuoro",
+    "send": "Lähetä",
+    "prompt": "Pyydä agenttia työskentelemään tässä hakemistossa...",
+    "noSessions": "Ei agentti-istuntoja tälle isännälle.",
+    "approval": "Agentti tarvitsee päätöksesi",
+    "answer": "Vastaa (JSON rakenteellisille kysymyksille)",
+    "allow": "Salli kerran",
+    "deny": "Kiellä",
+    "tool": "Työkalutoiminta",
+    "streamFailed": "Agentin virta katkesi. Avaa istunto uudelleen muodostaaksesi yhteyden.",
+    "status": {
+      "starting": "Käynnistyy",
+      "ready": "Valmis",
+      "running": "Työskentelee",
+      "stopped": "Pysäytetty",
+      "error": "Virhe"
+    },
+    "installRuntime": "Asenna valittu agentti ja Node.js",
+    "installSource": "Vain viralliset lähteet: nodejs.org (SHA-256-varmistettu) ja registry.npmjs.org (lukittu paketin eheys). Asennus SSH-käyttäjälle hakemistoon ~/.local/share/termix-agent-runtime; vaatii curlin, tarin ja Linux/macOS x64- tai arm64-arkkitehtuurin. Ei muuta SSH-välityskäytäntöä.",
+    "installSucceeded": "Asennus vahvistettu. Voit nyt käynnistää agentin; SSH:n silmukointikaukovälityksen on myös oltava sallittu.",
+    "installFailed": "Asennus epäonnistui. Tarkista loki ja yritä uudelleen.",
+    "installLog": "Asennusloki",
+    "enableForwarding": "Ota agenttivälitys käyttöön",
+    "forwardingScope": "Linux, jossa on systemd/OpenSSH; vaatii root-oikeudet tai salasanasuodan. Varmuuskopioi ja validoi SSH-määritykset, ja lataa ne uudelleen. Vain nykyinen SSH-tili ja havaittu yhteyden lähde saavat silmukointikaukovälityksen; olemassa oleva paikallinen välitys säilyy. Epäonnistuneet muutokset kumotaan.",
+    "forwardingSucceeded": "SSH:n silmukointikaukovälitys on valmis. Käynnistä tai jatka agenttia luodaksesi uuden SSH-yhteyden.",
+    "forwardingFailed": "SSH-välityksen määritys epäonnistui. Tarkista loki; mitään validoimattomia määrityksiä ei säilytetä.",
+    "search": "Hae istunnoista",
+    "sessionName": "Istunnon nimi",
+    "rename": "Nimeä uudelleen",
+    "archive": "Arkistoi ja pysäytä",
+    "restore": "Palauta istunto",
+    "queue": "Jonotetut viestit",
+    "enqueue": "Lisää viesti jonoon",
+    "continueQueue": "Jatka jonoa",
+    "pauseQueue": "Keskeytä jono",
+    "editQueued": "Muokkaa jonotettua viestiä",
+    "save": "Tallenna",
+    "remove": "Poista",
+    "upload": "Lataa liite",
+    "remoteFile": "Tiedoston polku työskentelyhakemiston sisällä",
+    "attach": "Liitä tiedosto isäntäkonelta",
+    "attachments": "Hyödynnä aiempaa liitettä",
+    "attachmentLimit": "Enintään 4 liitettä, 1 Mt kpl",
+    "review": "Git-muutokset",
+    "gitStatus": "Päivitä Git-tila",
+    "diffFile": "Tarkistettavan tiedoston polku",
+    "diff": "Näytä erot",
+    "branch": "Uuden haaran nimi",
+    "createWorktree": "Luo työpuu",
+    "useWorktree": "Uusi istunto tässä työpuussa",
+    "worktreeHint": "Luo uuden haaran HEADista. Tallentamattomat muutokset pysyvät nykyisessä hakemistossa. Olemassa olevia työpuita ei koskaan poisteta automaattisesti.",
+    "clean": "Ei muutoksia",
+    "reconnecting": "Yhdistetään uudelleen ja palautetaan viestejä…",
+    "unavailable": "Istuntoa ei ole enää saatavilla. Tarkista oikeuksesi tai kirjaudu sisään uudelleen.",
+    "shortcuts": "Enter lähettää tai jonoittaa · Shift+Enter lisää rivin · Esc keskeyttää ja pysäyttää jonon",
+    "activeSessions": "Aktiiviset",
+    "archivedSessions": "Arkistoidut",
+    "dismiss": "Hylkää",
+    "changes": "Muutokset",
+    "close": "Sulje",
+    "cancel": "Peruuta",
+    "sessionSetup": "Istunto",
+    "hostSetup": "Isäntäkonfiguraatio",
+    "changedFiles": "Muutetut tiedostot",
+    "worktree": "Työpuu",
+    "attachShort": "Liitä",
+    "emptyTranscript": "Lähetä viesti aloittaaksesi agentin."
+  },
+  "plugin": {
+    "name": "Te keinoinen avustaja",
+    "description": "Te keinoinen avustaja, joka lukee asetuksesi ja ehdottaa muutoksia hyväksyttäväksesi."
+  },
+  "ops": {
+    "searchHosts": "Hae isäntiä",
+    "selectedCount": "{{count}} valittu",
+    "clear": "Tyhjennä",
+    "fleets": "Laivastot",
+    "folders": "Kansiot",
+    "tags": "Tunnisteet",
+    "allHosts": "Kaikki isännät",
+    "noHosts": "Ei isäntiä",
+    "newConversation": "Uusi keskustelu",
+    "sendHint_one": "Suorittaa {{count}} isännässä. Komennot suoritetaan kysymättä lupaa.",
+    "sendHint_other": "Suorittaa {{count}} isännässä. Komennot suoritetaan kysymättä lupaa.",
+    "runCommand": "Suorita komento",
+    "hostFacts": "Isännän tiedot",
+    "hostCount_one": "{{count}} isäntä",
+    "hostCount_other": "{{count}} isäntää",
+    "succeeded": "{{count}} onnistui",
+    "failed": "{{count}} epäonnistui",
+    "exitCode": "poistumisarvo {{code}}",
+    "timedOut": "aikakatkaisu",
+    "stopped": "pysäytetty",
+    "notRun": "ei suoritettu",
+    "cached": "välimuistissa",
+    "duration": "{{seconds}} s",
+    "noOutput": "(ei tulostetta)"
+  },
+  "assistant": {
+    "title": "Teekohtaaja",
+    "moveHint": "Vedä siirtääksesi. Kaksoisnapsauta kiinnittääksesi sivulle.",
+    "toggle": "Näytä tai piilota teekohtaaja",
+    "close": "Sulje",
+    "dock": "Kiinnitä oikealle",
+    "float": "Leijuva",
+    "openTab": "Avaa koko näkymä",
+    "history": "Keskustelut",
+    "noConversations": "Ei keskusteluja vielä",
+    "untitled": "Nimetön",
+    "deleteConversation": "Poista keskustelu",
+    "deleteConfirm": "Haluatko poistaa tämän keskustelun?",
+    "emptyTitle": "Kysy tai muuta mitä tahansa Termixissä",
+    "emptyHint": "Avustaja toimii puolestasi Termixin komentorivillä ja suorittaa komentoja kohdeisäntiilläsi. Kirjoita @ lisätäksesi isäntiä, laivastoja, kansioita tai tunnisteita kohteiksi.",
+    "inputPlaceholder": "Kysy avustajalta. Kirjoita @ lisätäksesi kohdekohteita.",
+    "noTargets": "Ei kohdekohteita. Kirjoita @ lisätäksesi joitakin.",
+    "sendHint": "Muutokset ja komennot suoritetaan kysymättä lupaa.",
+    "removeTarget": "Poista {{name}}",
+    "kind": {
+      "host": "Isäntä",
+      "fleet": "Laivasto",
+      "folder": "Kansio",
+      "tag": "Tunniste"
+    },
+    "emptyHintBasic": "Avustaja toimii puolestasi Termixin komentoriviliittymän kautta käyttäen oikeuksiasi.",
+    "inputPlaceholderBasic": "Kysy avustajalta.",
+    "sendHintBasic": "Muutokset suoritetaan kysymättä lupaa.",
+    "thinking": "Ajattelee",
+    "thinkingActive": "Ajattelee...",
+    "compacted": "Konteksti tiivistetty: aiemmat viestit on tiivistetty",
+    "compact": "Tiivistä keskustelu",
+    "nothingToCompact": "Keskustelu on vielä liian lyhyt tiivistettäväksi.",
+    "contextMeter": "Konteksti: viimeisin kutsu käytti {{used}} tokenia {{window}} tokenista",
+    "contextMeterSource": "Ikkuna on {{source}}.",
+    "contextMeterReserved": "{{tokens}} tokenia pidetään varattuna vastaukselle.",
+    "todayTokens": "Tänään {{tokens}}",
+    "todayTitle": "Tänään käyttämäsi tokenit. Napsauta nähdäksesi yksityiskohdat.",
+    "usage": "Tokenien käyttö",
+    "conversationTokens": "{{tokens}} tokenia",
+    "openFloating": "Kelluva paneeli",
+    "openFloatingHint": "Avaa avustaja paneelina minkä tahansa sivun päällä. Paina {{shortcut}} missä tahansa avataksesi tai sulkeaksesi sen.",
+    "shortcutHint": "Paina {{shortcut}} missä tahansa sivulla avataksesi avustajan kelluvana paneelina."
+  },
+  "usage": {
+    "title": "Tokenien käyttö",
+    "settingDescription": "Tokenit, joita tekoälykutsusi on käyttänyt viimeisen 30 päivän aikana.",
+    "cardTitle": "Tekeälytokenien käyttö",
+    "today": "Tänään",
+    "week": "7 päivää",
+    "month": "30 päivää",
+    "mine": "Omat",
+    "everyone": "Kaikki käyttäjät",
+    "mineCaption": "Sinun tokenisi kaikissa tekoälyominaisuuksissa.",
+    "everyoneCaption": "Tokenit kaikilta käyttäjiltä ja kaikissa tekoälyominaisuuksissa.",
+    "byDay": "Päivä kohtaan",
+    "byModel": "Malli kohtaan",
+    "bySource": "Ominaisuus kohtaan",
+    "byUser": "Käyttäjä kohtaan",
+    "model": "Malli",
+    "feature": "Ominaisuus",
+    "user": "Käyttäjä",
+    "calls": "Kutsut",
+    "prompt": "Syöte",
+    "completion": "Tuotos",
+    "total": "Yhteensä",
+    "empty": "Ei tekoälyn käyttöä viimeisen 30 päivän aikana.",
+    "loadFailed": "Käyttötilastojen lataaminen epäonnistui",
+    "estimatedNote": "Jotkin arvot ovat arvioita (noin neljä merkkiä per token), koska palveluntarjoaja ei raportoinut käyttötilastojaan.",
+    "source": {
+      "assistant": "Avustaja",
+      "terminal": "Päätepaneeli",
+      "compaction": "Tiivistäminen",
+      "assets": "Omaisuuden merkintä"
+    }
+  },
+  "autoOps": {
+    "viewAssistant": "Avustaja",
+    "viewAutoOps": "Automaattiset toiminnot",
+    "intro": "Automaattiset toiminnot mahdollistavat avustajan tarkistaa palvelimesi itsenäisesti. Automaatio käynnistää sen aikataulun mukaan tai kun jokin menee pieleen, ja se laatii raportin tai ehdottaa korjausta, jonka voit hyväksyä. Aloita valmiilla asetelmalla.",
+    "sections": {
+      "tasks": "Tehtävät",
+      "approvals": "Hyväksynnät",
+      "presets": "Valmiit asetelmat"
+    },
+    "provider": "Tehtävien tarjoaja",
+    "providerDefault": "Ensimmäinen tarjoaja, jolla on oletusmalli",
+    "model": "Tehtävien malli",
+    "modelDefault": "Tarjoajan oletusmalli",
+    "saveModel": "Tallenna malli",
+    "preferencesHint": "Taustatehtävien käyttämä tarjoaja ja malli. Jätä ne ennallaan käyttääksesi oletustarjoajaa ja -mallia.",
+    "task": "Tehtävä",
+    "tokens": "{{tokens}} tokenia",
+    "tokenUsage": "{{total}} tokenia ({{prompt}} sisään, {{completion}} ulos)",
+    "dryRun": "Testiajo",
+    "trigger": "Laatiminen",
+    "noTasks": "Ei tehtäviä vielä",
+    "tasksHint": "Tehtävät ovat automaatioiden suorituksia, joissa on Kysy tekoälyltä -vaihe. Ota esiasetus käyttöön tai luo oma automaatio Automaatiot-osiosta: lisää Kysy tekoälyltä -vaihe mihin tahansa automaatioon. Suoritukset näkyvät tässä.",
+    "openAutomations": "Avaa automaatiot",
+    "browsePresets": "Selaa esiasetuksia",
+    "noApprovals": "Ei suunnitelmia, jotka odottavat hyväksyntää",
+    "loadFailed": "Automaattisten toimintojen lataaminen epäonnistui",
+    "decideFailed": "Päätöstä ei voitu tallentaa",
+    "openConversation": "Avaa avustajassa",
+    "approve": "Hyväksy ja suorita",
+    "reject": "Hylkää",
+    "expires": "Vanhenee {{time}}",
+    "enabled": "Ote käytössä",
+    "updateAvailable": "Päivitys saatavilla",
+    "shared": "Jaettu",
+    "needsAutomations": "Vaatii automaatioita",
+    "enableAgain": "Ota käyttöön uudelleen",
+    "deletePreset": "Poista esiasetus",
+    "autonomy": {
+      "report": "Vain raportointi",
+      "propose": "Ehdota suunnitelmaa"
+    },
+    "status": {
+      "running": "Käynnissä",
+      "reported": "Raportoitu",
+      "proposed": "Odottaa hyväksyntää",
+      "approved": "Hyväksytty",
+      "rejected": "Hylätty",
+      "expired": "Vanhentunut",
+      "executing": "Suunnitelma käynnissä",
+      "done": "Valmis",
+      "failed": "Epäonnistui",
+      "skipped": "Ohitettu"
+    },
+    "severity": {
+      "info": "Tieto",
+      "warning": "Varoitus",
+      "critical": "Kriittinen"
+    },
+    "plan": {
+      "title": "Ehdotettu suunnitelma",
+      "commands": "Komennot",
+      "rationale": "Miksi",
+      "risk": "Riski",
+      "rollback": "Palautus",
+      "verify": "Varmistus",
+      "progress": "Edistyminen"
+    },
+    "enable": {
+      "title": "Ota {{name}} käyttöön",
+      "submit": "Ota käyttöön",
+      "name": "Nimi",
+      "targets": "Isäntäpalvelimet",
+      "targetAll": "Kaikki isäntäpalvelimet",
+      "targetTrigger": "Isäntäpalvelin, joka laukaisi sen",
+      "targetHosts": "Valitut isäntäpalvelimet",
+      "noHosts": "Valitse vähintään yksi isäntäpalvelin.",
+      "threshold": "Kynnysarvo (%)",
+      "forSeconds": "Vähintään (sekuntia)",
+      "time": "Kellonaika",
+      "cron": "Aikataulutus (cron)",
+      "dockerEvent": "Säiliötapahtuma",
+      "dockerEvents": {
+        "exited": "Lopetettu",
+        "unhealthy": "Epäterve",
+        "restarting": "Käynnistyy uudelleen"
+      },
+      "badTime": "Syötä aika muodossa TT:MM.",
+      "autonomy": "Mitä avustajan saa tehdä",
+      "maxRunSeconds": "Aikaraja (sekuntia)",
+      "runbook": "Toimintaohje",
+      "runbookHint": "Mitä avustajan tulisi tehdä, selkeillä sanoilla. Englanti toimii parhaiten.",
+      "shared": "Jaa, kun tallennetaan esiasetukseksi",
+      "sharedHint": "Kaikki, joilla on oikeus käyttää automaatioita, voivat sen jälkeen ottaa sen käyttöön.",
+      "saveAsPreset": "Tallenna esiasetukseksi",
+      "savedPreset": "Tallennettu",
+      "failed": "Automaatiota ei voitu luoda",
+      "saveFailed": "Esiasetusta ei voitu tallentaa"
+    },
+    "presets": {
+      "daily-patrol": {
+        "title": "Päivittäinen tarkastus",
+        "description": "Tarkistaa joka aamu kello 09:00 kaikkien isäntien levyt, muistin, kuorman, epäonnistuneet palvelut, kontit, sertifikaatit, päivitykset, odottavat uudelleenkäynnistykset ja ajan synkronoinnin sekä raportoi vakavuuden mukaan."
+      },
+      "disk-cleanup": {
+        "title": "Levytilan siivous",
+        "description": "Kun levyn käyttöaste pysyy 85 % tai enemmän viiden minuutin ajan, etsii syytä täyttyvään tilaan ja ehdottaa turvallista siivousta hyväksyttäväksesi. Liiketietoja ei koskaan muuteta."
+      },
+      "host-down-triage": {
+        "title": "Isäntälaitteen poissaolon vianmääritys",
+        "description": "Kun isäntälaitteesta ei saada yhteyttä, se testataan muista isäntälaitteista ja Proxmoxista, ja ilmoitetaan, johtuuko ongelma verkosta, pysäytetystä koneesta vai SSH:stä."
+      },
+      "service-failure": {
+        "title": "Palvelun epäonnistuminen",
+        "description": "Kun terveydentilan tarkistus alkaa epäonnistua, löydetään sen takana oleva systemd-yksikkö, luetaan sen tila ja lokit, ja ehdotetaan yhden uudelleenkäynnistyksen hyväksymistä, jos se voi auttaa. Asetuksia ei muuteta."
+      },
+      "container-anomaly": {
+        "title": "Säiliön poikkeama",
+        "description": "Kun säiliö päättyy, muuttuu epäterveeksi tai käynnistyy jatkuvasti uudelleen, luetaan sen tila, poistumiskoodi, lokit ja muistinkäyttö, ja ehdotetaan sen käynnistämistä tai uudelleenkäynnistämistä kerran hyväksyttäväksi. Mitään ei poisteta."
+      },
+      "resource-overload-cpu": {
+        "title": "Keskusprosessorin ylikuormitus",
+        "description": "Kun keskusprosessorin käyttöaste pysyy 95 % tai enemmän 15 minuutin ajan, löydetään sen takana olevat prosessit, palvelut ja säiliöt, ja raportoidaan, mitä tehdä. Mitään ei muuteta."
+      },
+      "resource-overload-memory": {
+        "title": "Muistin ylikuormitus",
+        "description": "Kun muistin käyttöaste pysyy 95 % tai enemmän 10 minuutin ajan, löydetään mitä se käyttää, vaihtotiedostointi ja muistinpuutteen vuoksi lopetettuja prosesseja, ja raportoidaan, mitä tehdä. Mitään ei muuteta."
+      },
+      "security-updates-weekly": {
+        "title": "Viikoittaiset tietoturvapäivitykset",
+        "description": "Joka maanantai klo 09:30 listaa odottavat tietoturvapäivityt vakavuuden mukaan, uudelleenkäynnistyksen vaativat päivitykset ja niihin liittyvät paketit, käynnissä olevat ja asennetut ytimet sekä päivien määrän viimeisestä päivityksestä. Kaikki tiedot yhdistetään yhteen taulukkoon kaikille isäntäpalvelimille."
+      },
+      "cert-expiry-weekly": {
+        "title": "Viikoittainen sertifikaattien vanheneminen",
+        "description": "Joka maanantai klo 09:45 tarkistaa Let's Encryptin, web-palvelimien ja Kubernetesin sertifikaattien vanhenemispäivän kaikilla isäntäpalvelimilla ja merkitsee ne, jotka vanhenevat alle 30 päivän kuluessa, sekä kriittiset, jotka vanhenevat alle 7 päivän kuluessa."
+      },
+      "failing-drive": {
+        "title": "Vikaantunut levy",
+        "description": "Kun Storage Health havaitsee vikaantuvan tai kuluneen levyn, heikentyneen poolin tai arrayn tai täyttyvän thin poolin, se lukee SMART-tiedot, arrayn ja poolin tilan sekä ilmoittaa kiireellisyyden ja suositellut toimenpiteet. Mitään muutoksia ei tehdä."
+      }
+    },
+    "report": {
+      "verdict": "Päätelmä",
+      "evidence": "Todisteet",
+      "actionsTaken": "Tehdyt toimenpiteet",
+      "recommendations": "Suositukset",
+      "nothingFound": "Ajoa ei löytynyt mitään ennen sen päättymistä.",
+      "noChanges": "Muutoksia ei tehty.",
+      "openConversation": "Avaa keskustelu avustajassa nähdäksesi kaikki vaiheet ja kysyäksesi lisäkysymyksiä.",
+      "noFurtherAction": "Lisätoimia ei tarvita.",
+      "stoppedBudgetRun": "Keskeytetty: tämä suoritus käytti budjettinsa {{tokens}} tokenia.",
+      "stoppedBudgetDaily": "Keskeytetty: omistajan päivittäinen budjetti {{tokens}} tokenia on käytetty loppuun.",
+      "stoppedDeadline": "Keskeytetty: automaation aikaraja saavutettiin.",
+      "stoppedPaused": "Keskeytetty: järjestelmänvalvoja keskeytti tekoälyn automaattitoiminnot.",
+      "stoppedAborted": "Keskeytetty: automaation suoritus peruutettiin.",
+      "providerFailed": "Tekoälyn tarjoaja epäonnistui: {{error}}",
+      "noHosts": "Automaation omistaja ei pääse yhteyteen mihinkään kohde-isäntiin.",
+      "noProvider": "Automaation omistajalla ei ole tekoälyn tarjoajaa, jolla olisi mallia tehtävien suorittamiseen.",
+      "needsOpsUse": "Automaation omistajalla ei ole ai.ops.use-lupaa.",
+      "assistantOff": "Teekoira-assistentti on poissa käytöstä automaation omistajalle.",
+      "skippedPaused": "Järjestelmänvalvoja on keskeyttänyt tekoälyn automaattisen toiminnan.",
+      "skippedDuplicate": "Samaa automaatiota ja isäntää varten tehtävä on vielä käynnissä tai odottaa hyväksyntää.",
+      "skippedRate": "Tämä automaatio on jo käynnistänyt {{count}} tekoälytehtävää viimeisen tunnin aikana.",
+      "hostNotRun": "Ei suoritettu: suunnitelma keskeytettiin.",
+      "hostNoAccess": "Ei suoritettu: omistaja ei enää pysty yhdistämään tähän isäntään.",
+      "hostUnreachable": "Ei suoritettu: isäntään ei voitu yhdistää.",
+      "hostStopped": "Keskeytettiin ensimmäisen epäonnistuneen komennon kohdalla.",
+      "executionDone": "Hyväksytty suunnitelma suoritettiin {{count}} isännällä ja kaikki komennot ja tarkistukset onnistuivat.",
+      "executionFailed": "Hyväksyttyä suunnitelmaa ei voitu suorittaa kaikissa isäntäpalvelimissa.",
+      "executionStopped": "Hyväksytty suunnitelma keskeytettiin ennen sen valmistumista.",
+      "approvedBy": "Hyväksytty suunnitelma suoritettiin kirjoitetussa muodossa. Hyväksynyt: {{user}}.",
+      "noticeReported": "Te keinoin tuotettu raportti: {{title}}",
+      "noticeProposed": "Te keinoin tuotettu suunnitelma odottaa hyväksyntää: {{title}}",
+      "noticeExecuted": "Te keinoin tuotettu suunnitelma suoritettu: {{title}}",
+      "noticeFailed": "Te keinoin tuotettu tehtävä epäonnistui: {{title}}",
+      "noticeAssetsAnnotationFailed": "Omaisuuden merkintä epäonnistui"
+    }
+  },
+  "assets": {
+    "title": "Omaisuudet",
+    "search": "Hae nimen, avaimen tai osoitteen perusteella",
+    "allZones": "Kaikki vyöhykkeet",
+    "showRemoved": "Näytä poistetut",
+    "collectNow": "Kerää nyt",
+    "collecting": "Kerätään…",
+    "collectFailed": "Keräystä ei voitu aloittaa",
+    "neverRun": "Ei vielä kerätty",
+    "lastRun": "Viimeksi kerätty {{time}}: {{ok}}/{{total}} isäntäpalvelinta",
+    "lastRunFailed": "Keräys ajankohtana {{time}} epäonnistui",
+    "hostsFailed_one": "{{count}} isäntäpalvelin epäonnistui",
+    "hostsFailed_other": "{{count}} isäntäpalvelinta epäonnistui",
+    "loadFailed": "Omaisuuskantaa ei voitu ladata",
+    "saveFailed": "Tallennus epäonnistui",
+    "empty": "Ei vielä omaisuuksia",
+    "emptyHint": "Kerää nyt lukeaksesi jokaisen isäntäpalvelimen, johon kerääjä pystyy muodostamaan yhteyden.",
+    "emptyHintView": "Jotakuta, jolla on ai.assets.manage-oikeus, on kerättävä ensin.",
+    "removed": "Poistettu",
+    "pinned": "Kiinnitetty",
+    "multiZone": "Monivyöhykkeinen",
+    "multiZoneHint": "Sillä on osoitteita useammassa vyöhykkeessä, joten se voi tavoittaa molemmat: mahdollinen väylä.",
+    "columns": {
+      "name": "Nimi",
+      "kind": "Tyyppi",
+      "zone": "Vyöhyke",
+      "ips": "Osoitteet",
+      "listening": "Portit",
+      "outbound": "Ulostuleva",
+      "services": "Palvelut",
+      "collected": "Viimeksi kerätty",
+      "role": "Rooli",
+      "importance": "Tärkeys",
+      "system": "Järjestelmä"
+    },
+    "kind": {
+      "host": "Isäntäpalvelin",
+      "guest": "Vieraskone",
+      "container": "Kontti",
+      "external": "Ulkoinen"
+    },
+    "zone": {
+      "internal": "Sisäinen",
+      "dmz": "DMZ",
+      "external": "Ulkoinen",
+      "cloud": "Pilvi",
+      "overlay": "Ylitala"
+    },
+    "sections": {
+      "os": "Käyttöjärjestelmä",
+      "hostname": "Isäntänimi",
+      "uptimeSec": "Käyttöaika (sekuntia)",
+      "interfaces": "Liittymät",
+      "routes": "Reitit",
+      "listening": "Kuuntelevat portit",
+      "connections": "Vakautuneet yhteydet",
+      "services": "Käynnissä olevat palvelut",
+      "containers": "Kontit",
+      "kubernetes": "Kubernetes",
+      "guests": "Proxmox-vieraskoneet",
+      "cloud": "Pilvi",
+      "missing": "Osioita, joissa ei ole tulostetta",
+      "guest": "Proxmox-vieraskone",
+      "container": "Kontti"
+    },
+    "outgoing": "Meno",
+    "incoming": "Tulo",
+    "noEdges": "Ei mitään",
+    "stale": "Ei nähty viimeisimmässä keräyksessä",
+    "pinZone": "Vyöhyke",
+    "rulesDecide": "Säännöt päättivät",
+    "settingsTitle": "Vyöhykkeet ja aikataulu",
+    "scheduleTitle": "Keräys",
+    "daily": "Kerää päivittäin",
+    "dailyHint": "Isännät kerätään uudelleen myös, kun niitä lisätään tai muutetaan.",
+    "time": "Aika (UTC)",
+    "save": "Tallenna",
+    "collector": "Kerää käyttäjänä {{collector}}, jolloin päästään yhteyteen isäntiin, joihin tämä tili voi yhdistää.",
+    "collectorMe": "sinä",
+    "collectorOther": "toinen hallinnoija",
+    "collectorNone": "kukaan vielä",
+    "collectAsMe": "Kerää minä",
+    "zonesTitle": "Vyöhykesäännöt",
+    "zonesHint": "Sääntö kytkee CIDR:n vyöhykkeeseen ennen sisäänrakennettuja. Tarkin etuliite voittaa, sitten korkeampi prioriteetti. Varat sijoitetaan vyöhykkeille uudelleen tallennuksen yhteydessä.",
+    "zoneName": "Nimi",
+    "zoneNameExample": "Datakeskuksen LAN",
+    "zoneKind": "Tyyppi",
+    "cidr": "CIDR",
+    "priority": "Prioriteetti",
+    "addZone": "Lisää sääntö",
+    "deleteZone": "Poista sääntö",
+    "cancelEdit": "Peruuta",
+    "annotating": "Annotoidaan…",
+    "neverAnnotated": "Ei vielä annotoitu",
+    "lastAnnotation": "Viimeksi annotoitu {{time}}: {{ok}}/{{total}} varaa, {{tokens}} tokenia",
+    "annotationFailed": "epäonnistui: {{reason}}",
+    "annotateNow": "Annotoi nyt",
+    "annotateFailed": "Annotaation käynnistäminen epäonnistui",
+    "modeTable": "Taulukko",
+    "modeGraph": "Kaavio",
+    "importance": {
+      "critical": "Kriittinen",
+      "high": "Korkea",
+      "medium": "Keskitaso",
+      "low": "Matala"
+    },
+    "importanceUnknown": "Ei arvioitu",
+    "importanceReason": "Miksi",
+    "sourceAi": "AI",
+    "sourceAiHint": "Kirjoitettu annotaation toimesta; seuraava suoritus voi muuttaa sen.",
+    "sourceUser": "Lukittu",
+    "sourceUserHint": "Asetettu henkilön toimesta; annotaatiot jättävät sen koskematta, kunnes se avataan.",
+    "unlock": "Avaa: anna annotaation täyttää tämä uudelleen",
+    "unlockField": "Avaa {{field}}-kenttä lukitus",
+    "editAnnotation": "Muokkaa",
+    "lockHint": "Muuttamasi kentät lukitaan myöhempiltä merkintäsuorituksilta.",
+    "factsTitle": "Tiedot",
+    "closePanel": "Sulje",
+    "impact": "Vaikutus",
+    "clearImpact": "Tyhjennä",
+    "impactSummary_one": "Jos se epäonnistuu, {{count}} omaisuus menee sen mukana ({{critical}} kriittistä, {{high}} korkeaa), {{weak}} muu liittyy vain niihin.",
+    "impactSummary_other": "Jos se epäonnistuu, {{count}} omaisuutta menee sen mukana ({{critical}} kriittistä, {{high}} korkeaa), {{weak}} muu liittyy vain niihin.",
+    "impactTruncated": "Katkaistaan 6 hyppyä tai 300 omaisuutta kohden.",
+    "impactDirect": "Suoraan",
+    "impactTransitive": "Muiden kautta",
+    "impactWeak": "Liittyy vain niihin",
+    "expandContainers": "Näytä kontit",
+    "showExternal": "Näytä ulkoiset osoitteet",
+    "graphCounts": "{{nodes}} omaisuutta, {{edges}} suhdetta",
+    "graphTitle": "Omaisuusverkko",
+    "noZone": "Ei vyöhykettä",
+    "annotationTitle": "Tekoälyn merkinnät",
+    "annotateAfterCollect": "Merkitse jokaisen keräyksen jälkeen",
+    "annotateAfterCollectHint": "Vain ne omaisuudet, jotka ovat muuttuneet viimeisimmästä merkinnästä, sekä niiden naapurit lähetetään mallille.",
+    "annotateProvider": "Palveluntarjoaja",
+    "annotateProviderDefault": "Kerääjän automaattitoimintojen valinta",
+    "annotateModel": "Malli",
+    "annotateModelDefault": "Palveluntarjoajan oletusmalli",
+    "annotationHint": "Merkinnät suoritetaan kerääjänä kerääjän palveluntarjoajilla. Yhteenvetoissa ei ole ympäristöjä, komentorivejä tai ulkoisia osoitteita.",
+    "annotateAll": "Merkitse kaikki uudelleen"
+  },
+  "exposure": {
+    "title": "Internet-sisäänotot",
+    "disclaimer": "Vain konfiguraatiorekisteri. Julkinen sitoutuminen ja välityssäännöt eivät todista internetin saavutettavuutta. Yksityiset kuuntelijat säilytetään taustatodisteina.",
+    "loadFailed": "Eksposuurirekisterin lataaminen epäonnistui.",
+    "saveFailed": "Prioriteetin tallentaminen epäonnistui.",
+    "search": "Suodata osoite, isäntä, nimi tai polku",
+    "allPriority": "Kaikki prioriteetit",
+    "allZones": "Kaikki vyöhykkeet",
+    "allSources": "Kaikki lähteet",
+    "high": "Korkea",
+    "medium": "Keskitaso",
+    "low": "Matala",
+    "active": "Aktiivinen",
+    "stale": "Vanhentunut",
+    "resolved": "Ei enää havaittu",
+    "all": "Kaikki",
+    "refresh": "Päivitä",
+    "loading": "Ladataan…",
+    "empty": "Ei vastaavia merkintöjä. Tarkista keräyksen kattavuus alla ennen johtopäätösten tekemistä.",
+    "never": "Ei vielä kerätty. Kerää omaisuudet rekisteröidäksesi merkinnät.",
+    "endpoint": "Sisäänmeno",
+    "source": "Lähde",
+    "priority": "Arviointiprioriteetti",
+    "pathState": "Konfiguraatiopolku",
+    "freshness": "Tuoreus",
+    "details": "Todisteiden tiedot",
+    "close": "Sulje",
+    "notTested": "Ulkoisen saavutettavuuden: ei testattu.",
+    "priorityReason": "Prioriteetti on arviointivihje, ei haavoittuvuuspäätelmä. Julkiset hallinta- ja datapalveluporit priorisoidaan; palvelun identiteetti ja pääsytodentaminen vaativat edelleen vahvistuksen.",
+    "tls": "TLS-konfiguraatio",
+    "restrictions": "Pääsyrajoitukset",
+    "observed": "Viimeksi havaittu",
+    "rulePriority": "Säännön prioriteetti (avaa lukitus)",
+    "evidence": "Havainto",
+    "coverage": "Keräyksen kattavuus",
+    "changes": "Viimeaikaiset muutokset",
+    "current": "Nykyinen",
+    "partial": "Epätäydellinen",
+    "complete": "Määrityksen assosiaatio valmis",
+    "conflicting": "Monitulkintainen tai syklinen",
+    "configured": "Määritelty määrityksessä",
+    "unknown": "Tuntematon",
+    "status_ok": "Kerätty",
+    "status_unsupported": "Työkalu ei saatavilla",
+    "status_denied": "Lupa evätty",
+    "status_failed": "Keruu tai jäsentäminen epäonnistui",
+    "status_truncated": "Katkaistu",
+    "change_baseline": "Vertailuarvo määritetty",
+    "change_added": "Merkintä lisätty",
+    "change_changed": "Määritys muuttunut",
+    "change_removed": "Merkintää ei enää havaittu",
+    "change_coverage": "Kattavuus heikentynyt",
+    "explain": "Selitä todisteet",
+    "explaining": "Selitetään…",
+    "explainFailed": "Selitys epäonnistui tai todisteet muuttuivat.",
+    "aiLabel": "Te keinoin tuotettu tulkinta · ei vahvistettu havainto",
+    "previous": "Edellinen",
+    "next": "Seuraava",
+    "binding": "Sidoksen laajuus",
+    "binding_public": "Julkinen merkintäehdokas",
+    "binding_local": "Yksityinen/lokaali tausta",
+    "binding_unknown": "Ratkaisematon sidonta",
+    "ruleGaps": "Jäsentämättömiä sääntöjä: {{count}}",
+    "unsupportedRule": "Ei tuettu sääntö; aiemmat todisteet säilytetty",
+    "scope": "Näkymä",
+    "scope_internet": "Internetin merkintäehdokkaita",
+    "scope_all": "Kaikki todisteet",
+    "scope_unknown": "Tuntematon altistus",
+    "inventorySummary": "{{internet}} internetin merkintäehdokasta · yhteensä {{all}} sääntöä · {{unknown}} tuntemattoman altistuksen kanssa",
+    "bindingCount": "{{count}} havaittua sidosta",
+    "pathsTruncated": "Polun laajennus saavutti rajansa. Tämä on osittainen todiste.",
+    "pathBranch": "Polku {{index}}",
+    "branched": "Ehdolliset haarat",
+    "reason_sensitive": "Tarkista palvelun portti {{port}} (merkintä tai tausta)",
+    "reason_public-address": "Havaittu julkinen osoitesidonta",
+    "reason_wan-zone": "OpenWrt WAN-lähdevyöhyke; palomuurin hyväksyntä vahvistamaton",
+    "reason_configured-public-tunnel": "Määritelty julkinen tunneli; ulkoinen saavutettavuus testaamaton",
+    "reason_internal-only": "Vain sisäisiä tai paikallisia sidoksia havaittu",
+    "reason_exposure-unknown": "Riittämättömät todisteet altistuksen luokitteluun",
+    "reason_critical-asset": "Väline merkitty kriittiseksi",
+    "reason_manual": "Käyttäjän valitsema prioriteetti"
+  },
+  "companion": {
+    "toggle": "Avustajan paneeli"
+  },
+  "widget": {
+    "loading": "Ladataan...",
+    "empty": "Ei tehtäviä vielä",
+    "pending_one": "{{count}} suunnitelma odottaa hyväksyntää",
+    "pending_other": "{{count}} suunnitelmaa odottaa hyväksyntää",
+    "maxItems": "Näytettävät tehtävät"
+  }
+}

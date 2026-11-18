@@ -1,0 +1,872 @@
+{
+  "permissions": {
+    "use": {
+      "title": "Assistent verwenden",
+      "description": "Den Assistenten öffnen und Fragen stellen."
+    },
+    "manage_providers": {
+      "title": "Anbieter verwalten",
+      "description": "KI-Anbieter und deren API-Schlüssel hinzufügen, bearbeiten und entfernen."
+    },
+    "apply_proposals": {
+      "title": "Vorschläge anwenden",
+      "description": "Dem Assistenten erlauben, die von ihm vorgeschlagenen Änderungen durchzuführen."
+    },
+    "services": {
+      "use": {
+        "title": "KI in anderen Funktionen verwenden",
+        "description": "Andere Funktionen können den Assistenten in Ihrem Namen aufrufen."
+      }
+    },
+    "secrets": {
+      "share": {
+        "title": "API-Schlüssel teilen",
+        "description": "Andere Funktionen können den gespeicherten KI-API-Schlüssel verwenden, ohne ihn einsehen zu können."
+      }
+    },
+    "ops": {
+      "use": {
+        "title": "Befehle auf Hosts mit dem KI-Assistenten ausführen",
+        "description": "Ermöglicht dem Assistenten, beliebige Shell-Befehle auf den von Ihnen ausgewählten Hosts auszuführen. Standardmäßig nur für Administratoren."
+      }
+    },
+    "usage": {
+      "view_all": {
+        "title": "KI-Nutzung aller Benutzer einsehen",
+        "description": "Sehen Sie die Tokens, die die KI-Aufrufe jedes Benutzers verbraucht haben, nicht nur Ihre eigenen. Standardmäßig nur für Administratoren."
+      }
+    },
+    "assets": {
+      "view": {
+        "title": "Bestandsverzeichnis anzeigen",
+        "description": "Zeigt die gesammelten Hosts, Gäste, Container, Zonen und Verbindungen an. Standardmäßig nur für Administratoren."
+      },
+      "manage": {
+        "title": "Bestandsverzeichnis verwalten",
+        "description": "Startet Sammlungen, bearbeitet Zonenregeln, fixiert Zonen und ändert den Zeitplan. Die Sammlung liest Hosts schreibgeschützt. Standardmäßig nur für Administratoren."
+      }
+    }
+  },
+  "settings": {
+    "assistantUnavailable": "Der KI-Assistent ist auf diesem Server deaktiviert.",
+    "providersNeedOptIn": "Aktivieren Sie oben den KI-Assistenten, um Anbieter hinzuzufügen.",
+    "providers": {
+      "label": "Anbieter",
+      "description": "Die KI-Dienste, die der Assistent und Agenten verwenden können."
+    },
+    "admin": {
+      "globallyEnabled": {
+        "label": "KI-Assistent",
+        "description": "Benutzern erlauben, den KI-Assistenten zu aktivieren. Solange dies deaktiviert ist, ist der Assistent für alle verborgen und blockiert."
+      },
+      "privateEndpoints": {
+        "label": "Erlaubte private KI-Hosts",
+        "description": "Hosts in Ihrem privaten Netzwerk, auf die Benutzer einen Anbieter verweisen können, z. B. einen selbst gehosteten Ollama. Geben Sie pro Zeile einen Host ein."
+      },
+      "opsConcurrency": {
+        "label": "Parallele Hosts für KI-Assistenten",
+        "description": "Wie viele Hosts ein Befehl des Assistenten gleichzeitig bearbeiten kann."
+      },
+      "opsCommandTimeout": {
+        "label": "Zeitlimit für KI-Assistenten-Befehle (Sekunden)",
+        "description": "Wie lange ein Befehl auf einem Host laufen darf, bevor er gestoppt wird. Der Assistent kann bis zu 600 Sekunden anfordern."
+      },
+      "opsOutputLimit": {
+        "label": "KI-Assistenten-Ausgabe pro Host (Zeichen)",
+        "description": "Wie viel von der Ausgabe jedes Hosts gespeichert wird. Längere Ausgaben behalten ihren Anfang und ihr Ende."
+      },
+      "autoOpsPaused": {
+        "label": "KI-Automatisierung pausieren",
+        "description": "Stoppt alle laufenden KI-Aufgaben und genehmigten Pläne und lehnt neue ab, bis die Funktion wieder aktiviert wird."
+      },
+      "autoOpsRunsPerHour": {
+        "label": "KI-Aufgaben pro Automatisierung pro Stunde",
+        "description": "Weitere Auslösungen innerhalb derselben Stunde werden übersprungen."
+      },
+      "autoOpsRunTokens": {
+        "label": "Token-Budget pro KI-Aufgabe",
+        "description": "Eine Aufgabe, die diese Anzahl an Tokens verbraucht, wird gestoppt und meldet ihre Ergebnisse."
+      },
+      "autoOpsDailyTokens": {
+        "label": "Tägliches KI-Token-Budget pro Benutzer",
+        "description": "Sobald ein Benutzer heute (UTC) diese Anzahl an Tokens verbraucht hat, werden seine KI-Aufgaben übersprungen oder gestoppt."
+      },
+      "assetsDailyCollect": {
+        "label": "Bestandsverzeichnis täglich sammeln",
+        "description": "Liest jeden Host, mit dem der Collector eine Verbindung herstellen kann, einmal täglich mit einem schreibgeschützten Skript aus."
+      },
+      "assetsCollectTime": {
+        "label": "Zeitpunkt der Bestandsaufnahme (UTC)",
+        "description": "HH:MM, zum Beispiel 03:00."
+      },
+      "assetsCollector": {
+        "label": "Bestands-Collector"
+      },
+      "assetsAnnotateAfterCollect": {
+        "label": "Assets nach jeder Sammlung annotieren",
+        "description": "Ein Modell schreibt die Rolle, Wichtigkeit und das Geschäftssystem jedes geänderten Assets sowie die Abhängigkeiten, die die Fakten zeigen."
+      },
+      "assetsAnnotateRunTokens": {
+        "label": "Token-Budget pro Asset-Annotation",
+        "description": "Ein Durchlauf stoppt, sobald die Modellaufrufe diese Anzahl an Tokens verbraucht haben; das Geschriebene bleibt erhalten."
+      },
+      "assetsAnnotateProvider": {
+        "label": "Anbieter für Asset-Annotation"
+      },
+      "assetsAnnotateModel": {
+        "label": "Modell für Asset-Annotation"
+      },
+      "exposureRetentionDays": {
+        "label": "Aufbewahrungsdauer für Expositionsverlauf (Tage)",
+        "description": "Behält ausstehende Benachrichtigungen und Beweise bei, die von aktuellen Einträgen referenziert werden, unabhängig vom Alter."
+      }
+    },
+    "host": {
+      "enableAiAssistant": {
+        "label": "KI-Assistent aktivieren",
+        "description": "Dem KI-Assistenten erlauben, im Terminal dieses Hosts zu helfen. Standardmäßig deaktiviert und erfordert weiterhin, dass KI für Ihr Konto aktiviert ist."
+      },
+      "showPanel": {
+        "label": "Panel neben dem Terminal",
+        "description": "Ein Assistenten-Panel neben dem SSH-Terminal dieses Hosts anzeigen."
+      }
+    },
+    "user": {
+      "autoOpsPreferences": {
+        "label": "Einstellungen für Automatisierung"
+      },
+      "companionAutoOpen": {
+        "label": "Assistenten-Panel mit Terminal öffnen",
+        "description": "Das Assistenten-Panel anzeigen, wenn ein Terminal auf einem Host geöffnet wird, der dieses Feature unterstützt."
+      },
+      "companionSide": {
+        "label": "Position des Assistenten-Panels",
+        "description": "Wo das Panel neben dem Terminal angezeigt wird.",
+        "right": "Rechts",
+        "left": "Links",
+        "bottom": "Unten"
+      },
+      "companionSize": {
+        "label": "Größe des Assistenten-Panels",
+        "description": "Breite (oder Höhe, wenn unten platziert) in Pixeln."
+      },
+      "companionEdgeButton": {
+        "label": "Kantenschalter für Assistenten-Panel",
+        "description": "Eine kleine Schaltfläche am Rand des Terminals anzeigen, um das Panel zu öffnen."
+      }
+    }
+  },
+  "ai": {
+    "send": "Senden",
+    "stop": "Stoppen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "running": "läuft",
+    "approve": "Genehmigen",
+    "reject": "Ablehnen",
+    "selectProvider": "Wählen Sie einen Anbieter aus",
+    "addProvider": "Anbieter hinzufügen",
+    "manageModels": "Modelle verwalten",
+    "editProvider": "Anbieter bearbeiten",
+    "removeProvider": "Anbieter entfernen",
+    "providerType": "Anbieter",
+    "providerLabel": "Name",
+    "providerLabelPlaceholder": "Zum Beispiel: Lokaler Ollama",
+    "baseUrl": "Serveradresse",
+    "apiKey": "API-Schlüssel",
+    "defaultModel": "Standardmodell",
+    "defaultModelPlaceholder": "Zum Beispiel: llama3.1 oder claude-opus-5",
+    "labelRequired": "Geben Sie diesem Anbieter einen Namen",
+    "providerSaveFailed": "Anbieter konnte nicht gespeichert werden",
+    "providerUpdated": "Anbieter aktualisiert",
+    "providerDeleteFailed": "Anbieter konnte nicht entfernt werden",
+    "privateEndpointHint": "Adressen in Ihrem privaten Netzwerk erfordern, dass ein Administrator den Host zuerst erlaubt.",
+    "providerOllama": "Ollama",
+    "providerAnthropic": "Anthropic",
+    "providerOpenai": "OpenAI",
+    "providerGemini": "Google Gemini",
+    "providerOpenaiCompatible": "OpenAI-kompatibel",
+    "toolArguments": "Eingabe",
+    "toolResult": "Ergebnis",
+    "statusApplied": "Angewendet",
+    "statusRejected": "Abgelehnt",
+    "proposalApplyFailed": "Änderung konnte nicht angewendet werden",
+    "proposalRejectFailed": "Änderung konnte nicht abgelehnt werden",
+    "enableTitle": "KI-Assistent aktivieren",
+    "enableDescription": "Dem Assistenten erlauben, Ihre Einrichtung einzusehen und Änderungen vorzuschlagen, die Sie genehmigen können.",
+    "readOnlyCommands": "Schreibgeschützte Diagnosebefehle erlauben",
+    "readOnlyCommandsDescription": "Der Assistent kann eine kurze Liste sicherer Befehle wie df und uptime ohne jedes Mal nachzufragen ausführen. Alles, was einen Server verändert, wird immer zuerst vorgeschlagen.",
+    "modelDetectFailed": "Der Anbieter konnte nicht erreicht werden, daher ist dies eine allgemeine Liste. Du kannst jeden Modellnamen eingeben.",
+    "modelCustom": "Modellnamen eingeben",
+    "modelRefresh": "Liste aktualisieren",
+    "modelPlaceholder": "Modell auswählen oder eingeben",
+    "runCommandTitle": "Befehl ausführen",
+    "assistant": "KI-Assistent",
+    "terminalPanelEmpty": "Frag den Assistenten über diesen Host. Alles, was den Zustand verändert, benötigt zuerst deine Genehmigung.",
+    "terminalPanelPlaceholder": "Frag über diesen Host...",
+    "noProvidersConfigured": "Noch kein AI-Anbieter konfiguriert. Fügen Sie einen in den Einstellungen hinzu.",
+    "runsInOpenTerminal": "Wird in deiner offenen Terminal-Sitzung ausgeführt.",
+    "runInTerminal": "Ausführen",
+    "terminalContextPrefill": "Hier ist meine Terminalausgabe:\n\n{{output}}\n\n",
+    "secrets": {
+      "shareApiKey": "Erlaube anderen Funktionen, deinen KI-Anbieter-API-Schlüssel für ihre eigenen Anfragen zu verwenden. Der Schlüssel wird nie kopiert, und du kannst dies jederzeit widerrufen."
+    },
+    "removeProviderConfirm": "Den Anbieter {{name}} entfernen?",
+    "contextWindows": "Kontextfenster pro Modell",
+    "contextWindowsHint": "Wird vom Anbieter gelesen, sofern dieser eines angibt. Geben Sie eine Token-Anzahl ein, um den Wert für ein Modell zu überschreiben, oder lassen Sie das Feld leer, um den vom Anbieter gemeldeten Wert zu verwenden. Aktualisieren fragt den Anbieter erneut ab.",
+    "contextWindowValue": "Kontextfenster: {{tokens}} ({{source}})",
+    "contextOverride": "Kontextfenster-Überschreibung für {{model}}",
+    "contextSourceOverride": "von Ihnen festgelegt",
+    "contextSourceProvider": "vom Anbieter gemeldet",
+    "contextSourceGuess": "aus dem Modellnamen abgeleitet",
+    "contextSourceDefault": "Standard für unbekannte Modelle",
+    "contextLoadFailed": "Kontextfenster konnten nicht gelesen werden",
+    "contextRefresh": "Aktualisieren",
+    "contextWindowInvalid": "Geben Sie das Kontextfenster als ganze Zahl von Tokens ein, mindestens 1024.",
+    "advanced": "Erweitert",
+    "advancedHint": "Lassen Sie eine Einstellung auf Standard, um die eigenen Werte des Modells zu verwenden.",
+    "advancedDefault": "Standard",
+    "advancedDefaultAuto": "Standard (automatisch)",
+    "advancedAuto": "Automatisch",
+    "advancedEndpoint": "Endpunkt",
+    "advancedEndpointResponses": "Responses API",
+    "advancedEndpointChat": "Chat Completions",
+    "advancedReasoningEffort": "Denkaufwand",
+    "advancedReasoningSummary": "Denkzusammenfassung",
+    "advancedReasoningSummaryHint": "Nur für die Responses API.",
+    "advancedVerbosity": "Ausführlichkeit",
+    "advancedNone": "Keine",
+    "advancedMinimal": "Minimal",
+    "advancedLow": "Niedrig",
+    "advancedMedium": "Mittel",
+    "advancedHigh": "Hoch",
+    "advancedXhigh": "Sehr hoch",
+    "advancedMax": "Maximum",
+    "advancedConcise": "Knapp",
+    "advancedDetailed": "Ausführlich",
+    "advancedOff": "Aus",
+    "advancedMaxOutputTokens": "Maximale Ausgabe-Token",
+    "advancedMaxOutputTokensInvalid": "Geben Sie eine ganze Zahl von 1 bis 1.000.000 ein.",
+    "advancedTemperature": "Temperatur",
+    "advancedTemperatureHint": "OpenAI-Reasoning-Modelle akzeptieren dies nur, wenn der Denkaufwand auf Keine gesetzt ist. Bei jedem anderen Wert wird er nicht gesendet.",
+    "advancedTemperatureInvalid": "Geben Sie eine Zahl von 0 bis 2 ein."
+  },
+  "nav": {
+    "ai": "KI-Assistent"
+  },
+  "onboarding": {
+    "aiTitle": "KI-Assistent",
+    "aiIntro": "Termix kann einen KI-Assistenten enthalten. Du kannst dies später in deinen Einstellungen ändern.",
+    "aiSkipTitle": "Ausgeschaltet lassen",
+    "aiSkipDesc": "Termix funktioniert wie bisher. Der Assistent bleibt ausgeblendet.",
+    "aiEnableTitle": "Einschalten",
+    "aiEnableDesc": "Fügt einen Assistenten hinzu, der deine Einrichtung liest und Änderungen vorschlägt, die du genehmigst. Benötigt einen von dir bereitgestellten Anbieter, wie z.B. ein lokales Ollama.",
+    "aiNote": "Es wird nichts irgendwohin gesendet, bis du einen Anbieter hinzufügst und eine Nachricht sendest."
+  },
+  "agents": {
+    "working": "Arbeite...",
+    "startingIndicator": "Starte den Agenten...",
+    "noCompatibleProvider": "Keiner deiner KI-Anbieter funktioniert mit {{agent}}. Claude Code benötigt Anthropic und Codex benötigt OpenAI.",
+    "noProviders": "Füge zuerst einen KI-Anbieter in den Einstellungen hinzu.",
+    "title": "KI-Agent",
+    "permissionTitle": "Führe entfernte KI-Agenten aus",
+    "permissionDescription": "Starte Coding-Agenten auf SSH-Hosts mit konfigurierten KI-Anbietern. Agenten können Befehle ausführen und Dateien als SSH-Benutzer ändern.",
+    "new": "Neue Sitzung",
+    "description": "Führe einen Agenten in einem Verzeichnis auf diesem Host mit einem Termix-KI-Anbieter aus.",
+    "runtime": "Agent",
+    "provider": "Termix-Anbieter",
+    "chooseProvider": "Wähle einen kompatiblen Anbieter",
+    "model": "Modell",
+    "directory": "Arbeitsverzeichnis",
+    "executable": "Ausführbare Datei (optionaler absoluter Pfad)",
+    "requirements": "Der Host benötigt Node.js 22.19+ und den ausgewählten Agenten installiert. SSH-Remote-Loopback-Forwarding muss erlaubt sein. Bestehende Agentenkonfigurationen werden nicht überschrieben.",
+    "responsesRequired": "Codex benötigt einen Responses-API-Endpunkt. Ein nur Chat Completions-fähiger Endpunkt kann Codex nicht ausführen.",
+    "piPermissions": "Pi-Tools werden mit den Berechtigungen dieses SSH-Kontos ausgeführt. Starte sie nur in einem Verzeichnis, das du dem Agenten zur Änderung erlaubst.",
+    "start": "Agenten starten",
+    "resume": "Fortsetzen",
+    "stop": "Sitzung stoppen",
+    "interrupt": "Zugriff unterbrechen",
+    "send": "Senden",
+    "prompt": "Frag den Agenten, in diesem Verzeichnis zu arbeiten...",
+    "noSessions": "Keine Agentensitzungen für diesen Host.",
+    "approval": "Agent benötigt deine Entscheidung",
+    "answer": "Antwort (JSON für strukturierte Fragen)",
+    "allow": "Einmal erlauben",
+    "deny": "Ablehnen",
+    "tool": "Tool-Aktivität",
+    "streamFailed": "Agenten-Stream getrennt. Öffne die Sitzung erneut, um die Verbindung wiederherzustellen.",
+    "status": {
+      "starting": "Startet",
+      "ready": "Bereit",
+      "running": "Arbeite",
+      "stopped": "Gestoppt",
+      "error": "Fehler"
+    },
+    "installRuntime": "Ausgewählten Agenten und Node.js installieren",
+    "installSource": "Nur offizielle Quellen: nodejs.org (SHA-256 verifiziert) und registry.npmjs.org (gesicherte Paketintegrität). Wird für den SSH-Benutzer in ~/.local/share/termix-agent-runtime installiert; erfordert curl, tar sowie Linux/macOS x64 oder arm64. Ändert die SSH-Weiterleitungsrichtlinie nicht.",
+    "installSucceeded": "Installation verifiziert. Sie können den Agenten jetzt starten; SSH-Loopback-Remote-Weiterleitung muss ebenfalls erlaubt sein.",
+    "installFailed": "Installation fehlgeschlagen. Überprüfen Sie das Protokoll und versuchen Sie es erneut.",
+    "installLog": "Installationsprotokoll",
+    "enableForwarding": "Agentenweiterleitung aktivieren",
+    "forwardingScope": "Linux mit systemd/OpenSSH; erfordert Root- oder passwortloses sudo. Sichert und validiert die SSH-Konfiguration, lädt sie dann neu. Nur das aktuelle SSH-Konto und die erkannte Verbindungsquelle erhalten Loopback-Remote-Weiterleitung; bestehende lokale Weiterleitungen bleiben erhalten. Fehlgeschlagene Änderungen werden rückgängig gemacht.",
+    "forwardingSucceeded": "SSH-Loopback-Remote-Weiterleitung ist bereit. Starten oder setzen Sie den Agenten fort, um eine neue SSH-Verbindung zu öffnen.",
+    "forwardingFailed": "SSH-Weiterleitungskonfiguration fehlgeschlagen. Überprüfen Sie das Protokoll; keine nicht validierte Konfiguration wird beibehalten.",
+    "search": "Sitzungen durchsuchen",
+    "sessionName": "Sitzungsname",
+    "rename": "Umbenennen",
+    "archive": "Archivieren und stoppen",
+    "restore": "Sitzung wiederherstellen",
+    "queue": "Warteschlangen-Nachrichten",
+    "enqueue": "Nachricht in Warteschlange stellen",
+    "continueQueue": "Warteschlange fortsetzen",
+    "pauseQueue": "Warteschlange pausieren",
+    "editQueued": "Nachricht in Warteschlange bearbeiten",
+    "save": "Speichern",
+    "remove": "Entfernen",
+    "upload": "Anhang hochladen",
+    "remoteFile": "Dateipfad im Arbeitsverzeichnis",
+    "attach": "Datei vom Host anhängen",
+    "attachments": "Früheren Anhang wiederverwenden",
+    "attachmentLimit": "Bis zu 4 Anhänge, jeweils 1 MiB",
+    "review": "Git-Änderungen",
+    "gitStatus": "Git-Status aktualisieren",
+    "diffFile": "Dateipfad zur Überprüfung",
+    "diff": "Diff anzeigen",
+    "branch": "Neuer Branch-Name",
+    "createWorktree": "Worktree erstellen",
+    "useWorktree": "Neue Sitzung in diesem Worktree",
+    "worktreeHint": "Erstellt einen neuen Branch von HEAD. Nicht committete Änderungen bleiben im aktuellen Verzeichnis. Bestehende Worktrees werden niemals automatisch gelöscht.",
+    "clean": "Keine Änderungen",
+    "reconnecting": "Verbindung wird wiederhergestellt und Nachrichten werden geladen…",
+    "unavailable": "Sitzung ist nicht mehr zugänglich. Überprüfen Sie Ihre Berechtigungen oder melden Sie sich erneut an.",
+    "shortcuts": "Enter sendet oder stellt in Warteschlange · Shift+Enter fügt Zeile ein · Esc unterbricht und pausiert Warteschlange",
+    "activeSessions": "Aktiv",
+    "archivedSessions": "Archiviert",
+    "dismiss": "Verwerfen",
+    "changes": "Änderungen",
+    "close": "Schließen",
+    "cancel": "Abbrechen",
+    "sessionSetup": "Sitzung",
+    "hostSetup": "Host-Einrichtung",
+    "changedFiles": "Geänderte Dateien",
+    "worktree": "Worktree",
+    "attachShort": "Anhängen",
+    "emptyTranscript": "Senden Sie eine Nachricht, um den Agenten zu starten."
+  },
+  "plugin": {
+    "name": "KI-Assistent",
+    "description": "Ein KI-Assistent, der Ihre Konfiguration liest und Änderungen vorschlägt, die Sie genehmigen können."
+  },
+  "ops": {
+    "searchHosts": "Hosts durchsuchen",
+    "selectedCount": "{{count}} ausgewählt",
+    "clear": "Leeren",
+    "fleets": "Flotten",
+    "folders": "Ordner",
+    "tags": "Tags",
+    "allHosts": "Alle Hosts",
+    "noHosts": "Keine Hosts",
+    "newConversation": "Neue Konversation",
+    "sendHint_one": "Wird auf {{count}} Host ausgeführt. Befehle werden ohne vorherige Nachfrage ausgeführt.",
+    "sendHint_other": "Wird auf {{count}} Hosts ausgeführt. Befehle werden ohne vorherige Nachfrage ausgeführt.",
+    "runCommand": "Befehl ausführen",
+    "hostFacts": "Host-Informationen",
+    "hostCount_one": "{{count}} Host",
+    "hostCount_other": "{{count}} Hosts",
+    "succeeded": "{{count}} erfolgreich",
+    "failed": "{{count}} fehlgeschlagen",
+    "exitCode": "Exit-Code {{code}}",
+    "timedOut": "Zeitüberschreitung",
+    "stopped": "gestoppt",
+    "notRun": "nicht ausgeführt",
+    "cached": "aus dem Cache",
+    "duration": "{{seconds}}s",
+    "noOutput": "(keine Ausgabe)"
+  },
+  "assistant": {
+    "title": "KI-Assistent",
+    "moveHint": "Zum Verschieben ziehen. Doppelklick zum Andocken an der Seite.",
+    "toggle": "KI-Assistent umschalten",
+    "close": "Schließen",
+    "dock": "An die rechte Seite andocken",
+    "float": "Schwebend",
+    "openTab": "Vollständige Ansicht öffnen",
+    "history": "Konversationen",
+    "noConversations": "Noch keine Konversationen",
+    "untitled": "Unbenannt",
+    "deleteConversation": "Konversation löschen",
+    "deleteConfirm": "Diese Konversation löschen?",
+    "emptyTitle": "Fragen Sie nach oder ändern Sie etwas in Termix",
+    "emptyHint": "Der Assistent agiert als Sie über die Termix-CLI und führt Befehle auf Ihren Ziel-Hosts aus. Geben Sie @ ein, um Hosts, Flotten, Ordner oder Tags als Ziele hinzuzufügen.",
+    "inputPlaceholder": "Fragen Sie den Assistenten. Tippen Sie @, um Ziele hinzuzufügen.",
+    "noTargets": "Keine Zielhosts. Tippen Sie @, um welche hinzuzufügen.",
+    "sendHint": "Änderungen und Befehle werden ohne vorherige Nachfrage ausgeführt.",
+    "removeTarget": "{{name}} entfernen",
+    "kind": {
+      "host": "Host",
+      "fleet": "Fleet",
+      "folder": "Ordner",
+      "tag": "Tag"
+    },
+    "emptyHintBasic": "Der Assistent agiert über die Termix-CLI mit Ihren Berechtigungen.",
+    "inputPlaceholderBasic": "Fragen Sie den Assistenten.",
+    "sendHintBasic": "Änderungen werden ohne vorherige Nachfrage ausgeführt.",
+    "thinking": "Denke nach",
+    "thinkingActive": "Denke nach...",
+    "compacted": "Kontext komprimiert: frühere Nachrichten wurden zusammengefasst",
+    "compact": "Konversation komprimieren",
+    "nothingToCompact": "Die Konversation ist noch zu kurz, um sie zu komprimieren.",
+    "contextMeter": "Kontext: {{used}} von {{window}} Tokens wurden vom letzten Aufruf verwendet",
+    "contextMeterSource": "Das Fenster beträgt {{source}}.",
+    "contextMeterReserved": "{{tokens}} Tokens werden für die Antwort freigehalten.",
+    "todayTokens": "Heute {{tokens}}",
+    "todayTitle": "Tokens, die Sie heute verwendet haben. Klicken Sie für Details.",
+    "usage": "Token-Nutzung",
+    "conversationTokens": "{{tokens}} Tokens",
+    "openFloating": "Schwebendes Panel",
+    "openFloatingHint": "Öffnen Sie den Assistenten in einem Panel über jeder Seite. Drücken Sie {{shortcut}}, um es zu öffnen oder zu schließen.",
+    "shortcutHint": "Drücken Sie {{shortcut}} auf jeder Seite, um den Assistenten in einem schwebenden Panel zu öffnen."
+  },
+  "usage": {
+    "title": "Token-Nutzung",
+    "settingDescription": "Tokens, die Ihre AI-Aufrufe in den letzten 30 Tagen verwendet haben.",
+    "cardTitle": "AI-Token-Nutzung",
+    "today": "Heute",
+    "week": "7 Tage",
+    "month": "30 Tage",
+    "mine": "Meine",
+    "everyone": "Alle Benutzer",
+    "mineCaption": "Ihre Tokens in allen KI-Funktionen.",
+    "everyoneCaption": "Tokens aller Benutzer und KI-Funktionen.",
+    "byDay": "Pro Tag",
+    "byModel": "Pro Modell",
+    "bySource": "Pro Funktion",
+    "byUser": "Pro Benutzer",
+    "model": "Modell",
+    "feature": "Feature",
+    "user": "Benutzer",
+    "calls": "Aufrufe",
+    "prompt": "Eingabe",
+    "completion": "Ausgabe",
+    "total": "Gesamt",
+    "empty": "Keine KI-Nutzung in den letzten 30 Tagen.",
+    "loadFailed": "Nutzungsdaten konnten nicht geladen werden",
+    "estimatedNote": "Einige Werte sind Schätzungen (ca. vier Zeichen pro Token), da der Anbieter keine Nutzungsdaten übermittelt hat.",
+    "source": {
+      "assistant": "Assistent",
+      "terminal": "Terminal-Panel",
+      "compaction": "Kompaktierung",
+      "assets": "Asset-Annotation"
+    }
+  },
+  "autoOps": {
+    "viewAssistant": "Assistent",
+    "viewAutoOps": "Auto-ops",
+    "intro": "Auto-ops ermöglicht es dem Assistenten, Ihre Hosts eigenständig zu überprüfen. Eine Automatisierung startet ihn nach Zeitplan oder bei Problemen und erstellt einen Bericht oder schlägt eine Lösung zur Freigabe vor. Beginnen Sie mit einem Voreinstellung.",
+    "sections": {
+      "tasks": "Aufgaben",
+      "approvals": "Freigaben",
+      "presets": "Voreinstellungen"
+    },
+    "provider": "Anbieter für Aufgaben",
+    "providerDefault": "Erster Anbieter mit einem Standardmodell",
+    "model": "Modell für Aufgaben",
+    "modelDefault": "Das Standardmodell des Anbieters",
+    "saveModel": "Modell speichern",
+    "preferencesHint": "Der Anbieter und das Modell, die Hintergrundaufgaben verwenden. Lassen Sie diese unverändert, um Ihren Standardanbieter und Ihr Standardmodell zu nutzen.",
+    "task": "Aufgabe",
+    "tokens": "{{tokens}} Tokens",
+    "tokenUsage": "{{total}} Tokens ({{prompt}} Eingabe, {{completion}} Ausgabe)",
+    "dryRun": "Testlauf",
+    "trigger": "Auslöser",
+    "noTasks": "Noch keine Aufgaben",
+    "tasksHint": "Aufgaben sind Ausführungen von Automatisierungen mit einem „Ask AI“-Schritt. Aktivieren Sie eine Vorlage oder erstellen Sie Ihre eigene in Automatisierungen: Fügen Sie einen „Ask AI“-Schritt zu jeder Automatisierung hinzu. Die Ausführungen werden hier angezeigt.",
+    "openAutomations": "Automatisierungen öffnen",
+    "browsePresets": "Vorlagen durchsuchen",
+    "noApprovals": "Keine Pläne warten auf Genehmigung",
+    "loadFailed": "Auto-Ops konnten nicht geladen werden",
+    "decideFailed": "Die Entscheidung konnte nicht gespeichert werden",
+    "openConversation": "Im Assistenten öffnen",
+    "approve": "Genehmigen und ausführen",
+    "reject": "Ablehnen",
+    "expires": "Läuft um {{time}} ab",
+    "enabled": "Aktiviert",
+    "updateAvailable": "Update verfügbar",
+    "shared": "Geteilt",
+    "needsAutomations": "Benötigt Automatisierungen",
+    "enableAgain": "Erneut aktivieren",
+    "deletePreset": "Voreinstellung löschen",
+    "autonomy": {
+      "report": "Nur melden",
+      "propose": "Plan vorschlagen"
+    },
+    "status": {
+      "running": "Wird ausgeführt",
+      "reported": "Gemeldet",
+      "proposed": "Auf Genehmigung wartend",
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt",
+      "expired": "Abgelaufen",
+      "executing": "Plan wird ausgeführt",
+      "done": "Fertig",
+      "failed": "Fehlgeschlagen",
+      "skipped": "Übersprungen"
+    },
+    "severity": {
+      "info": "Info",
+      "warning": "Warnung",
+      "critical": "Kritisch"
+    },
+    "plan": {
+      "title": "Vorgeschlagener Plan",
+      "commands": "Befehle",
+      "rationale": "Begründung",
+      "risk": "Risiko",
+      "rollback": "Rückgängig machen",
+      "verify": "Überprüfen",
+      "progress": "Fortschritt"
+    },
+    "enable": {
+      "title": "{{name}} aktivieren",
+      "submit": "Aktivieren",
+      "name": "Name",
+      "targets": "Hosts",
+      "targetAll": "Alle Hosts",
+      "targetTrigger": "Der auslösende Host",
+      "targetHosts": "Ausgewählte Hosts",
+      "noHosts": "Wählen Sie mindestens einen Host aus.",
+      "threshold": "Schwellenwert (%)",
+      "forSeconds": "Für mindestens (Sekunden)",
+      "time": "Uhrzeit",
+      "cron": "Zeitplan (Cron)",
+      "dockerEvent": "Container-Ereignis",
+      "dockerEvents": {
+        "exited": "Beendet",
+        "unhealthy": "Nicht gesund",
+        "restarting": "Wird neu gestartet"
+      },
+      "badTime": "Geben Sie die Uhrzeit im Format HH:MM ein.",
+      "autonomy": "Was der Assistent tun darf",
+      "maxRunSeconds": "Zeitlimit (Sekunden)",
+      "runbook": "Runbook",
+      "runbookHint": "Was der Assistent tun soll, in einfachen Worten. Englisch funktioniert am besten.",
+      "shared": "Teilen, wenn als Voreinstellung gespeichert",
+      "sharedHint": "Jeder, der Auto-Ops verwenden darf, kann es dann aktivieren.",
+      "saveAsPreset": "Als Voreinstellung speichern",
+      "savedPreset": "Gespeichert",
+      "failed": "Die Automatisierung konnte nicht erstellt werden",
+      "saveFailed": "Die Voreinstellung konnte nicht gespeichert werden"
+    },
+    "presets": {
+      "daily-patrol": {
+        "title": "Tägliche Kontrolle",
+        "description": "Jeden Morgen um 09:00 Uhr werden bei allen Hosts Festplatten, Arbeitsspeicher, Auslastung, fehlgeschlagene Dienste, Container, Zertifikate, Updates, ausstehende Neustarts und die Zeitsynchronisation überprüft. Der Bericht wird nach Schweregrad sortiert."
+      },
+      "disk-cleanup": {
+        "title": "Festplattenspeicher bereinigen",
+        "description": "Wenn eine Festplatte für 5 Minuten 85 % oder mehr belegt ist, wird ermittelt, was sie füllt, und eine sichere Bereinigung zur Genehmigung vorgeschlagen. Geschäftsdaten werden niemals berührt."
+      },
+      "host-down-triage": {
+        "title": "Host-Ausfall-Analyse",
+        "description": "Wenn ein Host offline geht, wird er von anderen Hosts und Proxmox aus geprüft, und es wird gemeldet, ob das Problem im Netzwerk, an einer gestoppten Maschine oder an SSH liegt."
+      },
+      "service-failure": {
+        "title": "Dienstfehler",
+        "description": "Wenn ein Health-Check fehlschlägt, wird der dahinterliegende systemd-Dienst ermittelt, sein Status und Log gelesen und bei Bedarf ein einmaliger Neustart zur Genehmigung vorgeschlagen. Die Konfiguration wird niemals geändert."
+      },
+      "container-anomaly": {
+        "title": "Container-Anomalie",
+        "description": "Wenn ein Container beendet wird, als ungesund markiert wird oder sich ständig neu startet, werden sein Status, Exit-Code, Logs und Speicherverbrauch analysiert und ein einmaliger Start oder Neustart zur Genehmigung vorgeschlagen. Es wird nichts entfernt."
+      },
+      "resource-overload-cpu": {
+        "title": "CPU-Überlastung",
+        "description": "Wenn die CPU-Auslastung für 15 Minuten bei 95 % oder mehr liegt, werden die verantwortlichen Prozesse, Dienste und Container ermittelt und Handlungsempfehlungen gegeben. Es wird nichts geändert."
+      },
+      "resource-overload-memory": {
+        "title": "Speicherüberlastung",
+        "description": "Wenn die Speicherauslastung für 10 Minuten bei 95 % oder mehr liegt, wird ermittelt, was den Speicher verbraucht, ob ausgetauscht (swapping) oder durch Out-of-Memory-Kills beendet wurde, und es werden Handlungsempfehlungen gegeben. Es wird nichts geändert."
+      },
+      "security-updates-weekly": {
+        "title": "Wöchentliche Sicherheitsupdates",
+        "description": "Jeden Montag um 09:30 Uhr werden ausstehende Sicherheitsupdates nach Schweregrad, erforderliche Neustarts und die dahinterstehenden Pakete, laufende und installierte Kernel sowie die Tage seit dem letzten Update in einer Tabelle für alle Hosts aufgelistet."
+      },
+      "cert-expiry-weekly": {
+        "title": "Wöchentliche Zertifikatsabläufe",
+        "description": "Jeden Montag um 09:45 Uhr werden die Ablaufdaten von Let's Encrypt-, Webserver- und Kubernetes-Zertifikaten auf jedem Host geprüft. Zertifikate mit weniger als 30 Tagen Restlaufzeit werden markiert, kritisch sind weniger als 7 Tage."
+      },
+      "failing-drive": {
+        "title": "Defektes Laufwerk",
+        "description": "Wenn Storage Health ein defektes oder verschlissenes Laufwerk, einen degradierten Pool oder Array oder einen sich füllenden Thin Pool erkennt, liest es SMART-, Array- und Poolstatus und meldet, wie dringend die Situation ist und was zu tun ist. Es werden keine Änderungen vorgenommen."
+      }
+    },
+    "report": {
+      "verdict": "Ergebnis",
+      "evidence": "Beweise",
+      "actionsTaken": "Durchgeführte Aktionen",
+      "recommendations": "Empfehlungen",
+      "nothingFound": "Bevor der Lauf beendet wurde, wurde nichts gefunden.",
+      "noChanges": "Es wurden keine Änderungen vorgenommen.",
+      "openConversation": "Öffnen Sie das Gespräch im Assistenten, um jeden Schritt einzusehen und Nachfragen zu stellen.",
+      "noFurtherAction": "Es sind keine weiteren Maßnahmen erforderlich.",
+      "stoppedBudgetRun": "Gestoppt: Dieser Durchlauf hat sein Budget von {{tokens}} Tokens ausgeschöpft.",
+      "stoppedBudgetDaily": "Gestoppt: Das tägliche Budget des Besitzers von {{tokens}} Tokens ist aufgebraucht.",
+      "stoppedDeadline": "Gestoppt: Die Zeitbegrenzung der Automatisierung wurde erreicht.",
+      "stoppedPaused": "Gestoppt: Ein Administrator hat die KI-Automatisierung pausiert.",
+      "stoppedAborted": "Gestoppt: Der Automatisierungsdurchlauf wurde abgebrochen.",
+      "providerFailed": "Der KI-Anbieter ist fehlgeschlagen: {{error}}",
+      "noHosts": "Keiner der Zielhosts kann vom Besitzer der Automatisierung erreicht werden.",
+      "noProvider": "Der Besitzer der Automatisierung verfügt über keinen KI-Anbieter mit einem Modell zur Ausführung von Aufgaben.",
+      "needsOpsUse": "Der Besitzer der Automatisierung verfügt nicht über die Berechtigung ai.ops.use.",
+      "assistantOff": "Der KI-Assistent ist für den Besitzer der Automatisierung deaktiviert.",
+      "skippedPaused": "KI-Automatisierungen wurden von einem Administrator pausiert.",
+      "skippedDuplicate": "Eine Aufgabe für dieselbe Automatisierung und denselben Host wird bereits ausgeführt oder wartet auf Genehmigung.",
+      "skippedRate": "Diese Automatisierung hat in der letzten Stunde bereits {{count}} KI-Aufgaben gestartet.",
+      "hostNotRun": "Nicht ausgeführt: Der Plan wurde gestoppt.",
+      "hostNoAccess": "Nicht ausgeführt: Der Besitzer kann sich nicht mehr mit diesem Host verbinden.",
+      "hostUnreachable": "Nicht ausgeführt: Der Host konnte nicht erreicht werden.",
+      "hostStopped": "Beim ersten fehlgeschlagenen Befehl gestoppt.",
+      "executionDone": "Der genehmigte Plan wurde auf {{count}} Host(s) ausgeführt, und alle Befehle und Prüfungen waren erfolgreich.",
+      "executionFailed": "Der genehmigte Plan wurde nicht auf allen Hosts erfolgreich abgeschlossen.",
+      "executionStopped": "Der genehmigte Plan wurde vor dem Abschluss gestoppt.",
+      "approvedBy": "Der genehmigte Plan wurde wie vorgesehen ausgeführt. Genehmigt von {{user}}.",
+      "noticeReported": "KI-Bericht: {{title}}",
+      "noticeProposed": "KI-Plan wartet auf Genehmigung: {{title}}",
+      "noticeExecuted": "KI-Plan ausgeführt: {{title}}",
+      "noticeFailed": "KI-Aufgabe fehlgeschlagen: {{title}}",
+      "noticeAssetsAnnotationFailed": "Asset-Annotation fehlgeschlagen"
+    }
+  },
+  "assets": {
+    "title": "Assets",
+    "search": "Name, Schlüssel oder Adresse suchen",
+    "allZones": "Alle Zonen",
+    "showRemoved": "Entfernte anzeigen",
+    "collectNow": "Jetzt sammeln",
+    "collecting": "Wird gesammelt…",
+    "collectFailed": "Sammlung konnte nicht gestartet werden",
+    "neverRun": "Noch nicht gesammelt",
+    "lastRun": "Zuletzt gesammelt {{time}}: {{ok}} von {{total}} Hosts",
+    "lastRunFailed": "Die Sammlung um {{time}} ist fehlgeschlagen",
+    "hostsFailed_one": "{{count}} Host fehlgeschlagen",
+    "hostsFailed_other": "{{count}} Hosts fehlgeschlagen",
+    "loadFailed": "Bestandsverzeichnis konnte nicht geladen werden",
+    "saveFailed": "Speichern fehlgeschlagen",
+    "empty": "Noch keine Assets",
+    "emptyHint": "Sammle jetzt, um jeden Host auszulesen, mit dem der Collector eine Verbindung herstellen kann.",
+    "emptyHintView": "Jemand mit der Berechtigung ai.assets.manage muss zuerst sammeln.",
+    "removed": "Entfernt",
+    "pinned": "Fixiert",
+    "multiZone": "Mehrzonen",
+    "multiZoneHint": "Hat Adressen in mehr als einer Zone und kann somit beide erreichen: ein potenzieller Pivot.",
+    "columns": {
+      "name": "Name",
+      "kind": "Typ",
+      "zone": "Zone",
+      "ips": "Adressen",
+      "listening": "Ports",
+      "outbound": "Ausgehend",
+      "services": "Dienste",
+      "collected": "Zuletzt gesammelt",
+      "role": "Rolle",
+      "importance": "Wichtigkeit",
+      "system": "System"
+    },
+    "kind": {
+      "host": "Host",
+      "guest": "Gast",
+      "container": "Container",
+      "external": "Extern"
+    },
+    "zone": {
+      "internal": "Intern",
+      "dmz": "DMZ",
+      "external": "Extern",
+      "cloud": "Cloud",
+      "overlay": "Overlay"
+    },
+    "sections": {
+      "os": "Betriebssystem",
+      "hostname": "Hostname",
+      "uptimeSec": "Betriebszeit (Sekunden)",
+      "interfaces": "Schnittstellen",
+      "routes": "Routen",
+      "listening": "Lauschende Ports",
+      "connections": "Hergestellte Verbindungen",
+      "services": "Aktive Dienste",
+      "containers": "Container",
+      "kubernetes": "Kubernetes",
+      "guests": "Proxmox-Gäste",
+      "cloud": "Cloud",
+      "missing": "Abschnitte ohne Ausgabe",
+      "guest": "Proxmox-Gast",
+      "container": "Container"
+    },
+    "outgoing": "Ausgehend",
+    "incoming": "Eingehend",
+    "noEdges": "Keine",
+    "stale": "Nicht in der letzten Sammlung gesehen",
+    "pinZone": "Zone",
+    "rulesDecide": "Durch Regeln bestimmt",
+    "settingsTitle": "Zonen und Zeitplan",
+    "scheduleTitle": "Sammlung",
+    "daily": "Täglich sammeln",
+    "dailyHint": "Hosts werden auch erneut gesammelt, wenn sie hinzugefügt oder geändert werden.",
+    "time": "Zeit (UTC)",
+    "save": "Speichern",
+    "collector": "Sammelt als {{collector}} und erreicht die Hosts, auf die dieses Konto zugreifen kann.",
+    "collectorMe": "Sie",
+    "collectorOther": "ein anderer Manager",
+    "collectorNone": "noch niemand",
+    "collectAsMe": "Als ich sammeln",
+    "zonesTitle": "Zonenregeln",
+    "zonesHint": "Eine Regel ordnet eine CIDR einer Zone zu, vor den integrierten Regeln. Das spezifischste Präfix gewinnt, dann die höhere Priorität. Assets werden neu zugeordnet, wenn Sie speichern.",
+    "zoneName": "Name",
+    "zoneNameExample": "Rechenzentrum LAN",
+    "zoneKind": "Art",
+    "cidr": "CIDR",
+    "priority": "Priorität",
+    "addZone": "Regel hinzufügen",
+    "deleteZone": "Regel löschen",
+    "cancelEdit": "Abbrechen",
+    "annotating": "Annotieren…",
+    "neverAnnotated": "Noch nicht annotiert",
+    "lastAnnotation": "Zuletzt annotiert {{time}}: {{ok}} von {{total}} Assets, {{tokens}} Tokens",
+    "annotationFailed": "fehlgeschlagen: {{reason}}",
+    "annotateNow": "Jetzt annotieren",
+    "annotateFailed": "Die Annotation konnte nicht gestartet werden",
+    "modeTable": "Tabelle",
+    "modeGraph": "Graph",
+    "importance": {
+      "critical": "Kritisch",
+      "high": "Hoch",
+      "medium": "Mittel",
+      "low": "Niedrig"
+    },
+    "importanceUnknown": "Nicht bewertet",
+    "importanceReason": "Warum",
+    "sourceAi": "KI",
+    "sourceAiHint": "Geschrieben von der Annotation; der nächste Durchlauf kann sie ändern.",
+    "sourceUser": "Gesperrt",
+    "sourceUserHint": "Von einer Person festgelegt; Annotationsläufe lassen es unverändert, bis es entsperrt wird.",
+    "unlock": "Entsperren: Lassen Sie die Annotation dies erneut ausfüllen",
+    "unlockField": "Entsperren {{field}}",
+    "editAnnotation": "Bearbeiten",
+    "lockHint": "Änderungen an Feldern werden vor späteren Anreicherungs-Läufen gesperrt.",
+    "factsTitle": "Fakten",
+    "closePanel": "Schließen",
+    "impact": "Auswirkung",
+    "clearImpact": "Zurücksetzen",
+    "impactSummary_one": "Bei einem Ausfall fällt auch {{count}} Asset aus ({{critical}} kritisch, {{high}} hoch), {{weak}} weitere verbinden sich nur mit ihnen.",
+    "impactSummary_other": "Bei einem Ausfall fallen auch {{count}} Assets aus ({{critical}} kritisch, {{high}} hoch), {{weak}} weitere verbinden sich nur mit ihnen.",
+    "impactTruncated": "Abbruch nach 6 Hops oder 300 Assets.",
+    "impactDirect": "Direkt",
+    "impactTransitive": "Über andere",
+    "impactWeak": "Verbinden sich nur mit ihnen",
+    "expandContainers": "Container anzeigen",
+    "showExternal": "Externe Adressen anzeigen",
+    "graphCounts": "{{nodes}} Assets, {{edges}} Beziehungen",
+    "graphTitle": "Asset-Graph",
+    "noZone": "Keine Zone",
+    "annotationTitle": "KI-Anreicherung",
+    "annotateAfterCollect": "Nach jeder Sammlung anreichern",
+    "annotateAfterCollectHint": "Nur Assets, die sich seit ihrer letzten Anreicherung geändert haben, und ihre Nachbarn werden an das Modell gesendet.",
+    "annotateProvider": "Anbieter",
+    "annotateProviderDefault": "Die Auto-Ops-Auswahl des Sammlers",
+    "annotateModel": "Modell",
+    "annotateModelDefault": "Das Standardmodell des Anbieters",
+    "annotationHint": "Anreicherungen werden als Sammler mit den Anbietern des Sammlers ausgeführt. Zusammenfassungen enthalten keine Umgebungsvariablen, Befehlszeilen oder externen Adressen.",
+    "annotateAll": "Alles erneut anreichern"
+  },
+  "exposure": {
+    "title": "Internet-Einträge",
+    "disclaimer": "Nur Konfigurations-Inventar. Öffentliche Bindungen und Weiterleitungsregeln beweisen nicht die Erreichbarkeit aus dem Internet. Private Listener werden als Backend-Nachweis beibehalten.",
+    "loadFailed": "Inventar der Internet-Einträge konnte nicht geladen werden.",
+    "saveFailed": "Priorität konnte nicht gespeichert werden.",
+    "search": "Adresse, Host, Name oder Pfad filtern",
+    "allPriority": "Alle Prioritäten",
+    "allZones": "Alle Zonen",
+    "allSources": "Alle Quellen",
+    "high": "Hoch",
+    "medium": "Mittel",
+    "low": "Niedrig",
+    "active": "Aktiv",
+    "stale": "Veraltet",
+    "resolved": "Nicht mehr beobachtet",
+    "all": "Alle",
+    "refresh": "Aktualisieren",
+    "loading": "Wird geladen…",
+    "empty": "Keine passenden Einträge. Prüfen Sie die Abdeckung der Sammlung unten, bevor Sie Schlussfolgerungen ziehen.",
+    "never": "Noch nicht gesammelt. Sammeln Sie Assets, um Einträge zu inventarisieren.",
+    "endpoint": "Eintrag",
+    "source": "Quelle",
+    "priority": "Prüfpriorität",
+    "pathState": "Konfigurationspfad",
+    "freshness": "Aktualität",
+    "details": "Details zum Nachweis",
+    "close": "Schließen",
+    "notTested": "Externe Erreichbarkeit: nicht getestet.",
+    "priorityReason": "Die Priorität ist ein Hinweis für die Prüfung, kein Urteil über eine Schwachstelle. Öffentliche Verwaltungs- und Daten-Dienst-Ports haben Vorrang; Dienstidentität und Zugriffsrichtlinien müssen noch überprüft werden.",
+    "tls": "TLS-Konfiguration",
+    "restrictions": "Zugriffsbeschränkungen",
+    "observed": "Zuletzt beobachtet",
+    "rulePriority": "Regelpriorität (entsperren)",
+    "evidence": "Beobachtung",
+    "coverage": "Abdeckung der Sammlung",
+    "changes": "Neueste Änderungen",
+    "current": "Aktuell",
+    "partial": "Unvollständig",
+    "complete": "Konfigurationszuordnung abgeschlossen",
+    "conflicting": "Mehrdeutig oder zyklisch",
+    "configured": "In der Konfiguration deklariert",
+    "unknown": "Unbekannt",
+    "status_ok": "Erfasst",
+    "status_unsupported": "Tool nicht verfügbar",
+    "status_denied": "Zugriff verweigert",
+    "status_failed": "Erfassung oder Analyse fehlgeschlagen",
+    "status_truncated": "Abgeschnitten",
+    "change_baseline": "Basislinie erstellt",
+    "change_added": "Eintrag hinzugefügt",
+    "change_changed": "Konfiguration geändert",
+    "change_removed": "Eintrag nicht mehr beobachtet",
+    "change_coverage": "Abdeckung reduziert",
+    "explain": "Beweise erläutern",
+    "explaining": "Wird erläutert…",
+    "explainFailed": "Erläuterung fehlgeschlagen oder Beweise geändert.",
+    "aiLabel": "KI-Interpretation · kein verifizierter Befund",
+    "previous": "Vorheriger",
+    "next": "Nächster",
+    "binding": "Bindungsbereich",
+    "binding_public": "Kandidat für öffentlichen Eintrag",
+    "binding_local": "Privater/lokaler Backend",
+    "binding_unknown": "Nicht aufgelöste Bindung",
+    "ruleGaps": "Nicht analysierte Regeln: {{count}}",
+    "unsupportedRule": "Nicht unterstützte Regel; vorherige Beweise beibehalten",
+    "scope": "Ansicht",
+    "scope_internet": "Kandidaten für Internet-Einträge",
+    "scope_all": "Alle Beweise",
+    "scope_unknown": "Unbekannte Exposition",
+    "inventorySummary": "{{internet}} Kandidaten für Internet-Einträge · {{all}} Regeln insgesamt · {{unknown}} mit unbekannter Exposition",
+    "bindingCount": "{{count}} beobachtete Bindungen",
+    "pathsTruncated": "Pfad-Erweiterung hat ihr Limit erreicht. Dies ist ein unvollständiger Beweis.",
+    "pathBranch": "Pfad {{index}}",
+    "branched": "Bedingte Verzweigungen",
+    "reason_sensitive": "Überprüfen Sie den Dienstport {{port}} (Eintrag oder Backend)",
+    "reason_public-address": "Beobachtete Bindung an öffentliche Adresse",
+    "reason_wan-zone": "OpenWrt WAN-Quellenzone; Firewall-Akzeptanz nicht verifiziert",
+    "reason_configured-public-tunnel": "Konfigurierter öffentlicher Tunnel; externe Erreichbarkeit nicht getestet",
+    "reason_internal-only": "Nur interne oder lokale Bindungen beobachtet",
+    "reason_exposure-unknown": "Unzureichende Beweise zur Klassifizierung der Exposition",
+    "reason_critical-asset": "Asset als kritisch markiert",
+    "reason_manual": "Priorität vom Benutzer ausgewählt"
+  },
+  "companion": {
+    "toggle": "Assistenten-Panel"
+  },
+  "widget": {
+    "loading": "Wird geladen...",
+    "empty": "Noch keine Aufgaben",
+    "pending_one": "{{count}} Plan wartet auf Genehmigung",
+    "pending_other": "{{count}} Pläne warten auf Genehmigung",
+    "maxItems": "Anzuzeigende Aufgaben"
+  }
+}

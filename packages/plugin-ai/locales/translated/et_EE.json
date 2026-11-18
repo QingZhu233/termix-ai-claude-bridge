@@ -1,0 +1,872 @@
+{
+  "permissions": {
+    "use": {
+      "title": "Kasuta assistenti",
+      "description": "Ava assistent ja küsi temalt midagi."
+    },
+    "manage_providers": {
+      "title": "Pakkuja haldamine",
+      "description": "Lisa, muuda ja eemalda AI-pakkuja ning nende API- võtmed."
+    },
+    "apply_proposals": {
+      "title": "Ettepanekute rakendamine",
+      "description": "Luba assistendil rakendada tema ettepanekuid."
+    },
+    "services": {
+      "use": {
+        "title": "Kasuta teistest funktsioonidest AI-d",
+        "description": "Teised funktsioonid võivad sinu nimel assistenti kasutada."
+      }
+    },
+    "secrets": {
+      "share": {
+        "title": "Jaga API-võtit",
+        "description": "Teised funktsioonid võivad kasutada salvestatud AI API-võtit, ilma seda nägemata."
+      }
+    },
+    "ops": {
+      "use": {
+        "title": "Käivita käskeid hostidel AI-assistendi abil",
+        "description": "Luba assistendil käivitada suvalisi shell-käske valitud hostidel. Vaikimisi ainult administraatoritele."
+      }
+    },
+    "usage": {
+      "view_all": {
+        "title": "Vaata kõigi kasutajate AI-kasutust",
+        "description": "Näe, mitu tokenit iga kasutaja AI-kõned kasutasid, mitte ainult omaenda. Vaikimisi ainult administraatoritele."
+      }
+    },
+    "assets": {
+      "view": {
+        "title": "Vaata varade nimekirja",
+        "description": "Kuva kogutud hostid, külalised, konteinerid, tsoonid ja ühendused. Vaikimisi ainult administraatoritele."
+      },
+      "manage": {
+        "title": "Halda varade nimekirja",
+        "description": "Alusta kogumisi, muuda tsoonireegleid, kinnita tsoone ja muuda ajakava. Kogumine loeb hoste ainult lugemisõigusega. Vaikimisi ainult administraatoritele."
+      }
+    }
+  },
+  "settings": {
+    "assistantUnavailable": "AI-assistent on sellel serveril välja lülitatud.",
+    "providersNeedOptIn": "Lülita ülal AI-assistent sisse, et lisada pakkuja.",
+    "providers": {
+      "label": "Pakkuja",
+      "description": "AI-teenused, mida assistent ja agendid saavad kasutada."
+    },
+    "admin": {
+      "globallyEnabled": {
+        "label": "AI-assistent",
+        "description": "Luba kasutajatel AI-assistent sisse lülitada. Kui see on välja lülitatud, on assistent kõigile peidetud ja blokeeritud."
+      },
+      "privateEndpoints": {
+        "label": "Lubatud privaatne AI-pakkuja",
+        "description": "Sinu privaatvõrgus asuvad hostid, millele kasutajad võivad pakkuja suunata, näiteks ise majutatud Ollama. Pane iga host eraldi reale."
+      },
+      "opsConcurrency": {
+        "label": "AI-assistendi paralleelsed hostid",
+        "description": "Mitu hosti saab ühe assistendi käsu korral samaaegselt töödelda."
+      },
+      "opsCommandTimeout": {
+        "label": "AI-assistendi käsu aegumine (sekundites)",
+        "description": "Kui kaua võib käsk hostil enne peatamist töötada. Assistent võib paluda kuni 600 sekundit."
+      },
+      "opsOutputLimit": {
+        "label": "AI-assistendi väljund hosti kohta (tähed)",
+        "description": "Kui palju iga hosti väljundist salvestatakse. Pikkadel väljunditel säilitatakse algus ja lõpp."
+      },
+      "autoOpsPaused": {
+        "label": "Peata AI automaatne töö",
+        "description": "Peatab kõik käimasolevad AI ülesanded ja heaks kiidetud plaanid ning keeldub uutest, kuni see uuesti sisse lülitatakse."
+      },
+      "autoOpsRunsPerHour": {
+        "label": "AI ülesandeid automaatika kohta tunnis",
+        "description": "Samal tunnil esinevad lisatriggerid jäetakse vahele."
+      },
+      "autoOpsRunTokens": {
+        "label": "Tokenite eelarve ühe AI ülesande kohta",
+        "description": "Ülesanne, mis kasutab nii palju tokeneid, peatatakse ja teatab, mida leiti."
+      },
+      "autoOpsDailyTokens": {
+        "label": "Iga kasutaja päevane AI tokenite eelarve",
+        "description": "Kui kasutaja on täna (UTC) kasutanud nii palju tokeneid, jäetakse tema AI ülesanded vahele või peatatakse need."
+      },
+      "assetsDailyCollect": {
+        "label": "Kogu varade nimekiri igapäevaselt",
+        "description": "Loeb iga päev ühe lugemisõigusega skriptiga iga hosti, millega koguja suudab ühendust võtta."
+      },
+      "assetsCollectTime": {
+        "label": "Varade kogumise aeg (UTC)",
+        "description": "TT:MM, näiteks 03:00."
+      },
+      "assetsCollector": {
+        "label": "Varade koguja"
+      },
+      "assetsAnnotateAfterCollect": {
+        "label": "Märkige varad pärast iga kogumist",
+        "description": "Mudel kirjutab iga muudetud vara rolli, tähtsuse ja ärisüsteemi ning faktidest nähtavad sõltuvused."
+      },
+      "assetsAnnotateRunTokens": {
+        "label": "Tokenite eelarve ühe vara märkimise käigu kohta",
+        "description": "Käik peatub, kui selle mudeli kõned on kasutanud nii palju tokeneid; kirjutatu jääb alles."
+      },
+      "assetsAnnotateProvider": {
+        "label": "Varade märkimise pakkuj"
+      },
+      "assetsAnnotateModel": {
+        "label": "Varade märkimise mudel"
+      },
+      "exposureRetentionDays": {
+        "label": "Avatuse ajaloo säilitamine (päevi)",
+        "description": "Hoibab ootel teatisi ja tõendeid, mida viidatakse praegustes kirjetes, olenemata vanusest."
+      }
+    },
+    "host": {
+      "enableAiAssistant": {
+        "label": "Luba AI-assistent",
+        "description": "Luba AI-assistendil aidata selle hosti terminaaliga. Vaikimisi välja lülitatud ja vajab endiselt AI lubamist sinu kontole."
+      },
+      "showPanel": {
+        "label": "Paneel terminali kõrval",
+        "description": "Kuvab abistaja paneeli selle hosti SSH terminali kõrval."
+      }
+    },
+    "user": {
+      "autoOpsPreferences": {
+        "label": "Automaatse töö eelistused"
+      },
+      "companionAutoOpen": {
+        "label": "Ava abistaja paneel koos terminaliga",
+        "description": "Kuva abistaja paneel, kui terminal avaneb hostil, millel see on saadaval."
+      },
+      "companionSide": {
+        "label": "Abistaja paneeli asukoht",
+        "description": "Kus paneel terminali kõrval asub.",
+        "right": "Parem",
+        "left": "Vasak",
+        "bottom": "Alumine"
+      },
+      "companionSize": {
+        "label": "Abistaja paneeli suurus",
+        "description": "Laius või alumisel asukohal kõrgus pikslites."
+      },
+      "companionEdgeButton": {
+        "label": "Abistaja paneeli servanupp",
+        "description": "Kuva terminali serval väike nupp paneeli avamiseks."
+      }
+    }
+  },
+  "ai": {
+    "send": "Saada",
+    "stop": "Peata",
+    "save": "Salvesta",
+    "cancel": "Tühista",
+    "running": "töötab",
+    "approve": "Kinnita",
+    "reject": "Lükka tagasi",
+    "selectProvider": "Vali pakkuja",
+    "addProvider": "Lisa pakkuja",
+    "manageModels": "Mudelite haldamine",
+    "editProvider": "Muuda pakkuja",
+    "removeProvider": "Eemalda pakkuja",
+    "providerType": "Pakkuja",
+    "providerLabel": "Nimi",
+    "providerLabelPlaceholder": "Näiteks: Kohalik Ollama",
+    "baseUrl": "Serveri aadress",
+    "apiKey": "API-võti",
+    "defaultModel": "Vaikimisi mudel",
+    "defaultModelPlaceholder": "Näiteks: llama3.1 või claude-opus-5",
+    "labelRequired": "Anna sellele pakkuja nimi",
+    "providerSaveFailed": "Pakkuja salvestamine ebaõnnestus",
+    "providerUpdated": "Pakkuja uuendatud",
+    "providerDeleteFailed": "Pakkuja eemaldamine ebaõnnestus",
+    "privateEndpointHint": "Sinu privaatvõrgu aadressid vajavad administraatori luba hosti esmaseks lubamiseks.",
+    "providerOllama": "Ollama",
+    "providerAnthropic": "Anthropic",
+    "providerOpenai": "OpenAI",
+    "providerGemini": "Google Gemini",
+    "providerOpenaiCompatible": "OpenAI-ga ühilduv",
+    "toolArguments": "Sisend",
+    "toolResult": "Tulemus",
+    "statusApplied": "Rakendatud",
+    "statusRejected": "Tagasi lükatud",
+    "proposalApplyFailed": "Muudatuse rakendamine ebaõnnestus",
+    "proposalRejectFailed": "Muudatuse tagasilükkamine ebaõnnestus",
+    "enableTitle": "Luba AI-assistent",
+    "enableDescription": "Luba assistendil lugeda sinu seadistust ja ette panna muudatusi, mida sa kinnitada.",
+    "readOnlyCommands": "Luba ainult lugemiseks diagnostilised käsud",
+    "readOnlyCommandsDescription": "Abiline võib käivitada lühikese loaga ohutuid käske, nagu df ja uptime, ilma iga kord küsimata. Kõik, mis serverit muudab, esitatakse alati esmalt heakskiitmiseks.",
+    "modelDetectFailed": "Pakkuja ei olnud saadaval, seega on see üldine nimekiri. Saate sisestada suvalise mudeli nime.",
+    "modelCustom": "Sisestage mudeli nimi",
+    "modelRefresh": "Värskenda nimekirja",
+    "modelPlaceholder": "Valige või sisestage mudel",
+    "runCommandTitle": "Käivita käsk",
+    "assistant": "AI abiline",
+    "terminalPanelEmpty": "Küsi abiliselt selle peremeesmasina kohta. Kõik olekuid muutev tegevus nõuab esmalt teie heakskiitu.",
+    "terminalPanelPlaceholder": "Küsi selle peremeesmasina kohta...",
+    "noProvidersConfigured": "Ühtegi tehisintellekti pakkujat pole veel seadistatud. Lisa üks Seadistustes.",
+    "runsInOpenTerminal": "Käivitub teie avatud terminalisessioonis.",
+    "runInTerminal": "Käivita",
+    "terminalContextPrefill": "Siin on minu terminali väljund:\n\n{{output}}\n\n",
+    "secrets": {
+      "shareApiKey": "Luba teistel funktsioonidel kasutada teie AI pakkuja API võtit oma päringute jaoks. Vtit ei kopeerita kunagi ja saate selle igal ajal tühistada."
+    },
+    "removeProviderConfirm": "Kas eemaldada pakkuja {{name}}?",
+    "contextWindows": "Kontekstiaken mudeli kohta",
+    "contextWindowsHint": "Loe pakkujalt, kus see ühe teatab. Sisesta tokenite arv, et see mudeli jaoks ületada, või jäta tühjaks, et kasutada seda, mida pakkuja teatab. Värskendamine küsib pakkujalt uuesti.",
+    "contextWindowValue": "Kontekstiaken: {{tokens}} ({{source}})",
+    "contextOverride": "Kontekstiakeni ületamine mudeli {{model}} jaoks",
+    "contextSourceOverride": "sinu poolt määratud",
+    "contextSourceProvider": "pakkuja poolt teatatud",
+    "contextSourceGuess": "mudeli nime põhjal oletatud",
+    "contextSourceDefault": "vaikimisi tundmatute mudelite jaoks",
+    "contextLoadFailed": "Kontekstiakeni lugemine ei õnnestunud",
+    "contextRefresh": "Värskenda",
+    "contextWindowInvalid": "Sisestage kontekstiaken täisarvulise tokenite arvuna, vähemalt 1024.",
+    "advanced": "Täpsemad seaded",
+    "advancedHint": "Jäta seade vaikeväärtusele, et kasutada mudeli enda seadeid.",
+    "advancedDefault": "Vaikimisi",
+    "advancedDefaultAuto": "Vaikimisi (automaatne)",
+    "advancedAuto": "Automaatne",
+    "advancedEndpoint": "Lõpp-punkt",
+    "advancedEndpointResponses": "Vastuste API",
+    "advancedEndpointChat": "Vestluse täiendused",
+    "advancedReasoningEffort": "Järelduste jõupingutus",
+    "advancedReasoningSummary": "Järelduste kokkuvõte",
+    "advancedReasoningSummaryHint": "Ainult Vastuste API.",
+    "advancedVerbosity": "Üksikasjalikkus",
+    "advancedNone": "Puudub",
+    "advancedMinimal": "Minimaalne",
+    "advancedLow": "Madal",
+    "advancedMedium": "Keskmine",
+    "advancedHigh": "Kõrge",
+    "advancedXhigh": "Eriti kõrge",
+    "advancedMax": "Maksimaalne",
+    "advancedConcise": "Lühike",
+    "advancedDetailed": "Üksikasjalik",
+    "advancedOff": "Väljas",
+    "advancedMaxOutputTokens": "Maksimaalne väljundtokenite arv",
+    "advancedMaxOutputTokensInvalid": "Sisesta täisarv vahemikus 1 kuni 1 000 000.",
+    "advancedTemperature": "Temperatuur",
+    "advancedTemperatureHint": "OpenAI järeldusmudelid aktsepteerivad seda ainult siis, kui järelduste jõupingutus on puuduv, seega muu jõupingutuse korral seda ei saadeta.",
+    "advancedTemperatureInvalid": "Sisesta number vahemikus 0 kuni 2."
+  },
+  "nav": {
+    "ai": "AI-assistent"
+  },
+  "onboarding": {
+    "aiTitle": "AI abiline",
+    "aiIntro": "Termix võib sisaldada AI abilit. Seda saate hiljem seadistustes muuta.",
+    "aiSkipTitle": "Jäta välja",
+    "aiSkipDesc": "Termix töötab nagu praegu. Abiline jääb peidetud.",
+    "aiEnableTitle": "Lülita sisse",
+    "aiEnableDesc": "Lisab abilise, mis loeb teie seadistused ja pakub välja muudatusi, mille te heaks kiidate. Nõuab pakkuja, mille te ise varustate, näiteks kohalikku Ollama.",
+    "aiNote": "Midagi ei saadeta kuhugi, enne kui lisate pakkuja ja saatke sõnumi."
+  },
+  "agents": {
+    "working": "Töötab...",
+    "startingIndicator": "Agenti käivitatakse...",
+    "noCompatibleProvider": "Ükski teie AI pakkuja ei tööta {{agent}}-iga. Claude Code vajab Anthropicut ja Codex vajab OpenAI-d.",
+    "noProviders": "Lisage esmalt seadistustes AI pakkuja.",
+    "title": "AI agent",
+    "permissionTitle": "Käivita kaug-AI agente",
+    "permissionDescription": "Käivitage koodimisagente SSH peremeesmasinatel, kasutades seadistatud AI pakkujaid. Agendid saavad käivitada käske ja muuta faile SSH kasutaja õigustega.",
+    "new": "Uus sessioon",
+    "description": "Käivitage agent selles peremeesmasinas asuvas kaustas, kasutades Termix AI pakkuja.",
+    "runtime": "Agent",
+    "provider": "Termix pakkuja",
+    "chooseProvider": "Valige ühilduv pakkuja",
+    "model": "Mudel",
+    "directory": "Töökaust",
+    "executable": "Käivitatav fail (valikuline absoluutne tee)",
+    "requirements": "Peremeesmasin peab sisaldama Node.js 22.19+ ja valitud agent peab olema paigaldatud. SSH kaugloopback-suunamine peab olema lubatud. Olemasolevaid agentide seadistusi ei kirjutata üle.",
+    "responsesRequired": "Codex nõuab Responses API lõpp-punkti. Ainult Chat Completions lõpp-punkt ei saa käivitada Codexi.",
+    "piPermissions": "Pi tööriistad töötavad selle SSH konto õigustega. Käivitage ainult kaustas, mille muutmiseks annate agendile loa.",
+    "start": "Käivita agent",
+    "resume": "Jätka",
+    "stop": "Peata sessioon",
+    "interrupt": "Katkesta käik",
+    "send": "Saada",
+    "prompt": "Paluge agendil selles kaustas töötada...",
+    "noSessions": "Sellel peremeesmasinal pole agentide sessioone.",
+    "approval": "Agent vajab teie otsust",
+    "answer": "Vastus (JSON struktureeritud küsimuste jaoks)",
+    "allow": "Luba üks kord",
+    "deny": "Keeldu",
+    "tool": "Tööriista tegevus",
+    "streamFailed": "Agenti voog katkes. Avage sessioon uuesti, et ühendus taastada.",
+    "status": {
+      "starting": "Käivitamine",
+      "ready": "Valmis",
+      "running": "Töötab",
+      "stopped": "Peatatud",
+      "error": "Viga"
+    },
+    "installRuntime": "Paigalda valitud agent ja Node.js",
+    "installSource": "Ainult ametlikud allikad: nodejs.org (SHA-256 kontrollitud) ja registry.npmjs.org (lukustatud paki terviklikkus). Paigaldab SSH-kasutaja jaoks kausta ~/.local/share/termix-agent-runtime; nõuab curli, tari ja Linuxi/macOSi x64 või arm64. Ei muuda SSH edastamise poliitikat.",
+    "installSucceeded": "Paigaldus kinnitatud. Saad nüüd agendi käivitada; SSH loopbacki kaugedastamine peab samuti olema lubatud.",
+    "installFailed": "Paigaldus ebaõnnestus. Vaata logi ja proovi uuesti.",
+    "installLog": "Paigalduslogi",
+    "enableForwarding": "Luba agendi edastamine",
+    "forwardingScope": "Linux koos systemd/OpenSSH-ga; nõuab root-õigusi või paroolita sudo-d. Varundab ja valideerib SSH-konfiguratsiooni, seejärel laadib selle uuesti. Ainult praegune SSH-konto ja tuvastatud ühenduse allikas saavad loopbacki kaugedastuse; olemasolev kohalik edastamine jääb alles. Ebaõnnestunud muudatused tühistatakse.",
+    "forwardingSucceeded": "SSH loopbacki kaugedastamine on valmis. Käivita või jätkaga agent, et luua uus SSH-ühendus.",
+    "forwardingFailed": "SSH edastamise konfiguratsioon ebaõnnestus. Vaata logi; kehtivat konfiguratsiooni ei hoita.",
+    "search": "Otsi sessioone",
+    "sessionName": "Sessiooni nimi",
+    "rename": "Nimeta ümber",
+    "archive": "Arhiveeri ja peata",
+    "restore": "Taasta sessioon",
+    "queue": "Järjekorras olevad sõnumid",
+    "enqueue": "Lisa sõnum järjekorda",
+    "continueQueue": "Jätka järjekorda",
+    "pauseQueue": "Peata järjekord",
+    "editQueued": "Muuda järjekorras olevat sõnumit",
+    "save": "Salvesta",
+    "remove": "Eemalda",
+    "upload": "Laadi üles manust",
+    "remoteFile": "Faili asukoht töökausta sees",
+    "attach": "Manusta fail peremasinast",
+    "attachments": "Kasuta varem manustatud faili",
+    "attachmentLimit": "Kuni 4 manust, igaüks kuni 1 MiB",
+    "review": "Git'i muudatused",
+    "gitStatus": "Värskenda Git'i olekut",
+    "diffFile": "Ülevaatamiseks faili asukoht",
+    "diff": "Vaata erinevusi",
+    "branch": "Uue haru nimi",
+    "createWorktree": "Loo tööpuu",
+    "useWorktree": "Uus sessioon selles tööpuus",
+    "worktreeHint": "Loob uue haru HEAD-ist. Salvestamata muudatused jäävad praegusesse kausta. Olemasolevaid tööpuusid ei kustutata kunagi automaatselt.",
+    "clean": "Muudatusi pole",
+    "reconnecting": "Ühenduse taastamine ja sõnumite taastamine…",
+    "unavailable": "Sessioon ei ole enam ligipääsetav. Kontrolli oma õigusi või logi uuesti sisse.",
+    "shortcuts": "Enter saadab või lisab järjekorda · Shift+Enter lisab rea · Esc katkestab ja peatab järjekorra",
+    "activeSessions": "Aktiivsed",
+    "archivedSessions": "Arhiveeritud",
+    "dismiss": "Sulge",
+    "changes": "Muudatused",
+    "close": "Sulge",
+    "cancel": "Tühista",
+    "sessionSetup": "Sessioon",
+    "hostSetup": "Peremärgistaja seadistus",
+    "changedFiles": "Muudetud failid",
+    "worktree": "Tööpuu",
+    "attachShort": "Manusta",
+    "emptyTranscript": "Saada sõnum, et agent saaks tööle hakata."
+  },
+  "plugin": {
+    "name": "AI-assistent",
+    "description": "AI-assistent, mis loeb teie seadistuse ja pakub välja muudatusi, mille kinnitamine on teie otsustada."
+  },
+  "ops": {
+    "searchHosts": "Otsi hoste",
+    "selectedCount": "{{count}} valitud",
+    "clear": "Tühjenda",
+    "fleets": "Rühmad",
+    "folders": "Kaustad",
+    "tags": "Sildid",
+    "allHosts": "Kõik hostid",
+    "noHosts": "Hoste pole",
+    "newConversation": "Uus vestlus",
+    "sendHint_one": "Töötab {{count}} hostil. Käskude käivitamine ilma eelneva küsimiseta.",
+    "sendHint_other": "Töötab {{count}} hostil. Käskude käivitamine ilma eelneva küsimiseta.",
+    "runCommand": "Käivita käsk",
+    "hostFacts": "Hosti andmed",
+    "hostCount_one": "{{count}} host",
+    "hostCount_other": "{{count}} hosti",
+    "succeeded": "{{count}} edukat",
+    "failed": "{{count}} ebaõnnestunud",
+    "exitCode": "väljumiskood {{code}}",
+    "timedOut": "aeg lõppes",
+    "stopped": "peatatud",
+    "notRun": "ei käivitatud",
+    "cached": "vahemälu",
+    "duration": "{{seconds}}s",
+    "noOutput": "(väljundit pole)"
+  },
+  "assistant": {
+    "title": "AI-assistent",
+    "moveHint": "Lohistage liigutamiseks. Topeltklõps kinnitamiseks küljele.",
+    "toggle": "AI-assistent sisse/välja lülitada",
+    "close": "Sulge",
+    "dock": "Kinnita paremale",
+    "float": "Ujuv",
+    "openTab": "Ava täisvaade",
+    "history": "Vestlused",
+    "noConversations": "Vestlusi veel ei ole",
+    "untitled": "Nimetu",
+    "deleteConversation": "Kustuta vestlus",
+    "deleteConfirm": "Kas kustutada see vestlus?",
+    "emptyTitle": "Küsi või muuda midagi Termixis",
+    "emptyHint": "Assistent tegutseb sinu nimel Termixi CLI kaudu ja käivitab käske sihthostidel. Lisa sihthostid, laevastikud, kaustad või sildid, trükkides @",
+    "inputPlaceholder": "Küsi abi assistendilt. Lisa sihtmärke, trükkides @.",
+    "noTargets": "Sihtmärgihoste pole. Lisa mõned, trükkides @.",
+    "sendHint": "Muudatused ja käsud käivitatakse ilma eelneva küsimata.",
+    "removeTarget": "Eemalda {{name}}",
+    "kind": {
+      "host": "Host",
+      "fleet": "Flott",
+      "folder": "Kaust",
+      "tag": "Silt"
+    },
+    "emptyHintBasic": "Assistent töötab sinu kaudu Termixi CLI vahendusel, kasutades sinu õigusi.",
+    "inputPlaceholderBasic": "Küsi abi assistendilt.",
+    "sendHintBasic": "Muudatused käivitatakse ilma esmalt küsimata.",
+    "thinking": "Mõtleb",
+    "thinkingActive": "Mõtleb...",
+    "compacted": "Kontekst tihendatud: varasemad sõnumid on kokku võetud",
+    "compact": "Tihenda vestlus",
+    "nothingToCompact": "Vestlus on veel liiga lühike, et seda tihendada.",
+    "contextMeter": "Kontekst: viimases päringus kasutatud {{used}}/{{window}} tokenit",
+    "contextMeterSource": "Aken on {{source}}.",
+    "contextMeterReserved": "Vastuse jaoks jäetakse {{tokens}} tokenit vabaks.",
+    "todayTokens": "Täna {{tokens}}",
+    "todayTitle": "Täna kasutatud tokenid. Klõpsa üksikasjade vaatamiseks.",
+    "usage": "Tokenite kasutus",
+    "conversationTokens": "{{tokens}} tokenit",
+    "openFloating": "Ujuv paneel",
+    "openFloatingHint": "Ava assistent paneelina mis tahes lehe kohal. Vajuta {{shortcut}} kuskil, et see avada või sulgeda.",
+    "shortcutHint": "Vajuta {{shortcut}} mis tahes lehel, et avada assistent ujuvas paneelis."
+  },
+  "usage": {
+    "title": "Tokenite kasutus",
+    "settingDescription": "Tokenid, mida sinu AI-kõned on viimase 30 päeva jooksul kasutanud.",
+    "cardTitle": "AI tokenite kasutus",
+    "today": "Täna",
+    "week": "7 päeva",
+    "month": "30 päeva",
+    "mine": "Minu",
+    "everyone": "Kõik kasutajad",
+    "mineCaption": "Sinu tokenid kõigis AI-funktsioonides.",
+    "everyoneCaption": "Tokenid kõigi kasutajate ja AI-funktsioonide lõikes.",
+    "byDay": "Päevas",
+    "byModel": "Mudeli lõikes",
+    "bySource": "Funktsiooni lõikes",
+    "byUser": "Kasutaja lõikes",
+    "model": "Mudel",
+    "feature": "Funktsioon",
+    "user": "Kasutaja",
+    "calls": "Kõned",
+    "prompt": "Sisend",
+    "completion": "Väljund",
+    "total": "Kokku",
+    "empty": "Viimase 30 päeva jooksul ei olnud AI kasutust.",
+    "loadFailed": "Kasutuse laadimine ei õnnestunud",
+    "estimatedNote": "Mõned väärtused on hinnangulised (umbes neli märki tokeni kohta), kuna teenusepakkuja ei teatanud oma kasutusest.",
+    "source": {
+      "assistant": "Assistent",
+      "terminal": "Terminalipaneel",
+      "compaction": "Tihendamine",
+      "assets": "Varade märkimine"
+    }
+  },
+  "autoOps": {
+    "viewAssistant": "Assistent",
+    "viewAutoOps": "Automaatopsed",
+    "intro": "Automaatopsed võimaldavad assistendil sinu hoste iseseisvalt kontrollida. Automatiseerimine käivitab selle ajakava alusel või probleemide tekkimisel ning koostab aruande või pakub välja paranduse, mille sa kinnitada. Alusta eelseadistusest.",
+    "sections": {
+      "tasks": "Ülesanded",
+      "approvals": "Kinnitused",
+      "presets": "Eelseadistused"
+    },
+    "provider": "Ülesannete pakkuja",
+    "providerDefault": "Esimene pakkujaga, millel on vaikimisi mudel",
+    "model": "Ülesannete mudel",
+    "modelDefault": "Pakkuja vaikimisi mudel",
+    "saveModel": "Salvesta mudel",
+    "preferencesHint": "Taustülesannete kasutatav pakkuja ja mudel. Jäta need muutmata, et kasutada oma vaikimisi pakkuja ja mudelit.",
+    "task": "Ülesanne",
+    "tokens": "{{tokens}} tokenit",
+    "tokenUsage": "{{total}} tokenit (sisend: {{prompt}}, väljund: {{completion}})",
+    "dryRun": "Testkäik",
+    "trigger": "Lahendaja",
+    "noTasks": "Ülesandeid veel ei ole",
+    "tasksHint": "Ülesanded on automatiseerimiste käivitused, mis sisaldavad sammust „Küsi AI-lt“. Võimalda eelseadistus või loo oma Automatiseerimised: lisa suvalisele automatiseerimisele samm „Küsi AI-lt“. Käivitused kuvatakse siin.",
+    "openAutomations": "Ava Automatiseerimised",
+    "browsePresets": "Sirvi eelseadistusi",
+    "noApprovals": "Ühtegi plaani ei oota heakskiitu",
+    "loadFailed": "Automaatsete operatsioonide laadimine ebaõnnestus",
+    "decideFailed": "Otsust ei õnnestunud salvestada",
+    "openConversation": "Ava assistendis",
+    "approve": "Kinnita ja käivita",
+    "reject": "Lükka tagasi",
+    "expires": "Aegub {{time}}",
+    "enabled": "Lubatud",
+    "updateAvailable": "Uuendus saadaval",
+    "shared": "Jagatud",
+    "needsAutomations": "Nõuab automatiseerimist",
+    "enableAgain": "Luba uuesti",
+    "deletePreset": "Kustuta eelseadistus",
+    "autonomy": {
+      "report": "Ainult aruanne",
+      "propose": "Ettepaneku plaan"
+    },
+    "status": {
+      "running": "Töötab",
+      "reported": "Teatatud",
+      "proposed": "Ootel kinnitamist",
+      "approved": "Kinnitatud",
+      "rejected": "Tagasi lükatud",
+      "expired": "Aegunud",
+      "executing": "Plaanitakse",
+      "done": "Valmis",
+      "failed": "Ebaõnnestus",
+      "skipped": "Jäetud vahele"
+    },
+    "severity": {
+      "info": "Info",
+      "warning": "Hoiatus",
+      "critical": "Kriitiline"
+    },
+    "plan": {
+      "title": "Ettepanek",
+      "commands": "Käsklused",
+      "rationale": "Põhjendus",
+      "risk": "Risk",
+      "rollback": "Tagasipööramine",
+      "verify": "Kinnitamine",
+      "progress": "Edenemine"
+    },
+    "enable": {
+      "title": "Luba {{name}}",
+      "submit": "Luba",
+      "name": "Nimi",
+      "targets": "Majutid",
+      "targetAll": "Kõik majutid",
+      "targetTrigger": "Majut, mis selle käivitas",
+      "targetHosts": "Valitud majutid",
+      "noHosts": "Valige vähemalt üks majut.",
+      "threshold": "Lävi (%)",
+      "forSeconds": "Vähemalt (sekundit)",
+      "time": "Kellaaeg",
+      "cron": "Ajakava (cron)",
+      "dockerEvent": "Konteineri sündmus",
+      "dockerEvents": {
+        "exited": "Lõpetatud",
+        "unhealthy": "Terviketa",
+        "restarting": "Taaskäivitamine"
+      },
+      "badTime": "Sisesta aeg kujul TT:MM.",
+      "autonomy": "Mida abiline tohib teha",
+      "maxRunSeconds": "Ajalimiit (sekundites)",
+      "runbook": "Juhend",
+      "runbookHint": "Mida abiline peaks tegema, lihtsates sõnades. Inglise keel toimib parimalt.",
+      "shared": "Jaga, kui salvestada eelseadistusena",
+      "sharedHint": "Kõik, kellel on lubatud kasutada automaatseid tegevusi, saavad seejärel selle lubada.",
+      "saveAsPreset": "Salvesta eelseadistusena",
+      "savedPreset": "Salvestatud",
+      "failed": "Automaatset tegevust ei õnnestunud luua",
+      "saveFailed": "Eelseadistust ei õnnestunud salvestada"
+    },
+    "presets": {
+      "daily-patrol": {
+        "title": "Igapäevane ülevaatus",
+        "description": "Iga hommik kell 09:00 kontrollib kõigi hostide kettaid, mälu, koormust, katkenud teenuseid, konteinereid, sertifikaate, uuendusi, ootel taaskäivitusi ja aja sünkroonimist ning annab tagasisidet tõsiduse järgi."
+      },
+      "disk-cleanup": {
+        "title": "Kettaruumi puhastamine",
+        "description": "Kui ketta täituvus on 5 minutit järjest 85% või rohkem, tuvastab see, mis ruumi võtab, ja pakub välja ohutu puhastusplaani, mille saate kinnitada. Äriandmeid ei puuduta."
+      },
+      "host-down-triage": {
+        "title": "Hosti väljalangemise diagnostika",
+        "description": "Kui host läheb offline'i, testitakse seda teistelt hostidelt ja Proxmoxilt ning teavitatakse, kas probleem on võrgus, peatatud masinas või SSH-s."
+      },
+      "service-failure": {
+        "title": "Teenuse rike",
+        "description": "Kui tervisekontroll hakkab ebaõnnestuma, leiate selle taga oleva systemd'i üksuse, loete selle oleku ja logi ning pakute välja ühe taaskäivituse, mille saate kinnitada, kui see aitab. Konfiguratsiooni ei muudeta."
+      },
+      "container-anomaly": {
+        "title": "Konteineri anomaalia",
+        "description": "Kui konteiner väljub, muutub ebatervislikuks või taaskäivitub pidevalt, loetakse selle olek, väljumiskood, logid ja mälu ning pakutakse välja ühekordne käivitamine või taaskäivitamine, mille saate kinnitada. Midagi ei eemaldata."
+      },
+      "resource-overload-cpu": {
+        "title": "CPU ülekoormus",
+        "description": "Kui CPU kasutus on 15 minutit järjest 95% või rohkem, leiate selle taga olevad protsessid, teenused ja konteinerid ning teavitatakse, mida teha. Midagi ei muudeta."
+      },
+      "resource-overload-memory": {
+        "title": "Mälu ülekoormus",
+        "description": "Kui mälu kasutus on 10 minutit järjest 95% või rohkem, leiate, mis seda kasutab, vahetusruum ja mälu puudumise tõttu lõpetatud protsessid ning teavitatakse, mida teha. Midagi ei muudeta."
+      },
+      "security-updates-weekly": {
+        "title": "Nädalased turjavärskendused",
+        "description": "Iga esmaspäev kell 09:30 loetleb ootel olevad turjavärskendused tõsiduse järgi, taaskäivitamise vajaduse ja selle taga olevad paketid, käimasolevad ja paigaldatud tuumad ning päevad viimasest värskendusest – kõikidesse hostidesse ühes tabelis."
+      },
+      "cert-expiry-weekly": {
+        "title": "Nädalane sertifikaatide aegumine",
+        "description": "Iga esmaspäev kell 09:45 loeb Let's Encrypti, veebiserverite ja Kubernetesi sertifikaatide aegumistähtaegu igal hostil ja märgistab need, mille aegumiseni on vähem kui 30 päeva, kriitilised on need, mille aegumiseni on vähem kui 7 päeva."
+      },
+      "failing-drive": {
+        "title": "Rikiline ketas",
+        "description": "Kui Salvestise tervis tuvastab rikilise või kulunud ketas, halvenenud salvestisepooli või massiivi või täituvat õhukest pooli, loeb see SMART-andmed, massiivi ja pooli oleku ning teatab, kui kiiresti tegutseda tuleb ja mida teha. Midagi ei muudeta."
+      }
+    },
+    "report": {
+      "verdict": "Otsus",
+      "evidence": "Tõendid",
+      "actionsTaken": "Läbi viidud tegevused",
+      "recommendations": "Soovitused",
+      "nothingFound": "Enne käivituse lõppu ei leitud midagi.",
+      "noChanges": "Muudatusi ei tehtud.",
+      "openConversation": "Ava vestlus assistendis, et näha kõiki samme ja esitada täpsustavaid küsimusi.",
+      "noFurtherAction": "Lisategevust ei ole vaja.",
+      "stoppedBudgetRun": "Peatatud: see käivitamine kasutas ära oma {{tokens}} märgi eelarve.",
+      "stoppedBudgetDaily": "Peatatud: omaniku päevane {{tokens}} märgi eelarve on ammendunud.",
+      "stoppedDeadline": "Peatatud: automatiseerimise ajapiirang on saavutatud.",
+      "stoppedPaused": "Peatatud: administraator peatas AI automaatse töö.",
+      "stoppedAborted": "Peatatud: automatiseerimise käivitamine tühistati.",
+      "providerFailed": "AI pakkujal tekkis viga: {{error}}",
+      "noHosts": "Ühtegi sihtmärkide hosti ei saa automatiseerimise omanik saavutada.",
+      "noProvider": "Automatiseerimise omanikul puudub AI pakkuja, millel oleks mudel ülesannete täitmiseks.",
+      "needsOpsUse": "Automatsiooni omanikul puudub luba ai.ops.use.",
+      "assistantOff": "Automatsiooni omaniku jaoks on tehisintellekti assistent väljalülitatud.",
+      "skippedPaused": "Tehisintellekti automaatne haldus on administraatori poolt peatatud.",
+      "skippedDuplicate": "Sama automatsiooni ja hosti jaoks on juba ülesanne käimas või ootab kinnitust.",
+      "skippedRate": "See automatsioon on viimase tunni jooksul juba käivitanud {{count}} tehisintellekti ülesannet.",
+      "hostNotRun": "Ei käivitatud: plaan peatati.",
+      "hostNoAccess": "Ei käivitatud: omanik ei saa enam selle hostiga ühendust luua.",
+      "hostUnreachable": "Ei käivitatud: hosti ei saavutatud.",
+      "hostStopped": "Peatati esimese ebaõnnestunud käsu juures.",
+      "executionDone": "Kinnitatud plaan käis {{count}} hostil ja kõik käsud ning kontrollid õnnestusid.",
+      "executionFailed": "Heaks kiidetud plaan ei lõpetanud teostamist kõigil hostidel.",
+      "executionStopped": "Heaks kiidetud plaan peatati enne selle lõppemist.",
+      "approvedBy": "Heaks kiidetud plaan teostati kirjas oleva järgi. Heaks kiitis {{user}}.",
+      "noticeReported": "AI aruanne: {{title}}",
+      "noticeProposed": "AI plaan ootab heakskiitu: {{title}}",
+      "noticeExecuted": "AI plaan teostatud: {{title}}",
+      "noticeFailed": "AI ülesanne ebaõnnestus: {{title}}",
+      "noticeAssetsAnnotationFailed": "Varade märkimine ebaõnnestus"
+    }
+  },
+  "assets": {
+    "title": "Varad",
+    "search": "Otsi nime, võtme või aadressi järgi",
+    "allZones": "Kõik tsoonid",
+    "showRemoved": "Kuva eemaldatud",
+    "collectNow": "Kogu nüüd",
+    "collecting": "Kogutakse…",
+    "collectFailed": "Kogumist ei õnnestunud alustada",
+    "neverRun": "Pole veel kogutud",
+    "lastRun": "Viimati kogutud {{time}}: {{ok}}/{{total}} hosti",
+    "lastRunFailed": "Kogumine ajal {{time}} ebaõnnestus",
+    "hostsFailed_one": "{{count}} host ebaõnnestus",
+    "hostsFailed_other": "{{count}} hosti ebaõnnestus",
+    "loadFailed": "Nimekirja laadimine ebaõnnestus",
+    "saveFailed": "Salvestamine ebaõnnestus",
+    "empty": "Varasid pole veel",
+    "emptyHint": "Kogu nüüd, et lugeda iga hosti, millega koguja suudab ühendust võtta.",
+    "emptyHintView": "Kellelgi, kellel on õigus ai.assets.manage, tuleb esmalt koguda.",
+    "removed": "Eemaldatud",
+    "pinned": "Kinnitatud",
+    "multiZone": "Mitmetsooniline",
+    "multiZoneHint": "On aadresse rohkem kui ühes tsoonis, seega saab mõlemaga ühendust võtta: potentsiaalne pöördepunkt.",
+    "columns": {
+      "name": "Nimi",
+      "kind": "Liik",
+      "zone": "Tsoon",
+      "ips": "Aadressid",
+      "listening": "Pordid",
+      "outbound": "Väljaminev",
+      "services": "Teenused",
+      "collected": "Viimati kogutud",
+      "role": "Roll",
+      "importance": "Tähtsus",
+      "system": "Süsteem"
+    },
+    "kind": {
+      "host": "Host",
+      "guest": "Külaline",
+      "container": "Konteiner",
+      "external": "Väline"
+    },
+    "zone": {
+      "internal": "Sisemine",
+      "dmz": "DMZ",
+      "external": "Väline",
+      "cloud": "Pilv",
+      "overlay": "Ülekattekiht"
+    },
+    "sections": {
+      "os": "Operatsioonisüsteem",
+      "hostname": "Hostinimi",
+      "uptimeSec": "Ülesõiduaeg (sekundites)",
+      "interfaces": "Liidesed",
+      "routes": "Marsruudid",
+      "listening": "Kuulavad pordid",
+      "connections": "Lepitud ühendused",
+      "services": "Töötavad teenused",
+      "containers": "Konteinerid",
+      "kubernetes": "Kubernetes",
+      "guests": "Proxmox'i külalised",
+      "cloud": "Pilv",
+      "missing": "Otsingud, millel pole väljundit",
+      "guest": "Proxmox'i külastaja",
+      "container": "Konteiner"
+    },
+    "outgoing": "Väljuv",
+    "incoming": "Sisenev",
+    "noEdges": "Puudub",
+    "stale": "Viimasel kogumisel ei nähtud",
+    "pinZone": "Tsoon",
+    "rulesDecide": "Määratletud reeglitega",
+    "settingsTitle": "Tsoonid ja ajakava",
+    "scheduleTitle": "Kogumine",
+    "daily": "Kogu iga päev",
+    "dailyHint": "Hoste kogutakse uuesti ka siis, kui neid lisatakse või muudetakse.",
+    "time": "Aeg (UTC)",
+    "save": "Salvesta",
+    "collector": "Kogub kui {{collector}}, jõudes hostideni, millele see konto saab ühendada.",
+    "collectorMe": "sina",
+    "collectorOther": "teine haldur",
+    "collectorNone": "keegi veel ei",
+    "collectAsMe": "Kogu minu nime all",
+    "zonesTitle": "Tsoonireeglid",
+    "zonesHint": "Reegel kaardistab CIDR-i tsoonile, enne sisseehitatuid. Kõige spetsiifilisem eesliide võidab, siis kõrgem prioriteet. Varud tsoonitakse uuesti, kui sa salvestad.",
+    "zoneName": "Nimi",
+    "zoneNameExample": "Andmekeskuse LAN",
+    "zoneKind": "Liik",
+    "cidr": "CIDR",
+    "priority": "Prioriteet",
+    "addZone": "Lisa reegel",
+    "deleteZone": "Kustuta reegel",
+    "cancelEdit": "Tühista",
+    "annotating": "Märkmete lisamine…",
+    "neverAnnotated": "Veel pole märgistatud",
+    "lastAnnotation": "Viimati märgistatud {{time}}: {{ok}}/{{total}} varust, {{tokens}} tokenit",
+    "annotationFailed": "nurjus: {{reason}}",
+    "annotateNow": "Märgista nüüd",
+    "annotateFailed": "Märkmete lisamist ei õnnestunud alustada",
+    "modeTable": "Tabel",
+    "modeGraph": "Graafik",
+    "importance": {
+      "critical": "Kriitiline",
+      "high": "Kõrge",
+      "medium": "Keskmine",
+      "low": "Madal"
+    },
+    "importanceUnknown": "Hinnanguta",
+    "importanceReason": "Miks",
+    "sourceAi": "AI",
+    "sourceAiHint": "Kirjutanud märgistus; järgmine käivitamine võib seda muuta.",
+    "sourceUser": "Lukustatud",
+    "sourceUserHint": "Määratud inimese poolt; märgistuse käivitamised jätab selle puutumata, kuni see avatakse.",
+    "unlock": "Ava: lase märgistusel see uuesti täita",
+    "unlockField": "Lukusta {{field}}",
+    "editAnnotation": "Muuda",
+    "lockHint": "Muudetud väljad lukustatakse, et neid hilisemate märgistuste käigus ei muudetaks.",
+    "factsTitle": "Faktid",
+    "closePanel": "Sulge",
+    "impact": "Mõju",
+    "clearImpact": "Tühjenda",
+    "impactSummary_one": "Kui see ebaõnnestub, läheb koos sellega maha {{count}} varandus ({{critical}} kriitilist, {{high}} kõrge prioriteediga), {{weak}} teist ühendub ainult nendega.",
+    "impactSummary_other": "Kui see ebaõnnestub, lähevad koos sellega maha {{count}} varandust ({{critical}} kriitilist, {{high}} kõrge prioriteediga), {{weak}} teist ühendub ainult nendega.",
+    "impactTruncated": "Lõigatud 6 hüppe või 300 varanduse juures.",
+    "impactDirect": "Otseselt",
+    "impactTransitive": "Teiste kaudu",
+    "impactWeak": "Ühendub ainult nendega",
+    "expandContainers": "Kuva konteinerid",
+    "showExternal": "Kuva välised aadressid",
+    "graphCounts": "{{nodes}} varandust, {{edges}} seost",
+    "graphTitle": "Varanduste graafik",
+    "noZone": "Tsoon puudub",
+    "annotationTitle": "AI märgistus",
+    "annotateAfterCollect": "Märgista pärast iga kogumist",
+    "annotateAfterCollectHint": "Mudelisse saadetakse ainult need varandused, mis on viimasest märgistusest alates muutunud, ning nende naabrid.",
+    "annotateProvider": "Pakkuja",
+    "annotateProviderDefault": "Koguja automaatse valiku põhjal",
+    "annotateModel": "Mudel",
+    "annotateModelDefault": "Pakkuja vaikimisi mudel",
+    "annotationHint": "Märgistus toimub koguja õigustes, kasutades koguja pakkuji. Kokkuvõtted ei sisalda keskkonnamuutujaid, käsurea parameetreid ega väliseid aadresse.",
+    "annotateAll": "Märgista kõik uuesti"
+  },
+  "exposure": {
+    "title": "Interneti sissepääsud",
+    "disclaimer": "Ainult konfiguratsiooni inventuur. Avalikud sidemed ja edasisuunamisreeglid ei tõesta interneti kättesaadavust. Privaatsed kuulajad säilitatakse tagasisüsteemi tõendusmaterjalina.",
+    "loadFailed": "Ekspositsiooni inventuuri laadimine ebaõnnestus.",
+    "saveFailed": "Prioriteedi salvestamine ebaõnnestus.",
+    "search": "Filtreeri aadress, host, nimi või tee",
+    "allPriority": "Kõik prioriteedid",
+    "allZones": "Kõik tsoonid",
+    "allSources": "Kõik allikad",
+    "high": "Kõrge",
+    "medium": "Keskmine",
+    "low": "Madal",
+    "active": "Aktiivne",
+    "stale": "Aegunud",
+    "resolved": "Ei ole enam täheldatud",
+    "all": "Kõik",
+    "refresh": "Värskenda",
+    "loading": "Laadimine…",
+    "empty": "Ühtegi sobivat kirjet ei leitud. Enne järelduste tegemist kontrolli allpool kogumise katvust.",
+    "never": "Pole veel kogutud. Kogu varandusi, et kirjed inventuuri lisada.",
+    "endpoint": "Sissepääs",
+    "source": "Allikas",
+    "priority": "Ülevaate prioriteet",
+    "pathState": "Konfiguratsiooni tee",
+    "freshness": "Värskus",
+    "details": "Tõendusmaterjali üksikasjad",
+    "close": "Sulge",
+    "notTested": "Väline kättesaadavus: pole testitud.",
+    "priorityReason": "Prioriteet on ülevaate vihje, mitte haavatavuse otsus. Avaliku halduse ja andmeteenuste pordid on prioriteetsed; teenuse identiteet ja juurdepääsupoliitika vajavad siiski kinnitust.",
+    "tls": "TLS-i konfiguratsioon",
+    "restrictions": "Juurdepääsu piirangud",
+    "observed": "Viimati täheldatud",
+    "rulePriority": "Reegli prioriteet (lukusta lahti)",
+    "evidence": "Täheldus",
+    "coverage": "Kogumise katvus",
+    "changes": "Viimased muudatused",
+    "current": "Praegune",
+    "partial": "Ebatäielik",
+    "complete": "Konfiguratsiooni seos on täielik",
+    "conflicting": "Mitmetähenduslik või tsükliline",
+    "configured": "Deklareeritud konfiguratsioonis",
+    "unknown": "Tundmatu",
+    "status_ok": "Kogutud",
+    "status_unsupported": "Tööriist pole saadaval",
+    "status_denied": "Lubadus keelatud",
+    "status_failed": "Kogumine või parsimine ebaõnnestus",
+    "status_truncated": "Lõigatud",
+    "change_baseline": "Baasjoon on kehtestatud",
+    "change_added": "Kirje lisatud",
+    "change_changed": "Konfiguratsioon muutunud",
+    "change_removed": "Kirjet ei jälgita enam",
+    "change_coverage": "Kattuvus on halvenenud",
+    "explain": "Selgita tõendit",
+    "explaining": "Selgitamine…",
+    "explainFailed": "Selgitamine ebaõnnestus või tõend muutus.",
+    "aiLabel": "AI tõlgendus · pole kinnitatud leide",
+    "previous": "Eelmine",
+    "next": "Järgmine",
+    "binding": "Seose ulatus",
+    "binding_public": "Avaliku kirje kandidaat",
+    "binding_local": "Privaatne/lokaalne tagapool",
+    "binding_unknown": "Lahendamata seos",
+    "ruleGaps": "Parsimata reeglid: {{count}}",
+    "unsupportedRule": "Toetamata reegel; eelmine tõend säilitatud",
+    "scope": "Vaade",
+    "scope_internet": "Interneti kirje kandidaadid",
+    "scope_all": "Kõik tõendid",
+    "scope_unknown": "Tundmatu avatus",
+    "inventorySummary": "{{internet}} interneti kirje kandidaati · kokku {{all}} reeglit · {{unknown}} tundmatu avatusega",
+    "bindingCount": "{{count}} täheldatud seost",
+    "pathsTruncated": "Teekonna laiendamine jõudis oma piirini. See on osaline tõend.",
+    "pathBranch": "Teekond {{index}}",
+    "branched": "Konditsionaalsed harud",
+    "reason_sensitive": "Kontrolli teenuse porti {{port}} (kirje või tagapool)",
+    "reason_public-address": "Täheldatud avaliku aadressi seos",
+    "reason_wan-zone": "OpenWrt WAN-i allikas tsoon; tulemüüri aktsepteerimist pole kontrollitud",
+    "reason_configured-public-tunnel": "Konfigureeritud avalik tunnel; välise saavutatavuse pole testitud",
+    "reason_internal-only": "Täheldatud ainult sisemisi või lokaalseid seoseid",
+    "reason_exposure-unknown": "Avatuse klassifitseerimiseks pole piisavalt tõendeid",
+    "reason_critical-asset": "Vara on märgistatud kriitiliseks",
+    "reason_manual": "Prioriteedi valis kasutaja"
+  },
+  "companion": {
+    "toggle": "Abistaja paneel"
+  },
+  "widget": {
+    "loading": "Laadimine...",
+    "empty": "Ülesandeid pole veel",
+    "pending_one": "{{count}} plaan ootab heakskiitu",
+    "pending_other": "{{count}} plaani ootavad heakskiitu",
+    "maxItems": "Kuvamiseks mõeldud ülesanded"
+  }
+}

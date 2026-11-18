@@ -1,0 +1,25 @@
+{
+  "name": "termix-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local stdio MCP server that exposes your Termix hosts to Claude Code and DeepSeek Harness. Spawned on demand, no daemon, no listener.",
+  "bin": {
+    "termix-mcp": "bin/termix-mcp.mjs"
+  },
+  "scripts": {
+    "setup": "node setup.mjs",
+    "selftest": "node setup.mjs --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {},
+  "author": "QingZhu",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QingZhu233/termix-ai-claude-bridge",
+    "directory": "packages/termix-mcp"
+  }
+}

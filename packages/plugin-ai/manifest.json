@@ -1,0 +1,535 @@
+{
+  "id": "ai",
+  "name": "AI Assistant",
+  "version": "1.6.4",
+  "description": "An AI assistant that reads your setup and proposes changes for you to approve.",
+  "author": {
+    "name": "QingZhu",
+    "url": "https://github.com/QingZhu233/termix-ai-claude-bridge"
+  },
+  "license": "Apache-2.0",
+  "repository": "https://github.com/QingZhu233/termix-ai-claude-bridge",
+  "docs": "https://github.com/QingZhu233/termix-ai-claude-bridge#readme",
+  "category": "Productivity",
+  "icon": "Sparkles",
+  "features": [
+    "Ask about your hosts, snippets, fleets, alerts, automations and more",
+    "Proposes changes instead of making them, and nothing runs until you approve it",
+    "Can run safe read-only commands like df and uptime if you allow it",
+    "Ask about a host right from its terminal",
+    "Works with Ollama, Anthropic, OpenAI, Google Gemini and any OpenAI compatible endpoint",
+    "Run Pi, OpenCode, Claude Code or Codex as a coding agent on an SSH host, using your own provider",
+    "One AI assistant, floating on every page or full screen in the AI tab, that manages Termix as you through the bundled Termix CLI and opens views for you",
+    "With the ai.ops.use permission, it also runs shell commands across the hosts, folders, tags or fleets you select",
+    "Auto-ops: automations start the assistant to investigate and report, or propose a plan you approve, with ready-made presets",
+    "Asset inventory: a read-only collector maps hosts, Proxmox guests, containers, listening ports and connections into zones, daily and on host changes",
+    "Asset graph: a model annotates each asset's role, importance and business system, with your edits locked, and a graph view shows what fails when an asset does",
+    "The assistant in the panel bar beside any SSH terminal"
+  ],
+  "engine": {
+    "termix": ">=26.11.1-0",
+    "api": "^1.2"
+  },
+  "capabilities": [
+    "hosts:read",
+    "hosts:write",
+    "credentials:use",
+    "ssh:connect",
+    "db:own",
+    "kv:own",
+    "secrets:own",
+    "network:outbound",
+    "notify:send",
+    "network:serve",
+    "ui:surface",
+    "users:impersonate",
+    "users:read",
+    "events:core",
+    "process:spawn",
+    "operations:invoke"
+  ],
+  "optionalDependencies": {
+    "workspaces": "^1.0.0",
+    "network-topology": "^1.0.0",
+    "snippets": "^1.0.0",
+    "fleets": "^1.0.0",
+    "ssh-terminal": "^1.0.0",
+    "automations": "^1.0.0",
+    "homepage": "^1.0.0"
+  },
+  "requires": [
+    {
+      "service": "workspaces.saved",
+      "versionRange": "^1.0.0",
+      "optional": true
+    },
+    {
+      "service": "network-topology.graph",
+      "versionRange": "^1.0.0",
+      "optional": true
+    },
+    {
+      "service": "snippets.access",
+      "versionRange": "^1.0.0",
+      "optional": true
+    },
+    {
+      "service": "fleets.access",
+      "versionRange": "^1.0.0",
+      "optional": true
+    },
+    {
+      "service": "terminal.history",
+      "versionRange": "^1.0.0",
+      "optional": true
+    },
+    {
+      "service": "automations.access",
+      "versionRange": "^1.0.0",
+      "optional": true
+    },
+    {
+      "service": "homepage.items",
+      "versionRange": "^1.0.0",
+      "optional": true
+    }
+  ],
+  "provides": [
+    {
+      "service": "ai.tasks",
+      "version": "1.0.0",
+      "permission": "ai.ops.use"
+    }
+  ],
+  "providesSecret": [
+    {
+      "key": "api-key",
+      "permission": "ai.secrets.share",
+      "descriptionKey": "ai.secrets.shareApiKey"
+    }
+  ],
+  "contributes": {
+    "tabs": [
+      {
+        "id": "ai",
+        "titleKey": "nav.ai",
+        "icon": "Sparkles",
+        "openFrom": [
+          "rail",
+          "palette"
+        ]
+      },
+      {
+        "id": "ai-agents",
+        "titleKey": "agents.title",
+        "icon": "Bot",
+        "openFrom": [
+          "host-context-menu",
+          "palette"
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "ai.openWithContext",
+        "titleKey": "ai.assistant",
+        "handler": "openWithContext",
+        "icon": "Bot",
+        "permission": "ai.services.use",
+        "slot": "terminal.toolbar",
+        "kind": "button"
+      }
+    ],
+    "dashboardCards": [
+      {
+        "id": "ai-usage",
+        "titleKey": "usage.cardTitle",
+        "icon": "ChartColumn"
+      }
+    ],
+    "keybindingActions": [
+      {
+        "id": "ai.toggleAssistant"
+      }
+    ],
+    "permissions": [
+      {
+        "name": "use",
+        "titleKey": "permissions.use.title",
+        "descriptionKey": "permissions.use.description",
+        "defaultRoles": [
+          "user"
+        ]
+      },
+      {
+        "name": "manage_providers",
+        "titleKey": "permissions.manage_providers.title",
+        "descriptionKey": "permissions.manage_providers.description",
+        "defaultRoles": [
+          "user"
+        ]
+      },
+      {
+        "name": "apply_proposals",
+        "titleKey": "permissions.apply_proposals.title",
+        "descriptionKey": "permissions.apply_proposals.description",
+        "defaultRoles": [
+          "user"
+        ]
+      },
+      {
+        "name": "services.use",
+        "titleKey": "permissions.services.use.title",
+        "descriptionKey": "permissions.services.use.description",
+        "defaultRoles": [
+          "user"
+        ]
+      },
+      {
+        "name": "secrets.share",
+        "titleKey": "permissions.secrets.share.title",
+        "descriptionKey": "permissions.secrets.share.description",
+        "defaultRoles": [
+          "user"
+        ]
+      },
+      {
+        "name": "agents",
+        "titleKey": "agents.permissionTitle",
+        "descriptionKey": "agents.permissionDescription",
+        "defaultRoles": [
+          "admin"
+        ]
+      },
+      {
+        "name": "ops.use",
+        "titleKey": "permissions.ops.use.title",
+        "descriptionKey": "permissions.ops.use.description",
+        "defaultRoles": [
+          "admin"
+        ]
+      },
+      {
+        "name": "usage.view_all",
+        "titleKey": "permissions.usage.view_all.title",
+        "descriptionKey": "permissions.usage.view_all.description",
+        "defaultRoles": [
+          "admin"
+        ]
+      },
+      {
+        "name": "assets.view",
+        "titleKey": "permissions.assets.view.title",
+        "descriptionKey": "permissions.assets.view.description",
+        "defaultRoles": [
+          "admin"
+        ]
+      },
+      {
+        "name": "assets.manage",
+        "titleKey": "permissions.assets.manage.title",
+        "descriptionKey": "permissions.assets.manage.description",
+        "defaultRoles": [
+          "admin"
+        ]
+      }
+    ],
+    "settings": {
+      "admin": [
+        {
+          "key": "globallyEnabled",
+          "type": "boolean",
+          "labelKey": "settings.admin.globallyEnabled.label",
+          "descriptionKey": "settings.admin.globallyEnabled.description",
+          "default": false
+        },
+        {
+          "key": "privateEndpoints",
+          "type": "textarea",
+          "labelKey": "settings.admin.privateEndpoints.label",
+          "descriptionKey": "settings.admin.privateEndpoints.description",
+          "requires": "globallyEnabled",
+          "default": "localhost\n127.0.0.1\n::1\nhost.docker.internal"
+        },
+        {
+          "key": "opsConcurrency",
+          "type": "number",
+          "labelKey": "settings.admin.opsConcurrency.label",
+          "descriptionKey": "settings.admin.opsConcurrency.description",
+          "requires": "globallyEnabled",
+          "default": 8,
+          "min": 1,
+          "max": 64
+        },
+        {
+          "key": "opsCommandTimeout",
+          "type": "number",
+          "labelKey": "settings.admin.opsCommandTimeout.label",
+          "descriptionKey": "settings.admin.opsCommandTimeout.description",
+          "requires": "globallyEnabled",
+          "default": 120,
+          "min": 5,
+          "max": 600
+        },
+        {
+          "key": "opsOutputLimit",
+          "type": "number",
+          "labelKey": "settings.admin.opsOutputLimit.label",
+          "descriptionKey": "settings.admin.opsOutputLimit.description",
+          "requires": "globallyEnabled",
+          "default": 4000,
+          "min": 500,
+          "max": 20000
+        },
+        {
+          "key": "autoOpsPaused",
+          "type": "boolean",
+          "labelKey": "settings.admin.autoOpsPaused.label",
+          "descriptionKey": "settings.admin.autoOpsPaused.description",
+          "requires": "globallyEnabled",
+          "default": false
+        },
+        {
+          "key": "autoOpsRunsPerHour",
+          "type": "number",
+          "labelKey": "settings.admin.autoOpsRunsPerHour.label",
+          "descriptionKey": "settings.admin.autoOpsRunsPerHour.description",
+          "requires": "globallyEnabled",
+          "default": 6,
+          "min": 1,
+          "max": 60
+        },
+        {
+          "key": "autoOpsRunTokens",
+          "type": "number",
+          "labelKey": "settings.admin.autoOpsRunTokens.label",
+          "descriptionKey": "settings.admin.autoOpsRunTokens.description",
+          "requires": "globallyEnabled",
+          "default": 200000,
+          "min": 10000,
+          "max": 5000000
+        },
+        {
+          "key": "autoOpsDailyTokens",
+          "type": "number",
+          "labelKey": "settings.admin.autoOpsDailyTokens.label",
+          "descriptionKey": "settings.admin.autoOpsDailyTokens.description",
+          "requires": "globallyEnabled",
+          "default": 2000000,
+          "min": 10000,
+          "max": 100000000
+        },
+        {
+          "key": "assetsDailyCollect",
+          "type": "boolean",
+          "labelKey": "settings.admin.assetsDailyCollect.label",
+          "descriptionKey": "settings.admin.assetsDailyCollect.description",
+          "requires": "globallyEnabled",
+          "default": true
+        },
+        {
+          "key": "assetsCollectTime",
+          "type": "string",
+          "labelKey": "settings.admin.assetsCollectTime.label",
+          "descriptionKey": "settings.admin.assetsCollectTime.description",
+          "requires": "assetsDailyCollect",
+          "default": "03:00"
+        },
+        {
+          "key": "assetsCollector",
+          "type": "string",
+          "labelKey": "settings.admin.assetsCollector.label",
+          "default": "",
+          "hidden": true
+        },
+        {
+          "key": "assetsAnnotateAfterCollect",
+          "type": "boolean",
+          "labelKey": "settings.admin.assetsAnnotateAfterCollect.label",
+          "descriptionKey": "settings.admin.assetsAnnotateAfterCollect.description",
+          "requires": "globallyEnabled",
+          "default": true
+        },
+        {
+          "key": "assetsAnnotateRunTokens",
+          "type": "number",
+          "labelKey": "settings.admin.assetsAnnotateRunTokens.label",
+          "descriptionKey": "settings.admin.assetsAnnotateRunTokens.description",
+          "requires": "globallyEnabled",
+          "default": 200000,
+          "min": 10000,
+          "max": 5000000
+        },
+        {
+          "key": "assetsAnnotateProvider",
+          "type": "number",
+          "labelKey": "settings.admin.assetsAnnotateProvider.label",
+          "default": 0,
+          "hidden": true
+        },
+        {
+          "key": "assetsAnnotateModel",
+          "type": "string",
+          "labelKey": "settings.admin.assetsAnnotateModel.label",
+          "default": "",
+          "hidden": true
+        },
+        {
+          "key": "exposureRetentionDays",
+          "type": "number",
+          "labelKey": "settings.admin.exposureRetentionDays.label",
+          "descriptionKey": "settings.admin.exposureRetentionDays.description",
+          "default": 90,
+          "min": 7,
+          "max": 365
+        }
+      ],
+      "user": [
+        {
+          "key": "enabled",
+          "type": "boolean",
+          "labelKey": "ai.enableTitle",
+          "descriptionKey": "ai.enableDescription",
+          "default": false
+        },
+        {
+          "key": "allowReadOnlyCommands",
+          "type": "boolean",
+          "labelKey": "ai.readOnlyCommands",
+          "descriptionKey": "ai.readOnlyCommandsDescription",
+          "requires": "enabled",
+          "default": false
+        },
+        {
+          "key": "engine",
+          "type": "select",
+          "labelKey": "settings.user.engine.label",
+          "descriptionKey": "settings.user.engine.description",
+          "requires": "enabled",
+          "default": "builtin",
+          "options": [
+            {
+              "value": "builtin",
+              "labelKey": "settings.user.engine.builtin"
+            },
+            {
+              "value": "claude",
+              "labelKey": "settings.user.engine.claude"
+            }
+          ]
+        },
+        {
+          "key": "claudeAutoApprove",
+          "type": "boolean",
+          "labelKey": "settings.user.claudeAutoApprove.label",
+          "descriptionKey": "settings.user.claudeAutoApprove.description",
+          "requires": "enabled",
+          "default": true
+        },
+        {
+          "key": "providers",
+          "type": "custom",
+          "component": "providers",
+          "permission": "manage_providers"
+        },
+        {
+          "key": "usage",
+          "type": "custom",
+          "component": "usage",
+          "permission": "use",
+          "requires": "enabled"
+        },
+        {
+          "key": "autoOpsPreferences",
+          "type": "json",
+          "labelKey": "settings.user.autoOpsPreferences.label",
+          "default": {},
+          "hidden": true
+        },
+        {
+          "key": "companionAutoOpen",
+          "type": "boolean",
+          "labelKey": "settings.user.companionAutoOpen.label",
+          "descriptionKey": "settings.user.companionAutoOpen.description",
+          "default": false
+        },
+        {
+          "key": "companionSide",
+          "type": "select",
+          "labelKey": "settings.user.companionSide.label",
+          "descriptionKey": "settings.user.companionSide.description",
+          "default": "right",
+          "options": [
+            {
+              "value": "right",
+              "labelKey": "settings.user.companionSide.right"
+            },
+            {
+              "value": "left",
+              "labelKey": "settings.user.companionSide.left"
+            },
+            {
+              "value": "bottom",
+              "labelKey": "settings.user.companionSide.bottom"
+            }
+          ]
+        },
+        {
+          "key": "companionSize",
+          "type": "number",
+          "labelKey": "settings.user.companionSize.label",
+          "descriptionKey": "settings.user.companionSize.description",
+          "min": 240,
+          "max": 900,
+          "default": 400
+        },
+        {
+          "key": "companionEdgeButton",
+          "type": "boolean",
+          "labelKey": "settings.user.companionEdgeButton.label",
+          "descriptionKey": "settings.user.companionEdgeButton.description",
+          "default": true
+        }
+      ],
+      "host": {
+        "editorGroup": "ssh",
+        "editorOrder": 90,
+        "fields": [
+          {
+            "key": "enableAiAssistant",
+            "type": "boolean",
+            "labelKey": "settings.host.enableAiAssistant.label",
+            "descriptionKey": "settings.host.enableAiAssistant.description",
+            "default": true
+          },
+          {
+            "key": "showPanel",
+            "type": "boolean",
+            "labelKey": "settings.host.showPanel.label",
+            "descriptionKey": "settings.host.showPanel.description",
+            "default": true,
+            "requires": "enableAiAssistant"
+          }
+        ]
+      }
+    },
+    "uses": [
+      "homepage.widgets",
+      "terminal.sidePanel",
+      "terminal.toolbar",
+      "shell.overlay",
+      "shell.rightEdge"
+    ],
+    "operations": {
+      "invokes": [
+        "*"
+      ]
+    }
+  },
+  "locales": "locales",
+  "platforms": [
+    "linux",
+    "win32",
+    "darwin"
+  ]
+}

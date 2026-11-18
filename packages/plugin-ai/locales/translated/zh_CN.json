@@ -1,0 +1,877 @@
+{
+  "permissions": {
+    "use": {
+      "title": "使用助手",
+      "description": "打开助手并向其提问。"
+    },
+    "manage_providers": {
+      "title": "管理提供商",
+      "description": "添加、编辑和删除 AI 提供商及其 API 密钥。"
+    },
+    "apply_proposals": {
+      "title": "应用建议",
+      "description": "允许助手执行其建议的更改。"
+    },
+    "services": {
+      "use": {
+        "title": "在其他功能中使用 AI",
+        "description": "其他功能可能会代表您调用助手。"
+      }
+    },
+    "secrets": {
+      "share": {
+        "title": "共享 API 密钥",
+        "description": "其他功能可能会使用存储的 AI API 密钥，而不会直接查看它。"
+      }
+    },
+    "ops": {
+      "use": {
+        "title": "通过 AI 助手在主机上运行命令",
+        "description": "允许助手在你选择的主机上运行任意 shell 命令。默认仅管理员拥有。"
+      }
+    },
+    "usage": {
+      "view_all": {
+        "title": "查看所有人的 AI 用量",
+        "description": "查看每个用户的 AI 调用所用的 token，而不只是你自己的。默认仅管理员拥有。"
+      }
+    },
+    "assets": {
+      "view": {
+        "title": "查看资产清单",
+        "description": "查看采集到的主机、来宾、容器、区域和连接。默认仅管理员拥有。"
+      },
+      "manage": {
+        "title": "管理资产清单",
+        "description": "发起采集、编辑区域规则、固定区域和修改计划。采集只以只读方式读取主机。默认仅管理员拥有。"
+      }
+    }
+  },
+  "settings": {
+    "assistantUnavailable": "此服务器上的 AI 助手已关闭。",
+    "providersNeedOptIn": "请在上方开启 AI 助手以添加提供商。",
+    "providers": {
+      "label": "提供商",
+      "description": "助手和代理可以使用的 AI 服务。"
+    },
+    "admin": {
+      "globallyEnabled": {
+        "label": "AI 助手",
+        "description": "允许用户开启 AI 助手。关闭此选项时，助手将对所有人隐藏并禁用。"
+      },
+      "privateEndpoints": {
+        "label": "允许的私有 AI 主机",
+        "description": "您私有网络上的主机，用户可以将提供商指向这些主机，例如自托管的 Ollama。每行填写一个主机。"
+      },
+      "opsConcurrency": {
+        "label": "AI 助手并行主机数",
+        "description": "助手的命令同时在多少台主机上运行。"
+      },
+      "opsCommandTimeout": {
+        "label": "AI 助手命令超时（秒）",
+        "description": "命令在一台主机上运行多久后被停止。助手最多可请求 600 秒。"
+      },
+      "opsOutputLimit": {
+        "label": "AI 助手每台主机输出（字符）",
+        "description": "每台主机保留多少输出。更长的输出会保留开头和结尾。"
+      },
+      "autoOpsPaused": {
+        "label": "暂停 AI 自动运维",
+        "description": "立即停止所有运行中的 AI 任务和已批准的方案，并拒绝新任务，直到关闭此项。"
+      },
+      "autoOpsRunsPerHour": {
+        "label": "每个自动化每小时的 AI 任务数",
+        "description": "同一小时内更多的触发会被跳过。"
+      },
+      "autoOpsRunTokens": {
+        "label": "单个 AI 任务的 token 预算",
+        "description": "任务用到这么多 token 时会停止，并报告已发现的内容。"
+      },
+      "autoOpsDailyTokens": {
+        "label": "每个用户每天的 AI token 预算",
+        "description": "用户今天（UTC）用到这么多 token 后，其 AI 任务会被跳过或停止。"
+      },
+      "assetsDailyCollect": {
+        "label": "每天采集资产清单",
+        "description": "每天用一个只读脚本读取采集账号能连接的所有主机。"
+      },
+      "assetsCollectTime": {
+        "label": "资产采集时间（UTC）",
+        "description": "格式为 HH:MM，例如 03:00。"
+      },
+      "assetsCollector": {
+        "label": "资产采集账号"
+      },
+      "assetsAnnotateAfterCollect": {
+        "label": "每次采集后标注资产",
+        "description": "由模型为每个有变动的资产写出作用、重要程度和所属业务系统，以及事实能证明的依赖关系。"
+      },
+      "assetsAnnotateRunTokens": {
+        "label": "每次资产标注的 token 预算",
+        "description": "模型调用用满这么多 token 后运行停止，已写入的保留。"
+      },
+      "assetsAnnotateProvider": {
+        "label": "资产标注提供商"
+      },
+      "assetsAnnotateModel": {
+        "label": "资产标注模型"
+      },
+      "exposureRetentionDays": {
+        "label": "暴露面历史保留天数",
+        "description": "待发送通知和当前入口引用的证据不随历史过期清理。"
+      }
+    },
+    "host": {
+      "enableAiAssistant": {
+        "label": "启用 AI 助手",
+        "description": "允许 AI 助手在此主机的终端中提供帮助。默认关闭，且仍需为您的账户启用 AI。"
+      },
+      "showPanel": {
+        "label": "终端旁边的面板",
+        "description": "在此主机的 SSH 终端旁提供助手面板。"
+      }
+    },
+    "user": {
+      "autoOpsPreferences": {
+        "label": "值守偏好"
+      },
+      "engine": {
+        "label": "推理引擎",
+        "description": "用哪个循环回答：内置循环，或本机的 Claude Code CLI（直接用它当前的 cc-switch 配置）。",
+        "builtin": "内置",
+        "claude": "Claude Code CLI"
+      },
+      "claudeAutoApprove": {
+        "label": "自动模式",
+        "description": "自动模式下命令直接执行。只有可能毁机器的少数命令（rm -rf /、mkfs、dd、shutdown、清空防火墙）仍会询问。关掉此项则全部每次确认。"
+      },
+      "companionAutoOpen": {
+        "label": "随终端打开助手面板",
+        "description": "当在启用了该功能的主机上打开终端时，显示助手面板。"
+      },
+      "companionSide": {
+        "label": "助手面板位置",
+        "description": "面板相对于终端的位置。",
+        "right": "右侧",
+        "left": "左侧",
+        "bottom": "底部"
+      },
+      "companionSize": {
+        "label": "助手面板大小",
+        "description": "宽度（或位于底部时的高度），单位为像素。"
+      },
+      "companionEdgeButton": {
+        "label": "助手面板边缘按钮",
+        "description": "在终端边缘显示一个小按钮，用于打开面板。"
+      }
+    }
+  },
+  "ai": {
+    "send": "发送",
+    "stop": "停止",
+    "save": "保存",
+    "cancel": "取消",
+    "running": "运行中",
+    "approve": "批准",
+    "reject": "拒绝",
+    "selectProvider": "选择提供商",
+    "addProvider": "添加提供商",
+    "manageModels": "管理模型",
+    "editProvider": "编辑提供商",
+    "removeProvider": "删除提供商",
+    "providerType": "提供商",
+    "providerLabel": "名称",
+    "providerLabelPlaceholder": "例如：本地 Ollama",
+    "baseUrl": "服务器地址",
+    "apiKey": "API 密钥",
+    "defaultModel": "默认模型",
+    "defaultModelPlaceholder": "例如：llama3.1 或 claude-opus-5",
+    "labelRequired": "请为该提供商指定一个名称",
+    "providerSaveFailed": "无法保存提供商",
+    "providerUpdated": "提供商已更新",
+    "providerDeleteFailed": "无法删除提供商",
+    "privateEndpointHint": "私有网络上的地址需要管理员先允许该主机。",
+    "providerOllama": "Ollama",
+    "providerAnthropic": "Anthropic",
+    "providerOpenai": "OpenAI",
+    "providerGemini": "Google Gemini",
+    "providerOpenaiCompatible": "兼容 OpenAI",
+    "toolArguments": "输入",
+    "toolResult": "结果",
+    "statusApplied": "已应用",
+    "statusRejected": "已拒绝",
+    "proposalApplyFailed": "无法应用更改",
+    "proposalRejectFailed": "无法拒绝更改",
+    "enableTitle": "启用 AI 助手",
+    "enableDescription": "允许助手读取您的配置并建议更改供您批准。",
+    "readOnlyCommands": "允许只读诊断命令",
+    "readOnlyCommandsDescription": "助手可能会在无需每次询问的情况下，运行 df 和 uptime 等简短的安全命令列表。任何会更改服务器的操作都会先提出建议。",
+    "modelDetectFailed": "无法连接到提供商，因此这是一份通用列表。您可以输入任何模型名称。",
+    "modelCustom": "输入模型名称",
+    "modelRefresh": "刷新列表",
+    "modelPlaceholder": "选择或输入模型",
+    "runCommandTitle": "运行命令",
+    "assistant": "AI 助手",
+    "terminalPanelEmpty": "向助手询问有关此主机的信息。任何会更改状态的操作都需要您先批准。",
+    "terminalPanelPlaceholder": "询问有关此主机的信息...",
+    "noProvidersConfigured": "尚未配置 AI 提供商。请在设置中添加一个。",
+    "runsInOpenTerminal": "在您打开的终端会话中运行。",
+    "runInTerminal": "运行",
+    "terminalContextPrefill": "这是我的终端输出：\n\n{{output}}\n\n",
+    "secrets": {
+      "shareApiKey": "允许其他功能使用您的 AI 提供商 API 密钥进行其自身的请求。密钥不会被复制，您可以随时撤销此权限。"
+    },
+    "removeProviderConfirm": "移除提供商 {{name}}？",
+    "contextWindows": "各模型的上下文窗口",
+    "contextWindowsHint": "提供商报告了就以其为准。为某个模型填写 token 数可覆盖它，留空则使用提供商报告的值。刷新会重新询问提供商。",
+    "contextWindowValue": "上下文窗口：{{tokens}}（{{source}}）",
+    "contextOverride": "{{model}} 的上下文窗口覆盖值",
+    "contextSourceOverride": "由你设置",
+    "contextSourceProvider": "由提供商报告",
+    "contextSourceGuess": "根据模型名称推测",
+    "contextSourceDefault": "未知模型的默认值",
+    "contextLoadFailed": "无法读取上下文窗口",
+    "contextRefresh": "刷新",
+    "contextWindowInvalid": "上下文窗口需填写一个整数 token 数，至少 1024。",
+    "advanced": "高级",
+    "advancedHint": "将设置保留为“默认”以使用模型自身的设置。",
+    "advancedDefault": "默认",
+    "advancedDefaultAuto": "默认（自动）",
+    "advancedAuto": "自动",
+    "advancedEndpoint": "端点",
+    "advancedEndpointResponses": "Responses API",
+    "advancedEndpointChat": "Chat Completions",
+    "advancedReasoningEffort": "推理力度",
+    "advancedReasoningSummary": "推理摘要",
+    "advancedReasoningSummaryHint": "仅限 Responses API。",
+    "advancedVerbosity": "详细程度",
+    "advancedNone": "无",
+    "advancedMinimal": "最少",
+    "advancedLow": "低",
+    "advancedMedium": "中",
+    "advancedHigh": "高",
+    "advancedXhigh": "极高",
+    "advancedMax": "最高",
+    "advancedConcise": "简洁",
+    "advancedDetailed": "详细",
+    "advancedOff": "关闭",
+    "advancedMaxOutputTokens": "最大输出 tokens 数",
+    "advancedMaxOutputTokensInvalid": "请输入 1 到 1,000,000 之间的整数。",
+    "advancedTemperature": "温度",
+    "advancedTemperatureHint": "OpenAI 推理模型仅在推理力度为“无”时接受此参数，因此若使用其他力度则不会发送该参数。",
+    "advancedTemperatureInvalid": "请输入 0 到 2 之间的数字。"
+  },
+  "nav": {
+    "ai": "AI 助手"
+  },
+  "onboarding": {
+    "aiTitle": "AI 助手",
+    "aiIntro": "Termix 可以包含一个 AI 助手。您可以稍后在设置中更改此选项。",
+    "aiSkipTitle": "保持关闭",
+    "aiSkipDesc": "Termix 将保持当前工作方式。助手将保持隐藏状态。",
+    "aiEnableTitle": "开启它",
+    "aiEnableDesc": "添加一个助手，它会读取您的设置并建议您批准的更改。需要您提供提供商，例如本地 Ollama。",
+    "aiNote": "在您添加提供商并发送消息之前，不会向任何地方发送任何数据。"
+  },
+  "agents": {
+    "working": "工作中...",
+    "startingIndicator": "正在启动代理...",
+    "noCompatibleProvider": "您的 AI 提供商中没有与 {{agent}} 兼容的。Claude Code 需要 Anthropic，Codex 需要 OpenAI。",
+    "noProviders": "请先在设置中添加一个 AI 提供商。",
+    "title": "AI 代理",
+    "permissionTitle": "运行远程 AI 代理",
+    "permissionDescription": "使用配置的 AI 提供商在 SSH 主机上启动编码代理。代理可以以 SSH 用户身份执行命令和更改文件。",
+    "new": "新会话",
+    "description": "使用 Termix AI 提供商在此主机的目录中运行代理。",
+    "runtime": "代理",
+    "provider": "Termix 提供商",
+    "chooseProvider": "选择兼容的提供商",
+    "model": "模型",
+    "directory": "工作目录",
+    "executable": "可执行文件（可选的绝对路径）",
+    "requirements": "主机需要安装 Node.js 22.19+ 和所选代理。必须允许 SSH 远程回环转发。现有的代理配置不会被覆盖。",
+    "responsesRequired": "Codex 需要 Responses API 端点。仅支持 Chat Completions 的端点无法运行 Codex。",
+    "piPermissions": "Pi 工具将以该 SSH 账户的权限运行。仅在您授权代理修改的目录中启动。",
+    "start": "启动代理",
+    "resume": "恢复",
+    "stop": "停止会话",
+    "interrupt": "中断当前轮次",
+    "send": "发送",
+    "prompt": "要求代理在此目录中工作...",
+    "noSessions": "此主机没有代理会话。",
+    "approval": "代理需要您的决定",
+    "answer": "回答（结构化问题使用 JSON）",
+    "allow": "允许一次",
+    "deny": "拒绝",
+    "tool": "工具活动",
+    "streamFailed": "代理流已断开。重新打开会话以重新连接。",
+    "status": {
+      "starting": "正在启动",
+      "ready": "就绪",
+      "running": "工作中",
+      "stopped": "已停止",
+      "error": "错误"
+    },
+    "installRuntime": "安装选定的代理和 Node.js",
+    "installSource": "仅使用官方来源：nodejs.org（经 SHA-256 验证）和 registry.npmjs.org（锁定包完整性）。为 SSH 用户安装到 ~/.local/share/termix-agent-runtime；需要 curl、tar 以及 Linux/macOS x64 或 arm64 环境。不会更改 SSH 转发策略。",
+    "installSucceeded": "安装已验证。您现在可以启动代理；同时必须允许 SSH 回环远程转发。",
+    "installFailed": "安装失败。请查看日志并重试。",
+    "installLog": "安装日志",
+    "enableForwarding": "启用代理转发",
+    "forwardingScope": "适用于带有 systemd/OpenSSH 的 Linux；需要 root 权限或免密 sudo。备份并验证 SSH 配置，然后重新加载。仅当前 SSH 账户和观察到的连接源接收回环远程转发；现有的本地转发保持不变。失败的更改将回滚。",
+    "forwardingSucceeded": "SSH 回环远程转发已就绪。启动或恢复代理以打开新的 SSH 连接。",
+    "forwardingFailed": "SSH 转发配置失败。请查看日志；不会保留任何未验证的配置。",
+    "search": "搜索会话",
+    "sessionName": "会话名称",
+    "rename": "重命名",
+    "archive": "归档并停止",
+    "restore": "恢复会话",
+    "queue": "排队消息",
+    "enqueue": "将消息加入队列",
+    "continueQueue": "继续队列",
+    "pauseQueue": "暂停队列",
+    "editQueued": "编辑排队中的消息",
+    "save": "保存",
+    "remove": "移除",
+    "upload": "上传附件",
+    "remoteFile": "工作目录内的文件路径",
+    "attach": "从主机附加文件",
+    "attachments": "复用之前的附件",
+    "attachmentLimit": "最多 4 个附件，每个 1 MiB",
+    "review": "Git 更改",
+    "gitStatus": "刷新 Git 状态",
+    "diffFile": "要审查的文件路径",
+    "diff": "查看差异",
+    "branch": "新分支名称",
+    "createWorktree": "创建工作树",
+    "useWorktree": "在此工作树中创建新会话",
+    "worktreeHint": "从 HEAD 创建新分支。未提交的更改保留在当前目录中。现有的工作树永远不会自动删除。",
+    "clean": "无更改",
+    "reconnecting": "正在重新连接并恢复消息…",
+    "unavailable": "会话已无法访问。请检查您的权限或重新登录。",
+    "shortcuts": "Enter 发送或加入队列 · Shift+Enter 换行 · Esc 中断并暂停队列",
+    "activeSessions": "活跃",
+    "archivedSessions": "已归档",
+    "dismiss": "忽略",
+    "changes": "更改",
+    "close": "关闭",
+    "cancel": "取消",
+    "sessionSetup": "会话",
+    "hostSetup": "主机设置",
+    "changedFiles": "已更改的文件",
+    "worktree": "工作树",
+    "attachShort": "附加",
+    "emptyTranscript": "发送一条消息以启动代理。"
+  },
+  "plugin": {
+    "name": "AI 助手",
+    "description": "读取你的配置并提出修改建议供你审批的 AI 助手。"
+  },
+  "ops": {
+    "searchHosts": "搜索主机",
+    "selectedCount": "已选择 {{count}} 台",
+    "clear": "清除",
+    "fleets": "主机群",
+    "folders": "文件夹",
+    "tags": "标签",
+    "allHosts": "所有主机",
+    "noHosts": "没有主机",
+    "newConversation": "新对话",
+    "sendHint_other": "将在 {{count}} 台主机上运行。命令会直接运行，不会事先询问。",
+    "runCommand": "运行命令",
+    "hostFacts": "主机信息",
+    "hostCount_other": "{{count}} 台主机",
+    "succeeded": "{{count}} 成功",
+    "failed": "{{count}} 失败",
+    "exitCode": "退出码 {{code}}",
+    "timedOut": "已超时",
+    "stopped": "已停止",
+    "notRun": "未运行",
+    "cached": "已缓存",
+    "duration": "{{seconds}} 秒",
+    "noOutput": "（无输出）"
+  },
+  "assistant": {
+    "title": "AI 助手",
+    "moveHint": "拖动可移动，双击可停靠到侧边。",
+    "toggle": "打开或关闭 AI 助手",
+    "close": "关闭",
+    "dock": "停靠到右侧",
+    "float": "浮动",
+    "openTab": "打开完整视图",
+    "history": "对话",
+    "noConversations": "还没有对话",
+    "untitled": "未命名",
+    "deleteConversation": "删除对话",
+    "deleteConfirm": "删除这个对话？",
+    "emptyTitle": "询问或修改 Termix 中的任何内容",
+    "emptyHint": "助手以你的身份通过 Termix CLI 工作，并在目标主机上运行命令。输入 @ 可以把主机、主机群、文件夹或标签加为目标。",
+    "inputPlaceholder": "向助手提问。输入 @ 添加目标。",
+    "noTargets": "没有目标主机。输入 @ 添加。",
+    "sendHint": "修改和命令会直接执行，不再询问。",
+    "removeTarget": "移除 {{name}}",
+    "kind": {
+      "host": "主机",
+      "fleet": "主机群",
+      "folder": "文件夹",
+      "tag": "标签"
+    },
+    "emptyHintBasic": "助手以你的身份、按你的权限通过 Termix CLI 工作。",
+    "inputPlaceholderBasic": "向助手提问。",
+    "sendHintBasic": "修改会直接执行，不再询问。",
+    "thinking": "思考过程",
+    "thinkingActive": "正在思考...",
+    "compacted": "上下文已压缩：较早的消息已被总结",
+    "compact": "压缩对话",
+    "nothingToCompact": "对话还太短，暂时无需压缩。",
+    "contextMeter": "上下文：最近一次调用使用了 {{window}} 个 token 中的 {{used}} 个",
+    "contextMeterSource": "窗口{{source}}。",
+    "contextMeterReserved": "为回复预留 {{tokens}} 个 token。",
+    "todayTokens": "今日 {{tokens}}",
+    "todayTitle": "你今天使用的 token。点击查看详情。",
+    "usage": "Token 用量",
+    "conversationTokens": "{{tokens}} token",
+    "openFloating": "浮动面板",
+    "openFloatingHint": "在任何页面上方以面板形式打开助手。在任何位置按 {{shortcut}} 即可打开或关闭它。",
+    "shortcutHint": "在任何页面按 {{shortcut}} 即可在浮动面板中打开助手。"
+  },
+  "usage": {
+    "title": "Token 用量",
+    "settingDescription": "过去 30 天你的 AI 调用所用的 token。",
+    "cardTitle": "AI token 用量",
+    "today": "今日",
+    "week": "7 天",
+    "month": "30 天",
+    "mine": "我的",
+    "everyone": "所有用户",
+    "mineCaption": "你在所有 AI 功能中使用的 token。",
+    "everyoneCaption": "所有用户在所有 AI 功能中使用的 token。",
+    "byDay": "按天",
+    "byModel": "按模型",
+    "bySource": "按功能",
+    "byUser": "按用户",
+    "model": "模型",
+    "feature": "功能",
+    "user": "用户",
+    "calls": "调用次数",
+    "prompt": "输入",
+    "completion": "输出",
+    "total": "合计",
+    "empty": "过去 30 天没有 AI 用量。",
+    "loadFailed": "无法加载用量",
+    "estimatedNote": "部分数字为估算值（约每四个字符一个 token），因为提供商没有报告用量。",
+    "source": {
+      "assistant": "助手",
+      "terminal": "终端面板",
+      "compaction": "上下文压缩",
+      "assets": "资产标注"
+    }
+  },
+  "autoOps": {
+    "viewAssistant": "助手",
+    "viewAutoOps": "值守",
+    "intro": "自动运维允许助手自主检查您的主机。自动化任务会在预定时间或出现问题时启动它，并生成报告或提出修复方案供您批准。可以从预设开始。",
+    "sections": {
+      "tasks": "任务",
+      "approvals": "待审批",
+      "presets": "预设"
+    },
+    "provider": "任务使用的提供商",
+    "providerDefault": "第一个设置了默认模型的提供商",
+    "model": "任务使用的模型",
+    "modelDefault": "提供商的默认模型",
+    "saveModel": "保存模型",
+    "preferencesHint": "后台任务使用的提供商和模型。保持默认即可使用您设置的默认提供商和模型。",
+    "task": "任务",
+    "tokens": "{{tokens}} tokens",
+    "tokenUsage": "{{total}} tokens（输入 {{prompt}}，输出 {{completion}}）",
+    "dryRun": "测试运行",
+    "trigger": "触发",
+    "noTasks": "还没有任务",
+    "tasksHint": "任务是包含“询问 AI”步骤的自动化运行实例。启用预设，或在自动化中创建自己的任务：向任何自动化添加“询问 AI”步骤。运行记录将显示在此处。",
+    "openAutomations": "打开自动化",
+    "browsePresets": "浏览预设",
+    "noApprovals": "没有待审批的方案",
+    "loadFailed": "加载值守失败",
+    "decideFailed": "无法保存审批结果",
+    "openConversation": "在助手中打开",
+    "approve": "批准并执行",
+    "reject": "拒绝",
+    "expires": "{{time}} 过期",
+    "enabled": "已启用",
+    "updateAvailable": "有新版本",
+    "shared": "共享",
+    "needsAutomations": "需要 Automations 插件",
+    "enableAgain": "再次启用",
+    "deletePreset": "删除预设",
+    "autonomy": {
+      "report": "只报告",
+      "propose": "提方案"
+    },
+    "status": {
+      "running": "运行中",
+      "reported": "已报告",
+      "proposed": "待审批",
+      "approved": "已批准",
+      "rejected": "已拒绝",
+      "expired": "已过期",
+      "executing": "执行中",
+      "done": "已完成",
+      "failed": "失败",
+      "skipped": "已跳过"
+    },
+    "severity": {
+      "info": "信息",
+      "warning": "警告",
+      "critical": "严重"
+    },
+    "plan": {
+      "title": "方案",
+      "commands": "命令",
+      "rationale": "理由",
+      "risk": "风险",
+      "rollback": "回滚",
+      "verify": "验证",
+      "progress": "进度"
+    },
+    "enable": {
+      "title": "启用{{name}}",
+      "submit": "启用",
+      "name": "名称",
+      "targets": "主机",
+      "targetAll": "全部主机",
+      "targetTrigger": "触发的主机",
+      "targetHosts": "选定的主机",
+      "noHosts": "请至少选择一台主机。",
+      "threshold": "阈值（%）",
+      "forSeconds": "持续至少（秒）",
+      "time": "每天时间",
+      "cron": "计划（cron）",
+      "dockerEvent": "容器事件",
+      "dockerEvents": {
+        "exited": "已退出",
+        "unhealthy": "不健康",
+        "restarting": "重启中"
+      },
+      "badTime": "请按 HH:MM 输入时间。",
+      "autonomy": "助手可以做什么",
+      "maxRunSeconds": "时间上限（秒）",
+      "runbook": "运维手册",
+      "runbookHint": "用平实的语言写助手该做什么，英文效果最好。",
+      "shared": "另存为预设时共享",
+      "sharedHint": "所有能使用值守的人都可以启用它。",
+      "saveAsPreset": "另存为预设",
+      "savedPreset": "已保存",
+      "failed": "无法创建自动化",
+      "saveFailed": "无法保存预设"
+    },
+    "presets": {
+      "daily-patrol": {
+        "title": "每日巡检",
+        "description": "每天 09:00 检查所有主机的磁盘、内存、负载、失败的服务、容器、证书、更新、待重启和时间同步，并按严重程度汇总报告。"
+      },
+      "disk-cleanup": {
+        "title": "磁盘空间处理",
+        "description": "磁盘使用率持续 5 分钟不低于 85% 时，找出占用并提出安全的清理方案，由你批准后执行。业务数据一律不碰。"
+      },
+      "host-down-triage": {
+        "title": "主机掉线排查",
+        "description": "主机下线时，从其他主机和 Proxmox 探测它，判断是网络、机器停止还是 SSH 的问题。"
+      },
+      "service-failure": {
+        "title": "服务故障处理",
+        "description": "健康检查开始失败时，找出背后的 systemd 单元，查看状态和日志，在重启有用时提出一次重启，由你批准后执行。配置一律不改。"
+      },
+      "container-anomaly": {
+        "title": "容器异常处理",
+        "description": "容器退出、变为不健康或反复重启时，查看其状态、退出码、日志和内存，提出一次启动或重启，由你批准后执行。不删除任何东西。"
+      },
+      "resource-overload-cpu": {
+        "title": "CPU 过载",
+        "description": "CPU 持续 15 分钟不低于 95% 时，找出背后的进程、服务和容器，并报告处理建议。不做任何改动。"
+      },
+      "resource-overload-memory": {
+        "title": "内存过载",
+        "description": "内存持续 10 分钟不低于 95% 时，找出占用、交换和 OOM 终止情况，并报告处理建议。不做任何改动。"
+      },
+      "security-updates-weekly": {
+        "title": "每周安全更新",
+        "description": "每周一 09:30 汇总待装安全更新（按严重程度）、待重启及其相关软件包、运行与已安装内核、距上次更新天数，所有主机一张表。"
+      },
+      "cert-expiry-weekly": {
+        "title": "每周证书到期",
+        "description": "每周一 09:45 读取每台主机上 Let's Encrypt、Web 服务器和 Kubernetes 证书的到期时间，30 天内到期标为警告，7 天内为严重。"
+      },
+      "failing-drive": {
+        "title": "硬盘故障",
+        "description": "当 Storage Health 发现硬盘故障或磨损、存储池或阵列降级、精简池即将写满时，读取 SMART、阵列和存储池状态，并报告紧急程度和处理建议。不会更改任何内容。"
+      }
+    },
+    "report": {
+      "verdict": "结论",
+      "evidence": "证据",
+      "actionsTaken": "已做的事",
+      "recommendations": "建议",
+      "nothingFound": "运行结束前没有发现任何内容。",
+      "noChanges": "没有做任何更改。",
+      "openConversation": "在助手中打开对应会话，可以查看每一步并继续追问。",
+      "noFurtherAction": "无需进一步操作。",
+      "stoppedBudgetRun": "已停止：本次运行已用完 {{tokens}} tokens 的预算。",
+      "stoppedBudgetDaily": "已停止：所有者今天 {{tokens}} tokens 的预算已用完。",
+      "stoppedDeadline": "已停止：已到达自动化的时间上限。",
+      "stoppedPaused": "已停止：管理员暂停了 AI 自动运维。",
+      "stoppedAborted": "已停止：自动化运行被取消。",
+      "providerFailed": "AI 提供商出错：{{error}}",
+      "noHosts": "自动化所有者无法连接任何目标主机。",
+      "noProvider": "自动化所有者没有可用于运行任务的 AI 提供商和模型。",
+      "needsOpsUse": "自动化所有者没有 ai.ops.use 权限。",
+      "assistantOff": "自动化所有者没有启用 AI 助手。",
+      "skippedPaused": "AI 自动运维已被管理员暂停。",
+      "skippedDuplicate": "同一自动化和主机已有任务在运行或等待审批。",
+      "skippedRate": "这个自动化在过去一小时内已启动 {{count}} 个 AI 任务。",
+      "hostNotRun": "未执行：方案已被停止。",
+      "hostNoAccess": "未执行：所有者已无法连接这台主机。",
+      "hostUnreachable": "未执行：无法连接这台主机。",
+      "hostStopped": "在第一条失败的命令处停止。",
+      "executionDone": "已批准的方案在 {{count}} 台主机上执行完毕，所有命令和验证均成功。",
+      "executionFailed": "已批准的方案没有在所有主机上完成。",
+      "executionStopped": "已批准的方案在完成前被停止。",
+      "approvedBy": "已按原样执行批准的方案。批准人：{{user}}。",
+      "noticeReported": "AI 报告：{{title}}",
+      "noticeProposed": "AI 方案待审批：{{title}}",
+      "noticeExecuted": "AI 方案已执行：{{title}}",
+      "noticeFailed": "AI 任务失败：{{title}}",
+      "noticeAssetsAnnotationFailed": "资产标注失败"
+    }
+  },
+  "assets": {
+    "title": "资产",
+    "search": "搜索名称、键或地址",
+    "allZones": "全部区域",
+    "showRemoved": "显示已移除",
+    "collectNow": "立即采集",
+    "collecting": "采集中…",
+    "collectFailed": "无法开始采集",
+    "neverRun": "尚未采集",
+    "lastRun": "上次采集 {{time}}：{{total}} 台主机中 {{ok}} 台成功",
+    "lastRunFailed": "{{time}} 的采集失败",
+    "hostsFailed_other": "{{count}} 台失败",
+    "loadFailed": "无法加载资产清单",
+    "saveFailed": "无法保存",
+    "empty": "还没有资产",
+    "emptyHint": "点击立即采集，读取采集账号能连接的所有主机。",
+    "emptyHintView": "需要拥有 ai.assets.manage 权限的人先进行采集。",
+    "removed": "已移除",
+    "pinned": "已固定",
+    "multiZone": "跨区域",
+    "multiZoneHint": "在多个区域都有地址，能同时访问两边，是潜在的跳板。",
+    "columns": {
+      "name": "名称",
+      "kind": "类型",
+      "zone": "区域",
+      "ips": "地址",
+      "listening": "端口",
+      "outbound": "出站",
+      "services": "服务",
+      "collected": "上次采集",
+      "role": "作用",
+      "importance": "重要程度",
+      "system": "所属系统"
+    },
+    "kind": {
+      "host": "主机",
+      "guest": "来宾",
+      "container": "容器",
+      "external": "外部"
+    },
+    "zone": {
+      "internal": "内网",
+      "dmz": "DMZ",
+      "external": "外网",
+      "cloud": "云",
+      "overlay": "Overlay"
+    },
+    "sections": {
+      "os": "操作系统",
+      "hostname": "主机名",
+      "uptimeSec": "运行时间（秒）",
+      "interfaces": "网卡",
+      "routes": "路由",
+      "listening": "监听端口",
+      "connections": "已建立连接",
+      "services": "运行中的服务",
+      "containers": "容器",
+      "kubernetes": "Kubernetes",
+      "guests": "Proxmox 虚拟机与容器",
+      "cloud": "云",
+      "missing": "没有输出的部分",
+      "guest": "Proxmox 来宾",
+      "container": "容器"
+    },
+    "outgoing": "出向关系",
+    "incoming": "入向关系",
+    "noEdges": "无",
+    "stale": "最近一次采集未再出现",
+    "pinZone": "区域",
+    "rulesDecide": "由规则决定",
+    "settingsTitle": "区域与计划",
+    "scheduleTitle": "采集",
+    "daily": "每天采集",
+    "dailyHint": "主机新增或修改时也会重新采集。",
+    "time": "时间（UTC）",
+    "save": "保存",
+    "collector": "以{{collector}}的身份采集，只覆盖该账号能连接的主机。",
+    "collectorMe": "你",
+    "collectorOther": "另一位管理者",
+    "collectorNone": "（尚未设置）",
+    "collectAsMe": "改为以我的身份采集",
+    "zonesTitle": "区域规则",
+    "zonesHint": "规则把 CIDR 映射到区域，优先于内置规则。前缀最长的规则优先，其次是优先级高的。保存后会立即重新划分资产区域。",
+    "zoneName": "名称",
+    "zoneNameExample": "机房内网",
+    "zoneKind": "类型",
+    "cidr": "CIDR",
+    "priority": "优先级",
+    "addZone": "添加规则",
+    "deleteZone": "删除规则",
+    "cancelEdit": "取消",
+    "annotating": "正在标注…",
+    "neverAnnotated": "尚未标注",
+    "lastAnnotation": "上次标注 {{time}}：{{total}} 个资产中 {{ok}} 个，{{tokens}} tokens",
+    "annotationFailed": "失败：{{reason}}",
+    "annotateNow": "立即标注",
+    "annotateFailed": "无法开始标注",
+    "modeTable": "表格",
+    "modeGraph": "图谱",
+    "importance": {
+      "critical": "关键",
+      "high": "高",
+      "medium": "中",
+      "low": "低"
+    },
+    "importanceUnknown": "未评级",
+    "importanceReason": "理由",
+    "sourceAi": "AI",
+    "sourceAiHint": "由标注生成，下次运行可能会更新。",
+    "sourceUser": "已锁定",
+    "sourceUserHint": "由人工设置，解锁前标注运行不会改动。",
+    "unlock": "解锁：交还给标注重新填写",
+    "unlockField": "解锁{{field}}",
+    "editAnnotation": "编辑",
+    "lockHint": "你修改的字段会被锁定，之后的标注运行不会覆盖。",
+    "factsTitle": "事实",
+    "closePanel": "关闭",
+    "impact": "影响分析",
+    "clearImpact": "清除",
+    "impactSummary_other": "它挂了会波及 {{count}} 个资产（关键 {{critical}}，高 {{high}}），另有 {{weak}} 个只是连接到它们。",
+    "impactTruncated": "已在 6 跳或 300 个资产处截断。",
+    "impactDirect": "直接",
+    "impactTransitive": "间接",
+    "impactWeak": "仅连接",
+    "expandContainers": "显示容器",
+    "showExternal": "显示外部地址",
+    "graphCounts": "{{nodes}} 个资产，{{edges}} 条关系",
+    "graphTitle": "资产图谱",
+    "noZone": "无区域",
+    "annotationTitle": "AI 标注",
+    "annotateAfterCollect": "每次采集后标注",
+    "annotateAfterCollectHint": "只把上次标注后有变动的资产及其相邻资产发给模型。",
+    "annotateProvider": "提供商",
+    "annotateProviderDefault": "采集人的自动运维选择",
+    "annotateModel": "模型",
+    "annotateModelDefault": "提供商的默认模型",
+    "annotationHint": "标注以采集人的身份、用采集人的提供商运行。摘要不含环境变量、命令行和外部地址。",
+    "annotateAll": "全部重新标注"
+  },
+  "exposure": {
+    "title": "互联网入口",
+    "disclaimer": "这里只展示配置证据。公网绑定和转发规则不代表互联网可达；私网监听作为后端关联证据保留。",
+    "loadFailed": "无法加载入口清单。",
+    "saveFailed": "无法保存优先级。",
+    "search": "筛选地址、主机、域名或路径",
+    "allPriority": "全部优先级",
+    "allZones": "全部区域",
+    "allSources": "全部来源",
+    "high": "高",
+    "medium": "中",
+    "low": "低",
+    "active": "当前入口",
+    "stale": "已过期",
+    "resolved": "不再观测到",
+    "all": "全部",
+    "refresh": "刷新",
+    "loading": "加载中…",
+    "empty": "没有匹配的入口。请先核对下方采集覆盖，不能据此判断没有暴露。",
+    "never": "尚未采集。采集资产后将生成入口清单。",
+    "endpoint": "入口",
+    "source": "来源",
+    "priority": "复核优先级",
+    "pathState": "配置路径",
+    "freshness": "新鲜度",
+    "details": "证据详情",
+    "close": "关闭",
+    "notTested": "外部可达性：未验证。",
+    "priorityReason": "优先级仅用于复核，不是漏洞结论。公网管理与数据服务端口优先复核，服务身份和访问控制仍需验证。",
+    "tls": "TLS 配置",
+    "restrictions": "访问限制",
+    "observed": "最近观测",
+    "rulePriority": "按规则计算（解除锁定）",
+    "evidence": "观测记录",
+    "coverage": "采集覆盖",
+    "changes": "最近变化",
+    "current": "当前",
+    "partial": "不完整",
+    "complete": "配置关联完整",
+    "conflicting": "歧义或循环",
+    "configured": "配置已声明",
+    "unknown": "未知",
+    "status_ok": "已采集",
+    "status_unsupported": "工具不可用",
+    "status_denied": "权限不足",
+    "status_failed": "采集或解析失败",
+    "status_truncated": "结果截断",
+    "change_baseline": "已建立基线",
+    "change_added": "新增入口",
+    "change_changed": "配置变化",
+    "change_removed": "不再观测到入口",
+    "change_coverage": "覆盖退化",
+    "explain": "解释证据",
+    "explaining": "解释中…",
+    "explainFailed": "解释失败或证据已变化。",
+    "aiLabel": "AI 解读 · 不代表已验证结论",
+    "previous": "上一页",
+    "next": "下一页",
+    "binding": "绑定范围",
+    "binding_public": "公网入口候选",
+    "binding_local": "私网／本地后端",
+    "binding_unknown": "未确定绑定",
+    "ruleGaps": "未解析规则：{{count}}",
+    "unsupportedRule": "规则暂不支持，保留上次证据",
+    "scope": "视图",
+    "scope_internet": "互联网入口候选",
+    "scope_all": "全部证据",
+    "scope_unknown": "暴露范围未知",
+    "inventorySummary": "{{internet}} 个互联网入口候选 · 共 {{all}} 条规则 · {{unknown}} 条暴露范围未知",
+    "bindingCount": "{{count}} 个观测绑定地址",
+    "pathsTruncated": "链路展开已达上限，当前仅为部分证据。",
+    "pathBranch": "路径 {{index}}",
+    "branched": "按条件分支",
+    "reason_sensitive": "入口或后端使用需重点复核的服务端口 {{port}}",
+    "reason_public-address": "观测到公网地址绑定",
+    "reason_wan-zone": "OpenWrt 来源区域为 WAN，防火墙是否放行尚未验证",
+    "reason_configured-public-tunnel": "配置了公网隧道，外部可达性尚未验证",
+    "reason_internal-only": "仅观测到内网或本地绑定",
+    "reason_exposure-unknown": "证据不足，尚不能判定暴露范围",
+    "reason_critical-asset": "资产被标为关键资产",
+    "reason_manual": "用户指定的优先级"
+  },
+  "companion": {
+    "toggle": "助手面板"
+  },
+  "widget": {
+    "loading": "加载中...",
+    "empty": "暂无任务",
+    "pending_other": "{{count}} 个计划待审批",
+    "maxItems": "显示的任务数"
+  }
+}

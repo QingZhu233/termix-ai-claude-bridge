@@ -1,0 +1,867 @@
+{
+  "permissions": {
+    "use": {
+      "title": "アシスタントの使用",
+      "description": "アシスタントを開いて質問します。"
+    },
+    "manage_providers": {
+      "title": "プロバイダーの管理",
+      "description": "AI プロバイダーとその API キーを追加、編集、削除します。"
+    },
+    "apply_proposals": {
+      "title": "提案の適用",
+      "description": "アシスタントが提案した変更を実行できるようにします。"
+    },
+    "services": {
+      "use": {
+        "title": "他の機能からの AI の使用",
+        "description": "他の機能があなたに代わってアシスタントを呼び出す場合があります。"
+      }
+    },
+    "secrets": {
+      "share": {
+        "title": "API キーの共有",
+        "description": "他の機能が保存された AI API キーを参照することなく使用できる場合があります。"
+      }
+    },
+    "ops": {
+      "use": {
+        "title": "AI アシスタントを使用してホストでコマンドを実行する",
+        "description": "選択したホストでアシスタントが任意のシェルコマンドを実行できるようにします。デフォルトでは管理者のみが使用可能です。"
+      }
+    },
+    "usage": {
+      "view_all": {
+        "title": "全ユーザーの AI 使用状況を表示する",
+        "description": "自分自身だけでなく、すべてのユーザーの AI 呼び出しで使用されたトークン数を確認できます。デフォルトでは管理者のみが使用可能です。"
+      }
+    },
+    "assets": {
+      "view": {
+        "title": "資産インベントリを表示",
+        "description": "収集されたホスト、ゲスト、コンテナ、ゾーン、および接続を表示します。デフォルトでは管理者のみが利用可能です。"
+      },
+      "manage": {
+        "title": "資産インベントリを管理",
+        "description": "収集を開始し、ゾーンルールを編集し、ゾーンをピン留めし、スケジュールを変更します。収集はホストをリードオンリーで読み取ります。デフォルトでは管理者のみが利用可能です。"
+      }
+    }
+  },
+  "settings": {
+    "assistantUnavailable": "このサーバーでは AI アシスタントが無効化されています。",
+    "providersNeedOptIn": "プロバイダーを追加するには、上記で AI アシスタントを有効にしてください。",
+    "providers": {
+      "label": "プロバイダー",
+      "description": "アシスタントとエージェントが使用できる AI サービスです。"
+    },
+    "admin": {
+      "globallyEnabled": {
+        "label": "AI アシスタント",
+        "description": "ユーザーが AI アシスタントを有効にできるようにします。この設定がオフの場合、アシスタントはすべてのユーザーに対して非表示およびブロックされます。"
+      },
+      "privateEndpoints": {
+        "label": "許可されたプライベート AI ホスト",
+        "description": "ユーザーがプロバイダーのターゲットとして設定できる、プライベートネットワーク上のホスト（セルフホスト型の Ollama など）です。1行に1つのホストを入力してください。"
+      },
+      "opsConcurrency": {
+        "label": "AI アシスタントの並列ホスト数",
+        "description": "アシスタントコマンドが同時に実行されるホストの数。"
+      },
+      "opsCommandTimeout": {
+        "label": "AI アシスタントのコマンドタイムアウト（秒）",
+        "description": "ホスト上でコマンドが停止されるまでの最大実行時間。アシスタントは最大 600 秒まで要求できます。"
+      },
+      "opsOutputLimit": {
+        "label": "AI アシスタントのホストごとの出力制限（文字数）",
+        "description": "各ホストの出力のうち保持される量。長い出力の場合は先頭と末尾が保持されます。"
+      },
+      "autoOpsPaused": {
+        "label": "AI 自動運用を一時停止する",
+        "description": "実行中のすべての AI タスクと承認済みプランを停止し、再度有効にするまで新しいタスクを受け付けません。"
+      },
+      "autoOpsRunsPerHour": {
+        "label": "1 時間あたりの自動化ごとの AI タスク数",
+        "description": "同じ時間内で発生した追加のトリガーはスキップされます。"
+      },
+      "autoOpsRunTokens": {
+        "label": "AI タスクあたりのトークン予算",
+        "description": "この数のトークンを使用したタスクは停止され、発見した内容を報告します。"
+      },
+      "autoOpsDailyTokens": {
+        "label": "ユーザーごとの 1 日あたりの AI トークン予算",
+        "description": "ユーザーが 1 日（UTC）でこの数のトークンを使用すると、そのユーザーの AI タスクはスキップまたは停止されます。"
+      },
+      "assetsDailyCollect": {
+        "label": "資産インベントリを毎日収集する",
+        "description": "収集機が接続できるすべてのホストを、1つのリードオンリースクリプトで1日1回読み取ります。"
+      },
+      "assetsCollectTime": {
+        "label": "資産収集時間 (UTC)",
+        "description": "HH:MM形式、例: 03:00"
+      },
+      "assetsCollector": {
+        "label": "資産収集機"
+      },
+      "assetsAnnotateAfterCollect": {
+        "label": "各収集後に資産に注釈を付ける",
+        "description": "モデルが、変更された各資産の役割、重要度、ビジネスシステム、および事実から示される依存関係を記述します。"
+      },
+      "assetsAnnotateRunTokens": {
+        "label": "資産注釈実行あたりのトークン予算",
+        "description": "モデル呼び出しがこの数のトークンを消費すると実行が停止しますが、記述された内容は保持されます。"
+      },
+      "assetsAnnotateProvider": {
+        "label": "資産注釈プロバイダー"
+      },
+      "assetsAnnotateModel": {
+        "label": "資産注釈モデル"
+      },
+      "exposureRetentionDays": {
+        "label": "公開履歴の保持期間 (日数)",
+        "description": "現在のエントリで参照されている保留中の通知と証拠は、年齢に関係なく保持されます。"
+      }
+    },
+    "host": {
+      "enableAiAssistant": {
+        "label": "AI アシスタントを有効にする",
+        "description": "このホストのターミナルで AI アシスタントのサポートを有効にします。デフォルトではオフになっており、アカウントで AI が有効になっている必要があります。"
+      },
+      "showPanel": {
+        "label": "ターミナル横のパネル",
+        "description": "このホストの SSH ターミナルの横にアシスタントパネルを表示します。"
+      }
+    },
+    "user": {
+      "autoOpsPreferences": {
+        "label": "自動運用の設定"
+      },
+      "companionAutoOpen": {
+        "label": "ターミナルと一緒にアシスタントパネルを開く",
+        "description": "アシスタントパネルが設定されたホストでターミナルを開いたとき、アシスタントパネルを表示します。"
+      },
+      "companionSide": {
+        "label": "アシスタントパネルの位置",
+        "description": "ターミナルの横にパネルを表示する位置です。",
+        "right": "右",
+        "left": "左",
+        "bottom": "下"
+      },
+      "companionSize": {
+        "label": "アシスタントパネルのサイズ",
+        "description": "幅、または下部の高さ（ピクセル単位）。"
+      },
+      "companionEdgeButton": {
+        "label": "アシスタントパネルのエッジボタン",
+        "description": "パネルを開くための小さなボタンをターミナルのエッジに表示します。"
+      }
+    }
+  },
+  "ai": {
+    "send": "送信",
+    "stop": "停止",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "running": "実行中",
+    "approve": "承認",
+    "reject": "拒否",
+    "selectProvider": "プロバイダーを選択",
+    "addProvider": "プロバイダーを追加",
+    "manageModels": "モデルの管理",
+    "editProvider": "プロバイダーを編集",
+    "removeProvider": "プロバイダーを削除",
+    "providerType": "プロバイダー",
+    "providerLabel": "名前",
+    "providerLabelPlaceholder": "例: ローカル Ollama",
+    "baseUrl": "サーバーアドレス",
+    "apiKey": "API キー",
+    "defaultModel": "デフォルトモデル",
+    "defaultModelPlaceholder": "例: llama3.1 または claude-opus-5",
+    "labelRequired": "このプロバイダーに名前を付けてください",
+    "providerSaveFailed": "プロバイダーを保存できませんでした",
+    "providerUpdated": "プロバイダーが更新されました",
+    "providerDeleteFailed": "プロバイダーを削除できませんでした",
+    "privateEndpointHint": "プライベートネットワーク上のアドレスを使用するには、管理者がまずホストを許可する必要があります。",
+    "providerOllama": "Ollama",
+    "providerAnthropic": "Anthropic",
+    "providerOpenai": "OpenAI",
+    "providerGemini": "Google Gemini",
+    "providerOpenaiCompatible": "OpenAI 互換",
+    "toolArguments": "入力",
+    "toolResult": "結果",
+    "statusApplied": "適用済み",
+    "statusRejected": "拒否済み",
+    "proposalApplyFailed": "変更を適用できませんでした",
+    "proposalRejectFailed": "変更を拒否できませんでした",
+    "enableTitle": "AI アシスタントを有効にする",
+    "enableDescription": "アシスタントが設定を読み取り、承認する変更を提案できるようにします。",
+    "readOnlyCommands": "読み取り専用の診断コマンドを許可する",
+    "readOnlyCommandsDescription": "アシスタントは、df や uptime のような安全なコマンドを、毎回確認することなく実行できる場合があります。サーバーに変更を加える操作は、常に事前に提案されます。",
+    "modelDetectFailed": "プロバイダーに接続できなかったため、一般的なリストを表示しています。任意のモデル名を入力できます。",
+    "modelCustom": "モデル名を入力",
+    "modelRefresh": "リストを更新",
+    "modelPlaceholder": "モデルを選択または入力",
+    "runCommandTitle": "コマンドを実行",
+    "assistant": "AI アシスタント",
+    "terminalPanelEmpty": "このホストについてアシスタントに質問してください。状態を変更する操作は、まずあなたの承認が必要です。",
+    "terminalPanelPlaceholder": "このホストについて質問...",
+    "noProvidersConfigured": "AI プロバイダーがまだ設定されていません。設定から追加してください。",
+    "runsInOpenTerminal": "開いているターミナルセッションで実行されます。",
+    "runInTerminal": "実行",
+    "terminalContextPrefill": "这是我的终端输出：\n\n{{output}}\n\n",
+    "secrets": {
+      "shareApiKey": "他の機能が独自のリクエストのためにあなたの AI プロバイダー API キーを使用できるようにします。キーはコピーされず、いつでも取り消すことができます。"
+    },
+    "removeProviderConfirm": "プロバイダー {{name}} を削除しますか？",
+    "contextWindows": "モデルごとのコンテキストウィンドウ",
+    "contextWindowsHint": "プロバイダーが報告している値を読み取ります。モデルに対して上書きするトークン数を入力するか、プロバイダーの報告値を使用する場合は空のままにします。更新するとプロバイダーに再度問い合わせます。",
+    "contextWindowValue": "コンテキストウィンドウ：{{tokens}}（{{source}}）",
+    "contextOverride": "{{model}} のコンテキストウィンドウ上書き",
+    "contextSourceOverride": "あなたによって設定",
+    "contextSourceProvider": "プロバイダーによって報告",
+    "contextSourceGuess": "モデル名から推測",
+    "contextSourceDefault": "不明なモデルのデフォルト値",
+    "contextLoadFailed": "コンテキストウィンドウを読み取れませんでした",
+    "contextRefresh": "更新",
+    "contextWindowInvalid": "コンテキストウィンドウは 1024 以上の整数のトークン数として入力してください。",
+    "advanced": "詳細設定",
+    "advancedHint": "モデルのデフォルト値を使用するには、設定を「デフォルト」のままにしてください。",
+    "advancedDefault": "デフォルト",
+    "advancedDefaultAuto": "デフォルト（自動）",
+    "advancedAuto": "自動",
+    "advancedEndpoint": "エンドポイント",
+    "advancedEndpointResponses": "レスポンス API",
+    "advancedEndpointChat": "チャット完了",
+    "advancedReasoningEffort": "推論の努力",
+    "advancedReasoningSummary": "推論の要約",
+    "advancedReasoningSummaryHint": "レスポンス API のみ対応。",
+    "advancedVerbosity": "詳細度",
+    "advancedNone": "なし",
+    "advancedMinimal": "最小",
+    "advancedLow": "低",
+    "advancedMedium": "中",
+    "advancedHigh": "高",
+    "advancedXhigh": "非常に高い",
+    "advancedMax": "最大",
+    "advancedConcise": "簡潔",
+    "advancedDetailed": "詳細",
+    "advancedOff": "オフ",
+    "advancedMaxOutputTokens": "最大出力トークン数",
+    "advancedMaxOutputTokensInvalid": "1 から 1,000,000 までの整数を入力してください。",
+    "advancedTemperature": "温度",
+    "advancedTemperatureHint": "OpenAI の推論モデルは、推論努力が「なし」の場合のみこのパラメータを受け付けるため、それ以外の努力レベルでは送信されません。",
+    "advancedTemperatureInvalid": "0 から 2 までの数値を入力してください。"
+  },
+  "nav": {
+    "ai": "AI アシスタント"
+  },
+  "onboarding": {
+    "aiTitle": "AI アシスタント",
+    "aiIntro": "Termix には AI アシスタントを含めることができます。これは後で設定で変更できます。",
+    "aiSkipTitle": "無効のままにする",
+    "aiSkipDesc": "Termix は現在のまま動作します。アシスタントは非表示のままです。",
+    "aiEnableTitle": "有効にする",
+    "aiEnableDesc": "設定を読み取り、承認した変更を提案するアシスタントを追加します。Ollama のようなローカルプロバイダーが必要です。",
+    "aiNote": "プロバイダーを追加してメッセージを送信するまで、何も送信されません。"
+  },
+  "agents": {
+    "working": "処理中...",
+    "startingIndicator": "エージェントを起動中...",
+    "noCompatibleProvider": "あなたの AI プロバイダーのいずれも {{agent}} と互換性がありません。Claude Code には Anthropic が必要で、Codex には OpenAI が必要です。",
+    "noProviders": "まず設定で AI プロバイダーを追加してください。",
+    "title": "AI エージェント",
+    "permissionTitle": "リモート AI エージェントを実行",
+    "permissionDescription": "設定された AI プロバイダーを使用して、SSH ホスト上でコーディングエージェントを起動します。エージェントは SSH ユーザーとしてコマンドを実行し、ファイルを変更できます。",
+    "new": "新しいセッション",
+    "description": "Termix AI プロバイダーを使用して、このホストのディレクトリでエージェントを実行します。",
+    "runtime": "エージェント",
+    "provider": "Termix プロバイダー",
+    "chooseProvider": "互換性のあるプロバイダーを選択",
+    "model": "モデル",
+    "directory": "作業ディレクトリ",
+    "executable": "実行可能ファイル（オプションの絶対パス）",
+    "requirements": "ホストには Node.js 22.19+ と選択されたエージェントのインストールが必要です。SSH リモートループバックフォワーディングが許可されている必要があります。既存のエージェント設定は上書きされません。",
+    "responsesRequired": "Codex には Responses API エンドポイントが必要です。Chat Completions のみのエンドポイントでは Codex を実行できません。",
+    "piPermissions": "Pi ツールはこの SSH アカウントの権限で実行されます。エージェントが変更を許可するディレクトリでのみ起動してください。",
+    "start": "エージェントを起動",
+    "resume": "再開",
+    "stop": "セッションを停止",
+    "interrupt": "ターンを中断",
+    "send": "送信",
+    "prompt": "エージェントにこのディレクトリで作業を依頼...",
+    "noSessions": "このホストのエージェントセッションはありません。",
+    "approval": "エージェントはあなたの判断が必要です",
+    "answer": "回答（構造化された質問には JSON）",
+    "allow": "1回だけ許可",
+    "deny": "拒否",
+    "tool": "ツールアクティビティ",
+    "streamFailed": "エージェントストリームが切断されました。再接続するにはセッションを再度開いてください。",
+    "status": {
+      "starting": "起動中",
+      "ready": "準備完了",
+      "running": "処理中",
+      "stopped": "停止済み",
+      "error": "エラー"
+    },
+    "installRuntime": "選択したエージェントと Node.js をインストール",
+    "installSource": "公式ソースのみ: nodejs.org (SHA-256 検証済み) および registry.npmjs.org (パッケージ整合性ロック済み)。SSH ユーザーの ~/.local/share/termix-agent-runtime にインストールされます。curl、tar、および Linux/macOS x64 または arm64 が必要です。SSH フォワーディングポリシーは変更されません。",
+    "installSucceeded": "インストールが検証されました。エージェントを開始できます。SSH ループバックのリモートフォワーディングも許可されている必要があります。",
+    "installFailed": "インストールに失敗しました。ログを確認して再試行してください。",
+    "installLog": "インストールログ",
+    "enableForwarding": "エージェントフォワーディングを有効化",
+    "forwardingScope": "systemd/OpenSSH 搭載の Linux 用。root またはパスワード不要の sudo が必要です。SSH 設定をバックアップして検証し、リロードします。現在の SSH アカウントと観測された接続元のみにループバックのリモートフォワーディングが適用され、既存のローカルフォワーディングは保持されます。変更が失敗した場合はロールバックされます。",
+    "forwardingSucceeded": "SSH ループバックのリモートフォワーディングの準備ができました。エージェントを開始または再開して、新しい SSH 接続を開いてください。",
+    "forwardingFailed": "SSH フォワーディング設定に失敗しました。ログを確認してください。検証されていない設定は保持されません。",
+    "search": "セッションを検索",
+    "sessionName": "セッション名",
+    "rename": "名前を変更",
+    "archive": "アーカイブして停止",
+    "restore": "セッションを復元",
+    "queue": "キューイングされたメッセージ",
+    "enqueue": "メッセージをキューに追加",
+    "continueQueue": "キューを続行",
+    "pauseQueue": "キューを一時停止",
+    "editQueued": "キューイングされたメッセージを編集",
+    "save": "保存",
+    "remove": "削除",
+    "upload": "添付ファイルをアップロード",
+    "remoteFile": "作業ディレクトリ内のファイルパス",
+    "attach": "ホストからファイルを添付",
+    "attachments": "以前の添付ファイルを再利用",
+    "attachmentLimit": "最大4つの添付ファイル、各1 MiBまで",
+    "review": "Git の変更",
+    "gitStatus": "Git ステータスを更新",
+    "diffFile": "確認するファイルパス",
+    "diff": "差分を表示",
+    "branch": "新しいブランチ名",
+    "createWorktree": "ワークツリーを作成",
+    "useWorktree": "このワークツリーで新しいセッション",
+    "worktreeHint": "HEAD から新しいブランチを作成します。コミットされていない変更は現在のディレクトリに残ります。既存のワークツリーは自動的に削除されません。",
+    "clean": "変更なし",
+    "reconnecting": "再接続してメッセージを復元しています…",
+    "unavailable": "セッションはもうアクセスできません。権限を確認するか、再度サインインしてください。",
+    "shortcuts": "Enter で送信またはキューイング · Shift+Enter で改行 · Esc で中断してキューを一時停止",
+    "activeSessions": "アクティブ",
+    "archivedSessions": "アーカイブ済み",
+    "dismiss": "閉じる",
+    "changes": "変更",
+    "close": "閉じる",
+    "cancel": "キャンセル",
+    "sessionSetup": "セッション",
+    "hostSetup": "ホスト設定",
+    "changedFiles": "変更されたファイル",
+    "worktree": "ワークツリー",
+    "attachShort": "添付",
+    "emptyTranscript": "エージェントを起動するにはメッセージを送信してください。"
+  },
+  "plugin": {
+    "name": "AI アシスタント",
+    "description": "設定を読み取り、変更を提案して承認を求める AI アシスタント。"
+  },
+  "ops": {
+    "searchHosts": "ホストを検索",
+    "selectedCount": "{{count}} 件選択中",
+    "clear": "クリア",
+    "fleets": "フリート",
+    "folders": "フォルダ",
+    "tags": "タグ",
+    "allHosts": "すべてのホスト",
+    "noHosts": "ホストなし",
+    "newConversation": "新しい会話",
+    "sendHint_other": "{{count}} 台のホストで実行されます。コマンドは確認なしで実行されます。",
+    "runCommand": "コマンドを実行",
+    "hostFacts": "ホストの事実情報",
+    "hostCount_other": "{{count}} 台のホスト",
+    "succeeded": "{{count}} 件成功",
+    "failed": "{{count}} 件失敗",
+    "exitCode": "終了コード {{code}}",
+    "timedOut": "タイムアウト",
+    "stopped": "停止済み",
+    "notRun": "未実行",
+    "cached": "キャッシュ済み",
+    "duration": "{{seconds}} 秒",
+    "noOutput": "（出力なし）"
+  },
+  "assistant": {
+    "title": "AI アシスタント",
+    "moveHint": "ドラッグして移動します。ダブルクリックしてサイドにドッキングします。",
+    "toggle": "AI アシスタントの表示/非表示",
+    "close": "閉じる",
+    "dock": "右側に固定",
+    "float": "フローティング",
+    "openTab": "全画面で開く",
+    "history": "会話履歴",
+    "noConversations": "まだ会話がありません",
+    "untitled": "無題",
+    "deleteConversation": "会話を削除",
+    "deleteConfirm": "この会話を削除しますか？",
+    "emptyTitle": "Termix のあらゆる設定や操作について質問してください",
+    "emptyHint": "アシスタントは Termix CLI を通じてあなたに代わって動作し、対象ホストでコマンドを実行します。@ を入力して、ホスト、フリート、フォルダ、タグを対象として追加できます。",
+    "inputPlaceholder": "アシスタントに質問しましょう。@ で対象を追加できます。",
+    "noTargets": "対象ホストがありません。@ で追加してください。",
+    "sendHint": "変更やコマンドの実行は確認なしで行われます。",
+    "removeTarget": "{{name}} を削除",
+    "kind": {
+      "host": "ホスト",
+      "fleet": "フリート",
+      "folder": "フォルダ",
+      "tag": "タグ"
+    },
+    "emptyHintBasic": "アシスタントは Termix CLI を通じて、あなたの権限で動作します。",
+    "inputPlaceholderBasic": "アシスタントに質問しましょう。",
+    "sendHintBasic": "変更は確認なしで行われます。",
+    "thinking": "思考中",
+    "thinkingActive": "思考中...",
+    "compacted": "コンテキストを圧縮しました：以前のメッセージは要約されました",
+    "compact": "会話を圧縮",
+    "nothingToCompact": "会話が短すぎるため、圧縮できません。",
+    "contextMeter": "コンテキスト：最新の呼び出しで {{window}} トークン中 {{used}} トークン使用",
+    "contextMeterSource": "ウィンドウサイズは {{source}} です。",
+    "contextMeterReserved": "返信用に {{tokens}} トークンを確保しています。",
+    "todayTokens": "本日 {{tokens}}",
+    "todayTitle": "本日使用したトークン数。クリックして詳細を表示。",
+    "usage": "トークン使用量",
+    "conversationTokens": "{{tokens}} トークン",
+    "openFloating": "フローティングパネル",
+    "openFloatingHint": "任意のページ上にパネルとしてアシスタントを開きます。どこでも {{shortcut}} を押して開閉できます。",
+    "shortcutHint": "任意のページで {{shortcut}} を押して、フローティングパネルでアシスタントを開きます。"
+  },
+  "usage": {
+    "title": "トークン使用量",
+    "settingDescription": "過去30日間のAI呼び出しで使用したトークン数。",
+    "cardTitle": "AI トークン使用量",
+    "today": "本日",
+    "week": "7日間",
+    "month": "30日間",
+    "mine": "自分",
+    "everyone": "全ユーザー",
+    "mineCaption": "すべてのAI機能におけるあなたのトークン数。",
+    "everyoneCaption": "すべてのユーザーとAI機能におけるトークン数。",
+    "byDay": "1日あたり",
+    "byModel": "モデル別",
+    "bySource": "機能別",
+    "byUser": "ユーザー別",
+    "model": "モデル",
+    "feature": "機能",
+    "user": "ユーザー",
+    "calls": "呼び出し数",
+    "prompt": "入力",
+    "completion": "出力",
+    "total": "合計",
+    "empty": "過去30日間にAI使用履歴がありません。",
+    "loadFailed": "使用量の読み込みに失敗しました",
+    "estimatedNote": "プロバイダーが使用量を報告していないため、一部の数値は1トークンあたり約4文字として推定されています。",
+    "source": {
+      "assistant": "アシスタント",
+      "terminal": "ターミナルパネル",
+      "compaction": "コンパクション",
+      "assets": "資産注釈"
+    }
+  },
+  "autoOps": {
+    "viewAssistant": "アシスタント",
+    "viewAutoOps": "自動運用",
+    "intro": "自動運用では、アシスタントがホストを自律的にチェックします。自動化ルールによりスケジュール実行や異常発生時に起動し、レポートを作成するか、承認を待つ修正プランを提案します。プリセットから始めましょう。",
+    "sections": {
+      "tasks": "タスク",
+      "approvals": "承認",
+      "presets": "プリセット"
+    },
+    "provider": "タスク用プロバイダー",
+    "providerDefault": "デフォルトモデルを持つ最初のプロバイダー",
+    "model": "タスク用モデル",
+    "modelDefault": "プロバイダーのデフォルトモデル",
+    "saveModel": "モデルを保存",
+    "preferencesHint": "バックグラウンドタスクで使用するプロバイダーとモデルです。デフォルトのプロバイダーとモデルを使用する場合は、変更せずにそのままにしてください。",
+    "task": "タスク",
+    "tokens": "{{tokens}} トークン",
+    "tokenUsage": "{{total}} トークン（入力 {{prompt}}、出力 {{completion}}）",
+    "dryRun": "テスト実行",
+    "trigger": "トリガー",
+    "noTasks": "タスクはまだありません",
+    "tasksHint": "タスクは、「AI に質問する」ステップを含む自動化の実行履歴です。プリセットを有効にするか、自動化で独自のルールを作成してください（任意の自動化に「AI に質問する」ステップを追加）。実行履歴がここに表示されます。",
+    "openAutomations": "自動化を開く",
+    "browsePresets": "プリセットを参照",
+    "noApprovals": "承認待ちのプランはありません",
+    "loadFailed": "自動運用の読み込みに失敗しました",
+    "decideFailed": "判断結果を保存できませんでした",
+    "openConversation": "アシスタントで開く",
+    "approve": "承認して実行",
+    "reject": "拒否",
+    "expires": "{{time}} に期限切れ",
+    "enabled": "有効",
+    "updateAvailable": "アップデート利用可能",
+    "shared": "共有",
+    "needsAutomations": "自動化が必要です",
+    "enableAgain": "再度有効にする",
+    "deletePreset": "プリセットを削除",
+    "autonomy": {
+      "report": "レポートのみ",
+      "propose": "プランを提案"
+    },
+    "status": {
+      "running": "実行中",
+      "reported": "レポート済み",
+      "proposed": "承認待ち",
+      "approved": "承認済み",
+      "rejected": "拒否済み",
+      "expired": "期限切れ",
+      "executing": "プラン実行中",
+      "done": "完了",
+      "failed": "失敗",
+      "skipped": "スキップ"
+    },
+    "severity": {
+      "info": "情報",
+      "warning": "警告",
+      "critical": "重大"
+    },
+    "plan": {
+      "title": "提案されたプラン",
+      "commands": "コマンド",
+      "rationale": "理由",
+      "risk": "リスク",
+      "rollback": "ロールバック",
+      "verify": "検証",
+      "progress": "進捗"
+    },
+    "enable": {
+      "title": "{{name}} を有効にする",
+      "submit": "有効にする",
+      "name": "名前",
+      "targets": "ホスト",
+      "targetAll": "すべてのホスト",
+      "targetTrigger": "トリガーされたホスト",
+      "targetHosts": "選択したホスト",
+      "noHosts": "少なくとも1つのホストを選択してください。",
+      "threshold": "しきい値（%）",
+      "forSeconds": "継続時間（秒）",
+      "time": "時刻",
+      "cron": "スケジュール（cron）",
+      "dockerEvent": "コンテナイベント",
+      "dockerEvents": {
+        "exited": "終了",
+        "unhealthy": "不健康",
+        "restarting": "再起動中"
+      },
+      "badTime": "時刻を HH:MM の形式で入力してください。",
+      "autonomy": "アシスタントが実行できる操作",
+      "maxRunSeconds": "時間制限（秒）",
+      "runbook": "ランブック",
+      "runbookHint": "アシスタントに実行してほしい内容を平易な言葉で記述してください。英語が最も適切に動作します。",
+      "shared": "プリセットとして保存時に共有する",
+      "sharedHint": "自動運用を使用できるすべてのユーザーがこれを有効にできるようになります。",
+      "saveAsPreset": "プリセットとして保存",
+      "savedPreset": "保存済み",
+      "failed": "自動化の作成に失敗しました",
+      "saveFailed": "プリセットの保存に失敗しました"
+    },
+    "presets": {
+      "daily-patrol": {
+        "title": "デイリーパトロール",
+        "description": "毎朝 09:00 に、すべてのホストのディスク、メモリ、負荷、失敗したサービス、コンテナ、証明書、アップデート、保留中の再起動、時刻同期をチェックし、重要度別にレポートします。"
+      },
+      "disk-cleanup": {
+        "title": "ディスクスペースのクリーンアップ",
+        "description": "ディスク使用率が 5 分以上 85% 以上になった場合、何が容量を占有しているか特定し、承認を待つ安全なクリーンアップ案を提示します。ビジネスデータは決して操作されません。"
+      },
+      "host-down-triage": {
+        "title": "ホストダウンの初期対応",
+        "description": "ホストがオフラインになった場合、他のホストや Proxmox からプローブし、ネットワーク、停止したマシン、または SSH のいずれが原因かレポートします。"
+      },
+      "service-failure": {
+        "title": "サービス障害",
+        "description": "ヘルスチェックが失敗し始めた場合、背後にある systemd ユニットを特定し、ステータスとログを読み取り、有効な場合に単一の再起動を承認待ちで提案します。設定は決して変更されません。"
+      },
+      "container-anomaly": {
+        "title": "コンテナの異常",
+        "description": "コンテナが終了、不健康、または再起動を繰り返した場合、その状態、終了コード、ログ、メモリを読み取り、一度の起動または再起動を承認待ちで提案します。何も削除されません。"
+      },
+      "resource-overload-cpu": {
+        "title": "CPU 過負荷",
+        "description": "CPU 使用率が 15 分以上 95% 以上になった場合、背後にあるプロセス、サービス、コンテナを特定し、対応策をレポートします。何も変更されません。"
+      },
+      "resource-overload-memory": {
+        "title": "メモリ過負荷",
+        "description": "メモリ使用率が 10 分以上 95% 以上になった場合、使用元、スワップ、OOM キルを特定し、対応策をレポートします。何も変更されません。"
+      },
+      "security-updates-weekly": {
+        "title": "週次セキュリティアップデート",
+        "description": "毎週月曜日 09:30 に、重要度別の保留中のセキュリティアップデート、保留中の再起動とそのパッケージ、実行中およびインストール済みのカーネル、前回のアップデートからの日数を、すべてのホストについて1つの表で表示します。"
+      },
+      "cert-expiry-weekly": {
+        "title": "週次証明書有効期限",
+        "description": "毎週月曜日 09:45 に、すべてのホスト上の Let's Encrypt、Web サーバー、Kubernetes 証明書の有効期限を読み取り、30 日未満のものをフラグ付けし、7 日未満は重要としてマークします。"
+      },
+      "failing-drive": {
+        "title": "故障するドライブ",
+        "description": "ストレージヘルスが故障または摩耗したドライブ、劣化したプールまたはアレイ、または埋まりつつあるスリムプールを検出すると、SMART、アレイ、プールの状態を読み取り、緊急度と対処法を報告します。変更は行われません。"
+      }
+    },
+    "report": {
+      "verdict": "判定",
+      "evidence": "証拠",
+      "actionsTaken": "実行されたアクション",
+      "recommendations": "推奨事項",
+      "nothingFound": "実行終了までに何も見つかりませんでした。",
+      "noChanges": "変更は行われませんでした。",
+      "openConversation": "アシスタントで会話を開き、すべてのステップを確認し、追加の質問を行ってください。",
+      "noFurtherAction": "これ以上のアクションは必要ありません。",
+      "stoppedBudgetRun": "停止：この実行は {{tokens}} トークンの予算を使い果たしました。",
+      "stoppedBudgetDaily": "停止：所有者の {{tokens}} トークンの日次予算を使い果たしました。",
+      "stoppedDeadline": "停止：自動化の時間制限に達しました。",
+      "stoppedPaused": "停止：管理者が AI 自動運用を一時停止しました。",
+      "stoppedAborted": "停止：自動化の実行がキャンセルされました。",
+      "providerFailed": "AI プロバイダーに失敗しました：{{error}}",
+      "noHosts": "ターゲットホストのいずれも、自動化の所有者から到達できません。",
+      "noProvider": "自動化の所有者には、タスクを実行するためのモデルを持つ AI プロバイダーがありません。",
+      "needsOpsUse": "自動化作成者の ai.ops.use 権限がありません。",
+      "assistantOff": "自動化作成者の AI アシスタントが無効化されています。",
+      "skippedPaused": "管理者により AI 自動運用が一時停止されています。",
+      "skippedDuplicate": "同じ自動化とホストに対するタスクが実行中または承認待ちです。",
+      "skippedRate": "この自動化は過去1時間で既に {{count}} 件の AI タスクを開始しています。",
+      "hostNotRun": "実行されませんでした: プランが停止されました。",
+      "hostNoAccess": "実行されませんでした: 作成者がこのホストに接続できなくなりました。",
+      "hostUnreachable": "実行されませんでした: ホストに到達できませんでした。",
+      "hostStopped": "最初に失敗したコマンドで停止しました。",
+      "executionDone": "承認されたプランが {{count}} 台のホストで実行され、すべてのコマンドとチェックが成功しました。",
+      "executionFailed": "承認されたプランがすべてのホストで完了しませんでした。",
+      "executionStopped": "承認されたプランが完了する前に停止されました。",
+      "approvedBy": "承認されたプランがそのまま実行されました。{{user}} によって承認されました。",
+      "noticeReported": "AI レポート: {{title}}",
+      "noticeProposed": "承認待ちの AI プラン: {{title}}",
+      "noticeExecuted": "実行された AI プラン: {{title}}",
+      "noticeFailed": "AI タスクが失敗しました: {{title}}",
+      "noticeAssetsAnnotationFailed": "資産注釈に失敗しました"
+    }
+  },
+  "assets": {
+    "title": "資産",
+    "search": "名前、キー、またはアドレスを検索",
+    "allZones": "すべてのゾーン",
+    "showRemoved": "削除済みを表示",
+    "collectNow": "今すぐ収集",
+    "collecting": "収集しています…",
+    "collectFailed": "収集を開始できませんでした",
+    "neverRun": "まだ収集されていません",
+    "lastRun": "最終収集: {{time}} ({{total}}ホスト中{{ok}}成功)",
+    "lastRunFailed": "{{time}}の収集に失敗しました",
+    "hostsFailed_other": "{{count}}ホストが失敗しました",
+    "loadFailed": "インベントリを読み込めませんでした",
+    "saveFailed": "保存できませんでした",
+    "empty": "資産はまだありません",
+    "emptyHint": "今すぐ収集して、収集機が接続できるすべてのホストを読み取ります。",
+    "emptyHintView": "ai.assets.manage権限を持つユーザーが最初に収集する必要があります。",
+    "removed": "削除済み",
+    "pinned": "ピン留め済み",
+    "multiZone": "マルチゾーン",
+    "multiZoneHint": "複数のゾーンにアドレスを持っているため、両方に到達できます。潜在的なピボットポイントです。",
+    "columns": {
+      "name": "名前",
+      "kind": "種類",
+      "zone": "ゾーン",
+      "ips": "アドレス",
+      "listening": "ポート",
+      "outbound": "アウトバウンド",
+      "services": "サービス",
+      "collected": "最終収集",
+      "role": "役割",
+      "importance": "重要度",
+      "system": "システム"
+    },
+    "kind": {
+      "host": "ホスト",
+      "guest": "ゲスト",
+      "container": "コンテナ",
+      "external": "外部"
+    },
+    "zone": {
+      "internal": "内部",
+      "dmz": "DMZ",
+      "external": "外部",
+      "cloud": "クラウド",
+      "overlay": "オーバーレイ"
+    },
+    "sections": {
+      "os": "オペレーティングシステム",
+      "hostname": "ホスト名",
+      "uptimeSec": "稼働時間（秒）",
+      "interfaces": "インターフェース",
+      "routes": "ルート",
+      "listening": "リスニングポート",
+      "connections": "確立された接続",
+      "services": "実行中のサービス",
+      "containers": "コンテナ",
+      "kubernetes": "Kubernetes",
+      "guests": "Proxmox ゲスト",
+      "cloud": "クラウド",
+      "missing": "出力がないセクション",
+      "guest": "Proxmox ゲスト",
+      "container": "コンテナ"
+    },
+    "outgoing": "送信",
+    "incoming": "受信",
+    "noEdges": "なし",
+    "stale": "最新の収集で見つかりませんでした",
+    "pinZone": "ゾーン",
+    "rulesDecide": "ルールによって決定",
+    "settingsTitle": "ゾーンとスケジュール",
+    "scheduleTitle": "収集",
+    "daily": "毎日収集",
+    "dailyHint": "ホストは追加または変更された際にも再収集されます。",
+    "time": "時間（UTC）",
+    "save": "保存",
+    "collector": "{{collector}} として収集し、そのアカウントが接続できるホストに到達します。",
+    "collectorMe": "あなた",
+    "collectorOther": "別の管理者",
+    "collectorNone": "まだ誰もいません",
+    "collectAsMe": "私として収集",
+    "zonesTitle": "ゾーンルール",
+    "zonesHint": "ルールは CIDR をゾーンにマッピングし、組み込みのルールよりも優先されます。最も具体的なプレフィックスが優先され、次に優先度が高いものが選ばれます。保存時にアセットのゾーンが再設定されます。",
+    "zoneName": "名前",
+    "zoneNameExample": "データセンター LAN",
+    "zoneKind": "種類",
+    "cidr": "CIDR",
+    "priority": "優先度",
+    "addZone": "ルールを追加",
+    "deleteZone": "ルールを削除",
+    "cancelEdit": "キャンセル",
+    "annotating": "注釈を追加中…",
+    "neverAnnotated": "まだ注釈が追加されていません",
+    "lastAnnotation": "最終注釈 {{time}}: {{total}} アセット中 {{ok}} 件、{{tokens}} トークン",
+    "annotationFailed": "失敗: {{reason}}",
+    "annotateNow": "今すぐ注釈を追加",
+    "annotateFailed": "注釈の開始に失敗しました",
+    "modeTable": "テーブル",
+    "modeGraph": "グラフ",
+    "importance": {
+      "critical": "重要",
+      "high": "高",
+      "medium": "中",
+      "low": "低"
+    },
+    "importanceUnknown": "評価なし",
+    "importanceReason": "理由",
+    "sourceAi": "AI",
+    "sourceAiHint": "注釈によって記述されたもので、次回の実行で変更される可能性があります。",
+    "sourceUser": "ロック済み",
+    "sourceUserHint": "人が設定したもので、アンロックされるまで注釈の実行は変更しません。",
+    "unlock": "アンロック: 注釈が再度これを埋めることを許可",
+    "unlockField": "「{{field}}」をロック解除",
+    "editAnnotation": "編集",
+    "lockHint": "変更したフィールドは、今後のアノテーション実行時にロックされます。",
+    "factsTitle": "ファクト",
+    "closePanel": "閉じる",
+    "impact": "影響範囲",
+    "clearImpact": "クリア",
+    "impactSummary_other": "障害発生時、{{count}} 個の資産が同時にダウンします（{{critical}} 個が重要、{{high}} 個が高重要度）。さらに {{weak}} 個はこれらにのみ接続しています。",
+    "impactTruncated": "6 ホップまたは 300 資産で切り捨てます。",
+    "impactDirect": "直接的に",
+    "impactTransitive": "他を介して",
+    "impactWeak": "これらにのみ接続",
+    "expandContainers": "コンテナを表示",
+    "showExternal": "外部アドレスを表示",
+    "graphCounts": "{{nodes}} 個の資産、{{edges}} 個の関係",
+    "graphTitle": "資産グラフ",
+    "noZone": "ゾーンなし",
+    "annotationTitle": "AI アノテーション",
+    "annotateAfterCollect": "各収集後にアノテーションを実行",
+    "annotateAfterCollectHint": "前回のアノテーション以降に変更があった資産と、その近隣資産のみがモデルに送信されます。",
+    "annotateProvider": "プロバイダー",
+    "annotateProviderDefault": "コレクターの自動運用選択",
+    "annotateModel": "モデル",
+    "annotateModelDefault": "プロバイダーのデフォルトモデル",
+    "annotationHint": "アノテーションはコレクターとして、コレクターのプロバイダーを使用して実行されます。サマリーには環境、コマンドライン、外部アドレスは含まれません。",
+    "annotateAll": "すべてを再アノテーション"
+  },
+  "exposure": {
+    "title": "インターネットエントリ",
+    "disclaimer": "構成インベントリのみです。パブリックバインディングやフォワーディングルールは、インターネットからの到達性を証明するものではありません。プライベートリスナーはバックエンドの証拠として保持されます。",
+    "loadFailed": "公開インベントリを読み込めませんでした。",
+    "saveFailed": "優先度を保存できませんでした。",
+    "search": "アドレス、ホスト、名前、またはパスでフィルタ",
+    "allPriority": "すべての優先度",
+    "allZones": "すべてのゾーン",
+    "allSources": "すべてのソース",
+    "high": "高",
+    "medium": "中",
+    "low": "低",
+    "active": "アクティブ",
+    "stale": "古い",
+    "resolved": "観測されなくなった",
+    "all": "すべて",
+    "refresh": "更新",
+    "loading": "読み込み中…",
+    "empty": "一致するエントリがありません。結論を出す前に、以下の収集範囲を確認してください。",
+    "never": "まだ収集されていません。エントリをインベントリに追加するには資産を収集してください。",
+    "endpoint": "エントリ",
+    "source": "ソース",
+    "priority": "レビュー優先度",
+    "pathState": "構成パス",
+    "freshness": "鮮度",
+    "details": "証拠の詳細",
+    "close": "閉じる",
+    "notTested": "外部到達性：未テスト。",
+    "priorityReason": "優先度はレビューのヒントであり、脆弱性の判定ではありません。パブリックな管理ポートやデータサービスポートが優先されますが、サービスアイデンティティとアクセスポリシーは依然として検証が必要です。",
+    "tls": "TLS 構成",
+    "restrictions": "アクセス制限",
+    "observed": "最終観測日時",
+    "rulePriority": "ルール優先度（ロック解除）",
+    "evidence": "観測",
+    "coverage": "収集範囲",
+    "changes": "最近の変更",
+    "current": "現在",
+    "partial": "不完全",
+    "complete": "構成の関連付けが完了しました",
+    "conflicting": "曖昧または循環",
+    "configured": "構成で宣言済み",
+    "unknown": "不明",
+    "status_ok": "収集済み",
+    "status_unsupported": "ツールが利用できません",
+    "status_denied": "アクセスが拒否されました",
+    "status_failed": "収集または解析に失敗しました",
+    "status_truncated": "切り捨て済み",
+    "change_baseline": "ベースラインが確立されました",
+    "change_added": "エントリが追加されました",
+    "change_changed": "構成が変更されました",
+    "change_removed": "エントリは観測されなくなりました",
+    "change_coverage": "カバレッジが低下しました",
+    "explain": "証拠を説明する",
+    "explaining": "説明中…",
+    "explainFailed": "説明に失敗しました、または証拠が変更されました。",
+    "aiLabel": "AIによる解釈 · 検証済みの発見ではありません",
+    "previous": "前へ",
+    "next": "次へ",
+    "binding": "バインディングの範囲",
+    "binding_public": "公開エントリの候補",
+    "binding_local": "プライベート/ローカルバックエンド",
+    "binding_unknown": "未解決のバインディング",
+    "ruleGaps": "未解析のルール: {{count}}",
+    "unsupportedRule": "サポートされていないルール; 以前の証拠が保持されています",
+    "scope": "ビュー",
+    "scope_internet": "インターネットエントリの候補",
+    "scope_all": "すべての証拠",
+    "scope_unknown": "不明な公開範囲",
+    "inventorySummary": "{{internet}} のインターネットエントリ候補 · 合計 {{all}} ルール · 公開範囲が不明なものが {{unknown}}",
+    "bindingCount": "観測されたバインディング数: {{count}}",
+    "pathsTruncated": "パスの展開が制限に達しました。これは部分的な証拠です。",
+    "pathBranch": "パス {{index}}",
+    "branched": "条件分岐",
+    "reason_sensitive": "サービスポート {{port}} を確認してください（エントリまたはバックエンド）",
+    "reason_public-address": "公開アドレスのバインディングが観測されました",
+    "reason_wan-zone": "OpenWrt の WAN ソースゾーン; ファイアウォールの許可は未検証です",
+    "reason_configured-public-tunnel": "公開トンネルが構成されています; 外部からの到達可能性は未テストです",
+    "reason_internal-only": "内部またはローカルのバインディングのみが観測されました",
+    "reason_exposure-unknown": "公開範囲を分類するには証拠が不十分です",
+    "reason_critical-asset": "アセットは重要とマークされています",
+    "reason_manual": "ユーザーが優先度を選択しました"
+  },
+  "companion": {
+    "toggle": "アシスタントパネル"
+  },
+  "widget": {
+    "loading": "読み込み中...",
+    "empty": "タスクはまだありません",
+    "pending_other": "{{count}} 件のプランが承認待ちです",
+    "maxItems": "表示するタスク数"
+  }
+}

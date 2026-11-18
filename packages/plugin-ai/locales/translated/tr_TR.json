@@ -1,0 +1,872 @@
+{
+  "permissions": {
+    "use": {
+      "title": "Asistanı kullan",
+      "description": "Asistanı açın ve sorular sorun."
+    },
+    "manage_providers": {
+      "title": "Sağlayıcıları yönet",
+      "description": "Yapay zeka sağlayıcılarını ve API anahtarlarını ekleyin, düzenleyin ve kaldırın."
+    },
+    "apply_proposals": {
+      "title": "Önerileri uygula",
+      "description": "Asistanın önerdiği değişiklikleri uygulamasına izin verin."
+    },
+    "services": {
+      "use": {
+        "title": "Diğer özelliklerde yapay zeka kullan",
+        "description": "Diğer özellikler sizin adınıza asistanı çağırabilir."
+      }
+    },
+    "secrets": {
+      "share": {
+        "title": "API anahtarını paylaş",
+        "description": "Diğer özellikler, depolanan yapay zeka API anahtarını görmeden kullanabilir."
+      }
+    },
+    "ops": {
+      "use": {
+        "title": "Yapay zeka asistanıyla sunucularda komut çalıştır",
+        "description": "Asistanın seçtiğiniz sunucularda herhangi bir kabuk komutunu çalıştırmasına izin verin. Varsayılan olarak yalnızca yöneticiler."
+      }
+    },
+    "usage": {
+      "view_all": {
+        "title": "Herkesin yapay zeka kullanımını görüntüle",
+        "description": "Sadece kendi kullanımınızı değil, her kullanıcının yapay zeka çağrıları tarafından kullanılan belirteçleri de görün. Varsayılan olarak yalnızca yöneticiler."
+      }
+    },
+    "assets": {
+      "view": {
+        "title": "Varlık envanterini görüntüle",
+        "description": "Toplanan ana bilgisayarları, sanal makineleri, konteynerleri, bölgeleri ve bağlantıları görüntüler. Varsayılan olarak yalnızca yöneticiler."
+      },
+      "manage": {
+        "title": "Varlık envanterini yönet",
+        "description": "Toplamaları başlat, bölge kurallarını düzenle, bölgeleri sabitle ve zamanlamayı değiştir. Toplama, ana bilgisayarları salt okunur olarak okur. Varsayılan olarak yalnızca yöneticiler."
+      }
+    }
+  },
+  "settings": {
+    "assistantUnavailable": "Bu sunucuda yapay zeka asistanı devre dışı bırakıldı.",
+    "providersNeedOptIn": "Sağlayıcı eklemek için yukarıda yapay zeka asistanını açın.",
+    "providers": {
+      "label": "Sağlayıcılar",
+      "description": "Asistan ve ajanların kullanabileceği yapay zeka hizmetleri."
+    },
+    "admin": {
+      "globallyEnabled": {
+        "label": "Yapay zeka asistanı",
+        "description": "Kullanıcıların yapay zeka asistanını açmasına izin verin. Bu kapalıyken asistan herkes için gizlenir ve engellenir."
+      },
+      "privateEndpoints": {
+        "label": "İzin verilen özel yapay zeka ana bilgisayarları",
+        "description": "Kullanıcıların bir sağlayıcıyı yönlendirebileceği özel ağınızda bulunan ana bilgisayarlar, örneğin kendi kendine barındırılan Ollama. Her satıra bir ana bilgisayar yazın."
+      },
+      "opsConcurrency": {
+        "label": "Yapay zeka asistanı paralel sunucular",
+        "description": "Bir asistan komutunun aynı anda kaç sunucuda çalıştırılacağı."
+      },
+      "opsCommandTimeout": {
+        "label": "Yapay zeka asistanı komut zaman aşımı (saniye)",
+        "description": "Bir komutun durdurulmadan önce bir sunucuda ne kadar süre çalışabileceği. Asistan en fazla 600 saniye isteyebilir."
+      },
+      "opsOutputLimit": {
+        "label": "Yapay zeka asistanı sunucu başına çıktı (karakter)",
+        "description": "Her sunucunun çıktısının ne kadarının saklanacağı. Daha uzun çıktılar başlangıç ve son kısımlarını korur."
+      },
+      "autoOpsPaused": {
+        "label": "Yapay zeka otomatik işlemlerini duraklat",
+        "description": "Yeniden kapatılana kadar çalışan her yapay zeka görevini ve onaylanmış planı durdurur ve yenilerini reddeder."
+      },
+      "autoOpsRunsPerHour": {
+        "label": "Saat başına otomasyon başına yapay zeka görevleri",
+        "description": "Aynı saat içindeki daha fazla tetikleyici atlanır."
+      },
+      "autoOpsRunTokens": {
+        "label": "Yapay zeka görevi başına belirteç bütçesi",
+        "description": "Bu kadar belirteç kullanan bir görev durdurulur ve bulduklarını raporlar."
+      },
+      "autoOpsDailyTokens": {
+        "label": "Kullanıcı başına günlük yapay zeka belirteç bütçesi",
+        "description": "Bir kullanıcı bugün (UTC) bu kadar belirteç kullandıktan sonra, yapay zeka görevleri atlanır veya durdurulur."
+      },
+      "assetsDailyCollect": {
+        "label": "Varlık envanterini günlük olarak topla",
+        "description": "Toplayıcının bağlanabildiği her ana bilgisayarı, günde bir kez, tek bir salt okunur betikle okur."
+      },
+      "assetsCollectTime": {
+        "label": "Varlık toplama saati (UTC)",
+        "description": "SS:DD, örneğin 03:00."
+      },
+      "assetsCollector": {
+        "label": "Varlık toplayıcısı"
+      },
+      "assetsAnnotateAfterCollect": {
+        "label": "Her toplama sonrası varlıkları etiketle",
+        "description": "Bir model, her değişen varlığın rolünü, önemini ve iş sistemini ile gerçeklerin gösterdiği bağımlılıkları yazar."
+      },
+      "assetsAnnotateRunTokens": {
+        "label": "Varlık etiketleme çalışması başına token bütçesi",
+        "description": "Bir çalışma, model çağrıları bu kadar token kullandığında durur; yazdığı şeyler kalır."
+      },
+      "assetsAnnotateProvider": {
+        "label": "Varlık etiketleme sağlayıcısı"
+      },
+      "assetsAnnotateModel": {
+        "label": "Varlık etiketleme modeli"
+      },
+      "exposureRetentionDays": {
+        "label": "Maruziyet geçmişi saklama süresi (gün)",
+        "description": "Bekleyen bildirimleri ve geçerli girdiler tarafından referans verilen kanıtları, yaşına bakılmaksızın saklar."
+      }
+    },
+    "host": {
+      "enableAiAssistant": {
+        "label": "Yapay Zeka Asistanını Etkinleştir",
+        "description": "Bu ana bilgisayarın terminalinde yapay zeka asistanının yardımcı olmasına izin verin. Varsayılan olarak kapalıdır ve hesabınız için yapay zekanın etkinleştirilmiş olmasını gerektirir."
+      },
+      "showPanel": {
+        "label": "Terminalin yanında panel",
+        "description": "Bu sunucunun SSH terminalinin yanında bir asistan paneli sunun."
+      }
+    },
+    "user": {
+      "autoOpsPreferences": {
+        "label": "Otomatik işlem tercihleri"
+      },
+      "companionAutoOpen": {
+        "label": "Asistan panelini terminal ile aç",
+        "description": "Asistan paneli olan bir sunucuda terminal açıldığında asistan panelini göster."
+      },
+      "companionSide": {
+        "label": "Asistan paneli konumu",
+        "description": "Panelin terminalin yanında nerede yer alacağı.",
+        "right": "Sağ",
+        "left": "Sol",
+        "bottom": "Alt"
+      },
+      "companionSize": {
+        "label": "Asistan paneli boyutu",
+        "description": "Genişlik veya alt kısımdaki yükseklik (piksel cinsinden)."
+      },
+      "companionEdgeButton": {
+        "label": "Asistan paneli kenar düğmesi",
+        "description": "Paneli açmak için terminal kenarında küçük bir düğme göster."
+      }
+    }
+  },
+  "ai": {
+    "send": "Gönder",
+    "stop": "Durdur",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "running": "çalışıyor",
+    "approve": "Onayla",
+    "reject": "Reddet",
+    "selectProvider": "Bir sağlayıcı seçin",
+    "addProvider": "Sağlayıcı ekle",
+    "manageModels": "Modelleri yönet",
+    "editProvider": "Sağlayıcıyı düzenle",
+    "removeProvider": "Sağlayıcıyı kaldır",
+    "providerType": "Sağlayıcı",
+    "providerLabel": "Ad",
+    "providerLabelPlaceholder": "Örneğin: Yerel Ollama",
+    "baseUrl": "Sunucu adresi",
+    "apiKey": "API anahtarı",
+    "defaultModel": "Varsayılan model",
+    "defaultModelPlaceholder": "Örneğin: llama3.1 veya claude-opus-5",
+    "labelRequired": "Bu sağlayıcıya bir ad verin",
+    "providerSaveFailed": "Sağlayıcı kaydedilemedi",
+    "providerUpdated": "Sağlayıcı güncellendi",
+    "providerDeleteFailed": "Sağlayıcı kaldırılamadı",
+    "privateEndpointHint": "Özel ağınızda bulunan adresler için önce yöneticinin ana bilgisayara izin vermesi gerekir.",
+    "providerOllama": "Ollama",
+    "providerAnthropic": "Anthropic",
+    "providerOpenai": "OpenAI",
+    "providerGemini": "Google Gemini",
+    "providerOpenaiCompatible": "OpenAI uyumlu",
+    "toolArguments": "Girdi",
+    "toolResult": "Sonuç",
+    "statusApplied": "Uygulandı",
+    "statusRejected": "Reddedildi",
+    "proposalApplyFailed": "Değişiklik uygulanamadı",
+    "proposalRejectFailed": "Değişiklik reddedilemedi",
+    "enableTitle": "Yapay zeka asistanını etkinleştir",
+    "enableDescription": "Asistanın kurulumunuzu okumasına ve onaylamanız için değişiklik önermesine izin verin.",
+    "readOnlyCommands": "Salt okunur tanı komutlarına izin ver",
+    "readOnlyCommandsDescription": "Asistan, her seferinde sormadan df ve uptime gibi güvenli komutların kısa bir listesini çalıştırabilir. Sunucuda değişiklik yapan her şey önce size önerilir.",
+    "modelDetectFailed": "Sağlayıcıya ulaşılamadı, bu nedenle bu genel bir listedir. Herhangi bir model adını yazabilirsiniz.",
+    "modelCustom": "Bir model adı girin",
+    "modelRefresh": "Listeyi yenile",
+    "modelPlaceholder": "Bir model seçin veya yazın",
+    "runCommandTitle": "Komutu çalıştır",
+    "assistant": "Yapay Zeka Asistanı",
+    "terminalPanelEmpty": "Bu ana bilgisayar hakkında asistandan bilgi alın. Durum değiştiren her şey önce sizin onayınızı gerektirir.",
+    "terminalPanelPlaceholder": "Bu ana bilgisayar hakkında sorun...",
+    "noProvidersConfigured": "Henüz bir yapay zeka sağlayıcı yapılandırılmadı. Ayarlar'dan bir tane ekleyin.",
+    "runsInOpenTerminal": "Açık terminal oturumunuzda çalışır.",
+    "runInTerminal": "Çalıştır",
+    "terminalContextPrefill": "İşte terminal çıktım:\n\n{{output}}\n\n",
+    "secrets": {
+      "shareApiKey": "Diğer özelliklerin kendi istekleri için yapay zeka sağlayıcı API anahtarınızı kullanmasına izin verin. Anahtar asla kopyalanmaz ve bunu istediğiniz zaman iptal edebilirsiniz."
+    },
+    "removeProviderConfirm": "{{name}} sağlayıcısını kaldırmak istiyor musunuz?",
+    "contextWindows": "Model başına bağlam penceresi",
+    "contextWindowsHint": "Sağlayıcı bildirdiği yerden okuyun. Bir model için bunu geçersiz kılmak için bir belirteç sayısı girin veya sağlayıcının bildirdiği değeri kullanmak için boş bırakın. Yenileme, sağlayıcıdan tekrar sorar.",
+    "contextWindowValue": "Bağlam penceresi: {{tokens}} ({{source}})",
+    "contextOverride": "{{model}} için bağlam penceresi geçersiz kılma",
+    "contextSourceOverride": "sizce belirlendi",
+    "contextSourceProvider": "sağlayıcı tarafından bildirildi",
+    "contextSourceGuess": "model adından tahmin edildi",
+    "contextSourceDefault": "bilinmeyen modeller için varsayılan",
+    "contextLoadFailed": "Bağlam pencereleri okunamadı",
+    "contextRefresh": "Yenile",
+    "contextWindowInvalid": "Bağlam penceresini en az 1024 olan tam bir belirteç sayısı olarak girin.",
+    "advanced": "Gelişmiş",
+    "advancedHint": "Modelin kendi ayarlarını kullanmak için bir ayarı Varsayılan olarak bırakın.",
+    "advancedDefault": "Varsayılan",
+    "advancedDefaultAuto": "Varsayılan (otomatik)",
+    "advancedAuto": "Otomatik",
+    "advancedEndpoint": "Uç Nokta",
+    "advancedEndpointResponses": "Yanıtlar API'si",
+    "advancedEndpointChat": "Sohbet Tamamlamaları",
+    "advancedReasoningEffort": "Mantık yürütme çabası",
+    "advancedReasoningSummary": "Mantık yürütme özeti",
+    "advancedReasoningSummaryHint": "Yalnızca Yanıtlar API'si.",
+    "advancedVerbosity": "Ayrıntı düzeyi",
+    "advancedNone": "Yok",
+    "advancedMinimal": "Minimal",
+    "advancedLow": "Düşük",
+    "advancedMedium": "Orta",
+    "advancedHigh": "Yüksek",
+    "advancedXhigh": "Ekstra yüksek",
+    "advancedMax": "Maksimum",
+    "advancedConcise": "Özlü",
+    "advancedDetailed": "Detaylı",
+    "advancedOff": "Kapalı",
+    "advancedMaxOutputTokens": "Maksimum çıktı belirteci",
+    "advancedMaxOutputTokensInvalid": "1 ile 1.000.000 arasında bir tam sayı girin.",
+    "advancedTemperature": "Sıcaklık",
+    "advancedTemperatureHint": "OpenAI akıl yürütme modelleri bunu yalnızca akıl yürütme çabası Yok olduğunda kabul eder, bu nedenle başka bir çaba ile gönderilmez.",
+    "advancedTemperatureInvalid": "0 ile 2 arasında bir sayı girin."
+  },
+  "nav": {
+    "ai": "Yapay zeka asistanı"
+  },
+  "onboarding": {
+    "aiTitle": "Yapay zeka asistanı",
+    "aiIntro": "Termix bir yapay zeka asistanı içerebilir. Bunu daha sonra ayarlarınızdan değiştirebilirsiniz.",
+    "aiSkipTitle": "Kapalı bırakın",
+    "aiSkipDesc": "Termix şu anki gibi çalışır. Asistan gizli kalır.",
+    "aiEnableTitle": "Açın",
+    "aiEnableDesc": "Kurulumunuzu okuyan ve onayladığınız değişiklikleri öneren bir asistan ekler. Yerel bir Ollama gibi sizin sağladığınız bir sağlayıcı gerektirir.",
+    "aiNote": "Bir sağlayıcı ekleyip mesaj gönderene kadar hiçbir yerlere veri gönderilmez."
+  },
+  "agents": {
+    "working": "Çalışıyor...",
+    "startingIndicator": "Ajan başlatılıyor...",
+    "noCompatibleProvider": "Yapay zeka sağlayıcılarınızın hiçbiri {{agent}} ile çalışmıyor. Claude Code Anthropic, Codex ise OpenAI gerektirir.",
+    "noProviders": "Önce Ayarlar'dan bir yapay zeka sağlayıcısı ekleyin.",
+    "title": "Yapay Zeka Ajanı",
+    "permissionTitle": "Uzaktan yapay zeka ajanlarını çalıştır",
+    "permissionDescription": "Yapılandırılmış yapay zeka sağlayıcılarını kullanarak SSH ana bilgisayarlarında kodlama ajanlarını başlatın. Ajanlar SSH kullanıcısı olarak komut çalıştırabilir ve dosyaları değiştirebilir.",
+    "new": "Yeni oturum",
+    "description": "Termix yapay zeka sağlayıcısı kullanarak bu ana bilgisayardaki bir dizinde bir ajan çalıştırın.",
+    "runtime": "Ajan",
+    "provider": "Termix sağlayıcısı",
+    "chooseProvider": "Uyumlu bir sağlayıcı seçin",
+    "model": "Model",
+    "directory": "Çalışma dizini",
+    "executable": "Çalıştırılabilir (isteğe bağlı mutlak yol)",
+    "requirements": "Ana bilgisayarda Node.js 22.19+ ve seçilen ajanın yüklü olması gerekir. SSH uzak loopback yönlendirmesine izin verilmelidir. Mevcut ajan yapılandırmaları üzerine yazılmaz.",
+    "responsesRequired": "Codex, bir Responses API uç noktası gerektirir. Sadece Chat Completions uç noktası Codex'i çalıştıramaz.",
+    "piPermissions": "Pi araçları bu SSH hesabının izinleriyle çalışır. Ajanın değiştirmesine izin verdiğiniz bir dizinde başlatın.",
+    "start": "Ajanı başlat",
+    "resume": "Devam et",
+    "stop": "Oturumu durdur",
+    "interrupt": "Sırayı kes",
+    "send": "Gönder",
+    "prompt": "Ajanın bu dizinde çalışmasını isteyin...",
+    "noSessions": "Bu ana bilgisayar için ajan oturumu yok.",
+    "approval": "Ajan kararınızı bekliyor",
+    "answer": "Cevap (yapılandırılmış sorular için JSON)",
+    "allow": "Bir kez izin ver",
+    "deny": "Reddet",
+    "tool": "Araç etkinliği",
+    "streamFailed": "Ajan akışı kesildi. Yeniden bağlanmak için oturumu yeniden açın.",
+    "status": {
+      "starting": "Başlatılıyor",
+      "ready": "Hazır",
+      "running": "Çalışıyor",
+      "stopped": "Durduruldu",
+      "error": "Hata"
+    },
+    "installRuntime": "Seçili aracıyı ve Node.js'i yükle",
+    "installSource": "Sadece resmi kaynaklar: nodejs.org (SHA-256 doğrulandı) ve registry.npmjs.org (kilitli paket bütünlüğü). SSH kullanıcısı için ~/.local/share/termix-agent-runtime dizinine yükler; curl, tar ve Linux/macOS x64 veya arm64 gerektirir. SSH yönlendirme politikasını değiştirmez.",
+    "installSucceeded": "Yükleme doğrulandı. Artık aracıyı başlatabilirsiniz; SSH döngüsel uzak yönlendirmenin de izinli olması gerekir.",
+    "installFailed": "Yükleme başarısız oldu. Günlüğü inceleyin ve tekrar deneyin.",
+    "installLog": "Yükleme günlüğü",
+    "enableForwarding": "Aracı yönlendirmesini etkinleştir",
+    "forwardingScope": "systemd/OpenSSH ile Linux; root veya şifresiz sudo gerektirir. SSH yapılandırmasını yedekler ve doğrular, ardından yeniden yükler. Sadece geçerli SSH hesabı ve gözlemlenen bağlantı kaynağı döngüsel uzak yönlendirmeyi alır; mevcut yerel yönlendirme korunur. Başarısız değişiklikler geri alınır.",
+    "forwardingSucceeded": "SSH döngüsel uzak yönlendirme hazır. Yeni bir SSH bağlantısı açmak için aracıyı başlatın veya devam ettirin.",
+    "forwardingFailed": "SSH yönlendirme yapılandırması başarısız oldu. Günlüğü inceleyin; doğrulanmamış yapılandırma tutulmaz.",
+    "search": "Oturumları ara",
+    "sessionName": "Oturum adı",
+    "rename": "Yeniden adlandır",
+    "archive": "Arşivle ve durdur",
+    "restore": "Oturumu geri yükle",
+    "queue": "Sıraya alınmış mesajlar",
+    "enqueue": "Mesajı sıraya al",
+    "continueQueue": "Sıraya devam et",
+    "pauseQueue": "Sırayı duraklat",
+    "editQueued": "Sıraya alınmış mesajı düzenle",
+    "save": "Kaydet",
+    "remove": "Kaldır",
+    "upload": "Eki yükle",
+    "remoteFile": "Çalışma dizini içindeki dosya yolu",
+    "attach": "Ana makineden bir dosya ekle",
+    "attachments": "Daha önceki bir eki yeniden kullan",
+    "attachmentLimit": "En fazla 4 ek, her biri 1 MiB",
+    "review": "Git değişiklikleri",
+    "gitStatus": "Git durumunu yenile",
+    "diffFile": "İncelemek için dosya yolu",
+    "diff": "Farkı görüntüle",
+    "branch": "Yeni dal adı",
+    "createWorktree": "Çalışma ağacı oluştur",
+    "useWorktree": "Bu çalışma ağacında yeni oturum",
+    "worktreeHint": "HEAD'den yeni bir dal oluşturur. Taahhüt edilmemiş değişiklikler geçerli dizinde kalır. Mevcut çalışma ağaçları asla otomatik olarak silinmez.",
+    "clean": "Değişiklik yok",
+    "reconnecting": "Yeniden bağlanıyor ve mesajlar geri yükleniyor…",
+    "unavailable": "Oturum artık erişilebilir değil. İzinlerinizi kontrol edin veya tekrar oturum açın.",
+    "shortcuts": "Enter gönderir veya sıraya alır · Shift+Enter satır ekler · Esc keser ve sırayı duraklatır",
+    "activeSessions": "Aktif",
+    "archivedSessions": "Arşivlenmiş",
+    "dismiss": "Kapat",
+    "changes": "Değişiklikler",
+    "close": "Kapat",
+    "cancel": "İptal",
+    "sessionSetup": "Oturum",
+    "hostSetup": "Ana makine kurulumu",
+    "changedFiles": "Değiştirilmiş dosyalar",
+    "worktree": "Çalışma ağacı",
+    "attachShort": "Ekle",
+    "emptyTranscript": "Aracıyı başlatmak için bir mesaj gönderin."
+  },
+  "plugin": {
+    "name": "AI Asistanı",
+    "description": "Kurulumunuzu okuyan ve onaylamanız için değişiklikler öneren bir yapay zeka asistanı."
+  },
+  "ops": {
+    "searchHosts": "Sunucuları ara",
+    "selectedCount": "{{count}} seçildi",
+    "clear": "Temizle",
+    "fleets": "Kümeler",
+    "folders": "Klasörler",
+    "tags": "Etiketler",
+    "allHosts": "Tüm sunucular",
+    "noHosts": "Sunucu yok",
+    "newConversation": "Yeni sohbet",
+    "sendHint_one": "{{count}} sunucuda çalışır. Komutlar önce sorulmadan çalıştırılır.",
+    "sendHint_other": "{{count}} sunucuda çalışır. Komutlar önce sorulmadan çalıştırılır.",
+    "runCommand": "Komut çalıştır",
+    "hostFacts": "Sunucu bilgileri",
+    "hostCount_one": "{{count}} sunucu",
+    "hostCount_other": "{{count}} sunucu",
+    "succeeded": "{{count}} başarılı",
+    "failed": "{{count}} başarısız",
+    "exitCode": "çıkış {{code}}",
+    "timedOut": "zaman aşımı",
+    "stopped": "durduruldu",
+    "notRun": "çalıştırılmadı",
+    "cached": "önbelleğe alındı",
+    "duration": "{{seconds}}s",
+    "noOutput": "(çıktı yok)"
+  },
+  "assistant": {
+    "title": "Yapay zeka asistanı",
+    "moveHint": "Taşımak için sürükleyin. Yan panelde sabitlemek için çift tıklayın.",
+    "toggle": "Yapay zeka asistanını aç/kapat",
+    "close": "Kapat",
+    "dock": "Sağa sabitle",
+    "float": "Yüzen",
+    "openTab": "Tam görünümü aç",
+    "history": "Sohbetler",
+    "noConversations": "Henüz sohbet yok",
+    "untitled": "İsimsiz",
+    "deleteConversation": "Sohbeti sil",
+    "deleteConfirm": "Bu sohbet silinsin mi?",
+    "emptyTitle": "Termix'teki her şey hakkında soru sorun veya değişiklik yapın",
+    "emptyHint": "Asistan, Termix CLI üzerinden sizin adınıza çalışır ve hedef ana bilgisayarlarınızda komutlar çalıştırır. Hedef olarak ana bilgisayar, filo, klasör veya etiket eklemek için @ yazın.",
+    "inputPlaceholder": "Asistandan sorun. Hedef eklemek için @ yazın.",
+    "noTargets": "Hedef ana bilgisayar yok. Bazı eklemek için @ yazın.",
+    "sendHint": "Değişiklikler ve komutlar onay sorulmadan çalıştırılır.",
+    "removeTarget": "{{name}} öğesini kaldır",
+    "kind": {
+      "host": "Ana Bilgisayar",
+      "fleet": "Filo",
+      "folder": "Klasör",
+      "tag": "Etiket"
+    },
+    "emptyHintBasic": "Asistan, Termix CLI üzerinden sizin izinlerinizle sizin adınıza çalışır.",
+    "inputPlaceholderBasic": "Asistandan sorun.",
+    "sendHintBasic": "Değişiklikler onay sorulmadan çalıştırılır.",
+    "thinking": "Düşünüyor",
+    "thinkingActive": "Düşünüyor...",
+    "compacted": "Bağlam sıkıştırıldı: önceki mesajlar özetlendi",
+    "compact": "Sohbeti sıkıştır",
+    "nothingToCompact": "Sohbet henüz sıkıştırılacak kadar uzun değil.",
+    "contextMeter": "Bağlam: En son çağrı tarafından {{window}} token'ın {{used}}'ü kullanıldı",
+    "contextMeterSource": "Pencere {{source}}'tur.",
+    "contextMeterReserved": "Yanıt için {{tokens}} token boş tutulur.",
+    "todayTokens": "Bugün {{tokens}}",
+    "todayTitle": "Bugün kullandığınız token'lar. Ayrıntılar için tıklayın.",
+    "usage": "Token kullanımı",
+    "conversationTokens": "{{tokens}} token",
+    "openFloating": "Yüzen panel",
+    "openFloatingHint": "Asistanı herhangi bir sayfanın üzerinde bir panelde açın. Açmak veya kapatmak için her yerde {{shortcut}} tuşuna basın.",
+    "shortcutHint": "Asistanı yüzen bir panelde açmak için herhangi bir sayfada {{shortcut}} tuşuna basın."
+  },
+  "usage": {
+    "title": "Token kullanımı",
+    "settingDescription": "Yapay zeka çağrılarınızın son 30 gün içinde kullandığı token'lar.",
+    "cardTitle": "Yapay zeka token kullanımı",
+    "today": "Bugün",
+    "week": "7 gün",
+    "month": "30 gün",
+    "mine": "Benim",
+    "everyone": "Tüm kullanıcılar",
+    "mineCaption": "Tüm yapay zeka özelliklerindeki token'larınız.",
+    "everyoneCaption": "Tüm kullanıcılar ve yapay zeka özelliklerindeki token'lar.",
+    "byDay": "Gün başına",
+    "byModel": "Model başına",
+    "bySource": "Özellik başına",
+    "byUser": "Kullanıcı başına",
+    "model": "Model",
+    "feature": "Özellik",
+    "user": "Kullanıcı",
+    "calls": "Çağrılar",
+    "prompt": "Girdi",
+    "completion": "Çıktı",
+    "total": "Toplam",
+    "empty": "Son 30 gün içinde yapay zeka kullanımı yok.",
+    "loadFailed": "Kullanım yüklenemedi",
+    "estimatedNote": "Sağlayıcı kullanımını raporlamadığı için bazı rakamlar, token başına yaklaşık dört karakter üzerinden tahmin edilmiştir.",
+    "source": {
+      "assistant": "Asistan",
+      "terminal": "Terminal paneli",
+      "compaction": "Sıkıştırma",
+      "assets": "Varlık etiketleme"
+    }
+  },
+  "autoOps": {
+    "viewAssistant": "Asistan",
+    "viewAutoOps": "Otomatik işlemler",
+    "intro": "Otomatik işlemler, asistanın sunucularınızı kendi başına kontrol etmesini sağlar. Bir otomasyon, belirli bir zamanlamada veya bir sorun oluştuğunda bunu başlatır; ardından size onaylatmak için bir rapor yazar veya bir çözüm önerir. Hazır bir şablonla başlayın.",
+    "sections": {
+      "tasks": "Görevler",
+      "approvals": "Onaylar",
+      "presets": "Hazır şablonlar"
+    },
+    "provider": "Görevler için sağlayıcı",
+    "providerDefault": "Varsayılan modele sahip ilk sağlayıcı",
+    "model": "Görevler için model",
+    "modelDefault": "Sağlayıcının varsayılan modeli",
+    "saveModel": "Modeli kaydet",
+    "preferencesHint": "Arka plan görevlerinin kullandığı sağlayıcı ve model. Varsayılan sağlayıcınızı ve modelinizi kullanmak için bunları olduğu gibi bırakın.",
+    "task": "Görev",
+    "tokens": "{{tokens}} token",
+    "tokenUsage": "{{total}} token ({{prompt}} giriş, {{completion}} çıkış)",
+    "dryRun": "Test çalıştırması",
+    "trigger": "Tetikleyici",
+    "noTasks": "Henüz görev yok",
+    "tasksHint": "Görevler, Yapay Zekaya Sor adımı içeren otomasyonların çalıştırımlarıdır. Bir hazır şablonu etkinleştirin veya Otomasyonlar bölümünde kendiniz oluşturun: herhangi bir otomasyona Yapay Zekaya Sor adımı ekleyin. Çalıştırımlar burada görünür.",
+    "openAutomations": "Otomasyonları aç",
+    "browsePresets": "Hazır şablonlara göz at",
+    "noApprovals": "Onay bekleyen plan yok",
+    "loadFailed": "Otomatik işlemler yüklenemedi",
+    "decideFailed": "Karar kaydedilemedi",
+    "openConversation": "Asistanda aç",
+    "approve": "Onayla ve çalıştır",
+    "reject": "Reddet",
+    "expires": "{{time}} tarihinde sona eriyor",
+    "enabled": "Etkin",
+    "updateAvailable": "Güncelleme mevcut",
+    "shared": "Paylaşılan",
+    "needsAutomations": "Otomasyonlar gerekli",
+    "enableAgain": "Tekrar etkinleştir",
+    "deletePreset": "Hazır şablonu sil",
+    "autonomy": {
+      "report": "Sadece raporla",
+      "propose": "Plan öner"
+    },
+    "status": {
+      "running": "Çalışıyor",
+      "reported": "Raporlandı",
+      "proposed": "Onay bekleniyor",
+      "approved": "Onaylandı",
+      "rejected": "Reddedildi",
+      "expired": "Süresi doldu",
+      "executing": "Plan çalıştırılıyor",
+      "done": "Tamamlandı",
+      "failed": "Başarısız",
+      "skipped": "Atlandı"
+    },
+    "severity": {
+      "info": "Bilgi",
+      "warning": "Uyarı",
+      "critical": "Kritik"
+    },
+    "plan": {
+      "title": "Önerilen plan",
+      "commands": "Komutlar",
+      "rationale": "Nedeni",
+      "risk": "Risk",
+      "rollback": "Geri alma",
+      "verify": "Doğrulama",
+      "progress": "İlerleme"
+    },
+    "enable": {
+      "title": "{{name}} etkinleştir",
+      "submit": "Etkinleştir",
+      "name": "Ad",
+      "targets": "Sunucular",
+      "targetAll": "Tüm sunucular",
+      "targetTrigger": "Tetikleyen sunucu",
+      "targetHosts": "Seçili sunucular",
+      "noHosts": "En az bir sunucu seçin.",
+      "threshold": "Eşik değeri (%)",
+      "forSeconds": "En az (saniye)",
+      "time": "Gün saati",
+      "cron": "Zamanlama (cron)",
+      "dockerEvent": "Konteyner olayı",
+      "dockerEvents": {
+        "exited": "Çıkış yaptı",
+        "unhealthy": "Sağlıksız",
+        "restarting": "Yeniden başlatılıyor"
+      },
+      "badTime": "Saati SS:DD formatında girin.",
+      "autonomy": "Asistanın yapabileceği işlemler",
+      "maxRunSeconds": "Süre sınırı (saniye)",
+      "runbook": "İş kitabı",
+      "runbookHint": "Asistanın ne yapması gerektiği, sade kelimelerle. İngilizce en iyi sonucu verir.",
+      "shared": "Ön ayar olarak kaydedildiğinde paylaş",
+      "sharedHint": "Otomatik işlemleri kullanabilen herkes daha sonra bunu etkinleştirebilir.",
+      "saveAsPreset": "Ön ayar olarak kaydet",
+      "savedPreset": "Kaydedildi",
+      "failed": "Otomasyon oluşturulamadı",
+      "saveFailed": "Ön ayar kaydedilemedi"
+    },
+    "presets": {
+      "daily-patrol": {
+        "title": "Günlük devriye",
+        "description": "Her sabah 09:00'da, tüm sunucuların disklerini, belleğini, yükünü, başarısız hizmetlerini, konteynerlerini, sertifikalarını, güncellemelerini, bekleyen yeniden başlatmalarını ve zaman senkronizasyonunu kontrol eder ve ciddiyete göre raporlar."
+      },
+      "disk-cleanup": {
+        "title": "Disk alanı temizliği",
+        "description": "Bir disk %85 veya daha üstünde 5 dakika kaldığında, alanı dolduranları bulur ve onaylamanız için güvenli bir temizlik önerir. İş verileri asla dokunulmaz."
+      },
+      "host-down-triage": {
+        "title": "Sunucu arıza triaji",
+        "description": "Bir sunucu çevrimdışı olduğunda, diğer sunuculardan ve Proxmox'tan test eder ve sorunun ağ, durmuş bir makine veya SSH olup olmadığını raporlar."
+      },
+      "service-failure": {
+        "title": "Hizmet hatası",
+        "description": "Bir sağlık kontrolü başarısız olmaya başladığında, arkasındaki systemd birimini bulur, durumunu ve günlüğünü okur ve yardımcı olabilecekse onaylamanız için tek bir yeniden başlatma önerir. Yapılandırma asla değiştirilmez."
+      },
+      "container-anomaly": {
+        "title": "Konteyner anomali",
+        "description": "Bir konteyner çıktığında, sağlıksız olduğunda veya sürekli yeniden başladığında, durumunu, çıkış kodunu, günlüklerini ve belleğini okur ve onaylamanız için bir kez başlatma veya yeniden başlatma önerir. Hiçbir şey silinmez."
+      },
+      "resource-overload-cpu": {
+        "title": "CPU aşırı yüklenmesi",
+        "description": "CPU %95 veya daha üstünde 15 dakika kaldığında, arkasındaki işlemleri, hizmetleri ve konteynerleri bulur ve ne yapılması gerektiğini raporlar. Hiçbir şey değiştirilmez."
+      },
+      "resource-overload-memory": {
+        "title": "Bellek aşırı yüklenmesi",
+        "description": "Bellek %95 veya daha üstünde 10 dakika kaldığında, kullananları, takas işlemlerini ve bellek yetersizliği nedeniyle sonlandırılanları bulur ve ne yapılması gerektiğini raporlar. Hiçbir şey değiştirilmez."
+      },
+      "security-updates-weekly": {
+        "title": "Haftalık güvenlik güncellemeleri",
+        "description": "Her Pazartesi 09:30'da, bekleyen güvenlik güncellemelerini ciddiyete göre, bekleyen yeniden başlatmaları ve arkalarındaki paketleri, çalışan ve yüklü çekirdekleri ve son güncellemeden bu yana geçen günleri, tüm sunucular için tek bir tabloda listeler."
+      },
+      "cert-expiry-weekly": {
+        "title": "Haftalık sertifika süresi",
+        "description": "Her Pazartesi 09:45'te, tüm sunuculardaki Let's Encrypt, web sunucusu ve Kubernetes sertifikalarının son kullanma tarihlerini okur ve 30 günden az kalanları, 7 günden az kalanları kritik olarak işaretler."
+      },
+      "failing-drive": {
+        "title": "Bozuk sürücü",
+        "description": "Depolama Sağlığı, bozuk veya aşınmış bir sürücü, bozulmuş bir havuz veya dizi veya dolmaya başlayan ince bir havuz tespit ettiğinde, SMART, dizi ve havuz durumunu okur ve aciliyet derecesini ve yapılması gerekenleri bildirir. Hiçbir değişiklik yapılmaz."
+      }
+    },
+    "report": {
+      "verdict": "Karar",
+      "evidence": "Kanıt",
+      "actionsTaken": "Alınan aksiyonlar",
+      "recommendations": "Öneriler",
+      "nothingFound": "Çalışma bitmeden önce hiçbir şey bulunamadı.",
+      "noChanges": "Hiçbir değişiklik yapılmadı.",
+      "openConversation": "Her adımı görmek ve takip soruları sormak için asistandaki konuşmayı açın.",
+      "noFurtherAction": "Daha fazla işlem gerekmiyor.",
+      "stoppedBudgetRun": "Durduruldu: bu çalışma {{tokens}} token bütçesini kullandı.",
+      "stoppedBudgetDaily": "Durduruldu: sahibin {{tokens}} token günlük bütçesi tükendi.",
+      "stoppedDeadline": "Durduruldu: otomasyonun süre sınırı aşıldı.",
+      "stoppedPaused": "Durduruldu: bir yönetici AI otomatik işlemlerini duraklattı.",
+      "stoppedAborted": "Durduruldu: otomasyon çalışması iptal edildi.",
+      "providerFailed": "AI sağlayıcısı başarısız oldu: {{error}}",
+      "noHosts": "Hedef sunucuların hiçbiri otomasyonun sahibi tarafından erişilemiyor.",
+      "noProvider": "Otomasyonun sahibinin görevleri çalıştıracak modeli olan bir AI sağlayıcısı yok.",
+      "needsOpsUse": "Otomasyonun sahibi ai.ops.use iznine sahip değil.",
+      "assistantOff": "Otomasyonun sahibi için AI asistanı devre dışı bırakıldı.",
+      "skippedPaused": "AI otomatik işlemleri bir yönetici tarafından duraklatıldı.",
+      "skippedDuplicate": "Aynı otomasyon ve ana bilgisayar için bir görev hala çalışıyor veya onay bekliyor.",
+      "skippedRate": "Bu otomasyon son bir saatte zaten {{count}} AI görevi başlattı.",
+      "hostNotRun": "Çalıştırılmadı: plan durduruldu.",
+      "hostNoAccess": "Çalıştırılmadı: sahip artık bu ana bilgisayara bağlanamıyor.",
+      "hostUnreachable": "Çalıştırılmadı: ana bilgisayara ulaşılamadı.",
+      "hostStopped": "İlk başarısız komutta durduruldu.",
+      "executionDone": "Onaylanan plan {{count}} ana bilgisayarda çalıştırıldı ve tüm komutlar ve kontroller başarılı oldu.",
+      "executionFailed": "Onaylanan plan her ana bilgisayarda tamamlanamadı.",
+      "executionStopped": "Onaylanan plan tamamlanmadan önce durduruldu.",
+      "approvedBy": "Onaylanan plan olduğu gibi çalıştırıldı. {{user}} tarafından onaylandı.",
+      "noticeReported": "AI raporu: {{title}}",
+      "noticeProposed": "Onay bekleyen AI planı: {{title}}",
+      "noticeExecuted": "AI planı çalıştırıldı: {{title}}",
+      "noticeFailed": "AI görevi başarısız oldu: {{title}}",
+      "noticeAssetsAnnotationFailed": "Varlık etiketleme başarısız oldu"
+    }
+  },
+  "assets": {
+    "title": "Varlıklar",
+    "search": "Ad, anahtar veya adres ara",
+    "allZones": "Tüm bölgeler",
+    "showRemoved": "Kaldırılanları göster",
+    "collectNow": "Şimdi topla",
+    "collecting": "Toplanıyor…",
+    "collectFailed": "Toplama başlatılamadı",
+    "neverRun": "Henüz toplanmadı",
+    "lastRun": "Son toplama {{time}}: {{total}} ana bilgisayardan {{ok}} başarılı",
+    "lastRunFailed": "{{time}} saatindeki toplama başarısız oldu",
+    "hostsFailed_one": "{{count}} ana bilgisayar başarısız oldu",
+    "hostsFailed_other": "{{count}} ana bilgisayar başarısız oldu",
+    "loadFailed": "Envanter yüklenemedi",
+    "saveFailed": "Kaydedilemedi",
+    "empty": "Henüz varlık yok",
+    "emptyHint": "Toplayıcının bağlanabildiği her ana bilgisayarı okumak için şimdi topla.",
+    "emptyHintView": "ai.assets.manage iznine sahip birinin önce toplaması gerekir.",
+    "removed": "Kaldırıldı",
+    "pinned": "Sabitlendi",
+    "multiZone": "Çok bölgeli",
+    "multiZoneHint": "Birden fazla bölgede adreslere sahip, bu nedenle her ikisine de ulaşabilir: potansiyel bir geçiş noktası.",
+    "columns": {
+      "name": "Ad",
+      "kind": "Tür",
+      "zone": "Bölge",
+      "ips": "Adresler",
+      "listening": "Portlar",
+      "outbound": "Giden",
+      "services": "Hizmetler",
+      "collected": "Son toplama",
+      "role": "Rol",
+      "importance": "Önem",
+      "system": "Sistem"
+    },
+    "kind": {
+      "host": "Ana bilgisayar",
+      "guest": "Sanal makine",
+      "container": "Konteyner",
+      "external": "Harici"
+    },
+    "zone": {
+      "internal": "Dahili",
+      "dmz": "DMZ",
+      "external": "Harici",
+      "cloud": "Bulut",
+      "overlay": "Katman"
+    },
+    "sections": {
+      "os": "İşletim sistemi",
+      "hostname": "Ana bilgisayar adı",
+      "uptimeSec": "Çalışma süresi (saniye)",
+      "interfaces": "Arabirimler",
+      "routes": "Yollar",
+      "listening": "Dinleyen bağlantı noktaları",
+      "connections": "Kurulan bağlantılar",
+      "services": "Çalışan hizmetler",
+      "containers": "Konteynerler",
+      "kubernetes": "Kubernetes",
+      "guests": "Proxmox misafirleri",
+      "cloud": "Bulut",
+      "missing": "Çıktısı olmayan bölümler",
+      "guest": "Proxmox misafiri",
+      "container": "Konteyner"
+    },
+    "outgoing": "Giden",
+    "incoming": "Gelen",
+    "noEdges": "Hiçbiri",
+    "stale": "Son toplama işleminde görülmedi",
+    "pinZone": "Bölge",
+    "rulesDecide": "Kurallar tarafından belirlendi",
+    "settingsTitle": "Bölgeler ve zamanlama",
+    "scheduleTitle": "Toplama",
+    "daily": "Günlük topla",
+    "dailyHint": "Ana bilgisayarlar eklendiğinde veya değiştirildiğinde de yeniden toplanır.",
+    "time": "Saat (UTC)",
+    "save": "Kaydet",
+    "collector": "{{collector}} olarak toplar, bu hesabın bağlanabildiği ana bilgisayarları erişir.",
+    "collectorMe": "siz",
+    "collectorOther": "başka bir yönetici",
+    "collectorNone": "henüz kimse",
+    "collectAsMe": "Benim adımıma topla",
+    "zonesTitle": "Bölge kuralları",
+    "zonesHint": "Bir kural, yerleşik kurallardan önce bir CIDR'yi bir bölgeye eşler. En spesifik önek kazanır, ardından daha yüksek öncelik. Kaydettiğinizde varlıklar yeniden bölgeye ayrılır.",
+    "zoneName": "Ad",
+    "zoneNameExample": "Veri merkezi LAN'ı",
+    "zoneKind": "Tür",
+    "cidr": "CIDR",
+    "priority": "Öncelik",
+    "addZone": "Kural ekle",
+    "deleteZone": "Kuralı sil",
+    "cancelEdit": "İptal",
+    "annotating": "Annotasyon yapılıyor…",
+    "neverAnnotated": "Henüz annotasyon yapılmadı",
+    "lastAnnotation": "Son annotasyon {{time}}: {{total}} varlıktan {{ok}}'ı, {{tokens}} token",
+    "annotationFailed": "başarısız: {{reason}}",
+    "annotateNow": "Şimdi annotasyon yap",
+    "annotateFailed": "Annotasyon başlatılamadı",
+    "modeTable": "Tablo",
+    "modeGraph": "Grafik",
+    "importance": {
+      "critical": "Kritik",
+      "high": "Yüksek",
+      "medium": "Orta",
+      "low": "Düşük"
+    },
+    "importanceUnknown": "Değerlendirilmedi",
+    "importanceReason": "Nedeni",
+    "sourceAi": "AI",
+    "sourceAiHint": "Annotasyon tarafından yazıldı; sonraki çalıştırmada değişebilir.",
+    "sourceUser": "Kilitli",
+    "sourceUserHint": "Bir kişi tarafından ayarlandı; annotasyon çalışmaları kilidi açılana kadar buna dokunmaz.",
+    "unlock": "Kilidi aç: annotasyonun bunu tekrar doldurmasına izin ver",
+    "unlockField": "Kilitlemeyi aç {{field}}",
+    "editAnnotation": "Düzenle",
+    "lockHint": "Değiştirdiğiniz alanlar, sonraki açıklama çalışmaları için kilitlenir.",
+    "factsTitle": "Gerçekler",
+    "closePanel": "Kapat",
+    "impact": "Etki",
+    "clearImpact": "Temizle",
+    "impactSummary_one": "Başarısız olursa, {{count}} varlık onunla birlikte çöker ({{critical}} kritik, {{high}} yüksek), {{weak}} tane daha yalnızca onlara bağlanır.",
+    "impactSummary_other": "Başarısız olursa, {{count}} varlık onunla birlikte çöker ({{critical}} kritik, {{high}} yüksek), {{weak}} tane daha yalnızca onlara bağlanır.",
+    "impactTruncated": "6 atlayışta veya 300 varlıkta kesiliyor.",
+    "impactDirect": "Doğrudan",
+    "impactTransitive": "Başkaları aracılığıyla",
+    "impactWeak": "Yalnızca onlara bağlanır",
+    "expandContainers": "Konteynerleri göster",
+    "showExternal": "Harici adresleri göster",
+    "graphCounts": "{{nodes}} varlık, {{edges}} ilişki",
+    "graphTitle": "Varlık grafiği",
+    "noZone": "Bölge yok",
+    "annotationTitle": "Yapay zeka açıklaması",
+    "annotateAfterCollect": "Her toplama işleminden sonra açıklama yap",
+    "annotateAfterCollectHint": "Yalnızca son açıklamasından bu yana değişen varlıklar ve komşuları modele gönderilir.",
+    "annotateProvider": "Sağlayıcı",
+    "annotateProviderDefault": "Toplayıcının otomatik işlemler seçimi",
+    "annotateModel": "Model",
+    "annotateModelDefault": "Sağlayıcının varsayılan modeli",
+    "annotationHint": "Açıklama, toplayıcı tarafından ve toplayıcının sağlayıcılarıyla çalışır. Özetler ortam, komut satırı veya harici adresler içermez.",
+    "annotateAll": "Her şeyi yeniden açıkla"
+  },
+  "exposure": {
+    "title": "İnternet girişleri",
+    "disclaimer": "Yalnızca yapılandırma envanteri. Halka açık bağlamalar ve yönlendirme kuralları internet erişilebilirliğini kanıtlamaz. Özel dinleyiciler arka uç kanıtı olarak saklanır.",
+    "loadFailed": "Maruziyet envanteri yüklenemiyor.",
+    "saveFailed": "Öncelik kaydedilemiyor.",
+    "search": "Adres, ana bilgisayar, ad veya yol filtrele",
+    "allPriority": "Tüm öncelikler",
+    "allZones": "Tüm bölgeler",
+    "allSources": "Tüm kaynaklar",
+    "high": "Yüksek",
+    "medium": "Orta",
+    "low": "Düşük",
+    "active": "Aktif",
+    "stale": "Eski",
+    "resolved": "Artık gözlemlenmiyor",
+    "all": "Tümü",
+    "refresh": "Yenile",
+    "loading": "Yükleniyor…",
+    "empty": "Eşleşen giriş yok. Sonuç çıkarmadan önce aşağıdaki toplama kapsamını kontrol edin.",
+    "never": "Henüz toplanmadı. Girişleri envanterlemek için varlıkları toplayın.",
+    "endpoint": "Giriş",
+    "source": "Kaynak",
+    "priority": "İnceleme önceliği",
+    "pathState": "Yapılandırma yolu",
+    "freshness": "Tazelik",
+    "details": "Kanıt ayrıntıları",
+    "close": "Kapat",
+    "notTested": "Harici erişilebilirlik: test edilmedi.",
+    "priorityReason": "Öncelik, bir inceleme ipucudur, güvenlik açığı kararı değildir. Halka açık yönetim ve veri hizmeti portları önceliklendirilir; hizmet kimliği ve erişim politikası yine de doğrulamayı gerektirir.",
+    "tls": "TLS yapılandırması",
+    "restrictions": "Erişim kısıtlamaları",
+    "observed": "Son gözlemlenen",
+    "rulePriority": "Kural önceliği (kilidi aç)",
+    "evidence": "Gözlem",
+    "coverage": "Toplama kapsamı",
+    "changes": "Son değişiklikler",
+    "current": "Mevcut",
+    "partial": "Eksik",
+    "complete": "Yapılandırma ilişkisi tamamlandı",
+    "conflicting": "Belirsiz veya döngüsel",
+    "configured": "Yapılandırmada bildirildi",
+    "unknown": "Bilinmiyor",
+    "status_ok": "Toplandı",
+    "status_unsupported": "Araç kullanılamıyor",
+    "status_denied": "İzin reddedildi",
+    "status_failed": "Toplama veya ayrıştırma başarısız oldu",
+    "status_truncated": "Kesildi",
+    "change_baseline": "Taban çizgisi belirlendi",
+    "change_added": "Giriş eklendi",
+    "change_changed": "Yapılandırma değiştirildi",
+    "change_removed": "Giriş artık gözlemlenmiyor",
+    "change_coverage": "Kapsam azaldı",
+    "explain": "Kanıtı açıkla",
+    "explaining": "Açıklanıyor…",
+    "explainFailed": "Açıklama başarısız oldu veya kanıt değişti.",
+    "aiLabel": "Yapay zeka yorumu · doğrulanmış bir bulgu değil",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "binding": "Bağlama kapsamı",
+    "binding_public": "Herkese açık giriş adayı",
+    "binding_local": "Özel/yerel arka uç",
+    "binding_unknown": "Çözülmemiş bağlama",
+    "ruleGaps": "Ayrıştırılmayan kurallar: {{count}}",
+    "unsupportedRule": "Desteklenmeyen kural; önceki kanıt korundu",
+    "scope": "Görünüm",
+    "scope_internet": "İnternet giriş adayları",
+    "scope_all": "Tüm kanıtlar",
+    "scope_unknown": "Bilinmeyen maruziyet",
+    "inventorySummary": "{{internet}} internet giriş adayı · toplam {{all}} kural · {{unknown}} bilinmeyen maruziyetli",
+    "bindingCount": "{{count}} gözlemlenen bağlama",
+    "pathsTruncated": "Yol genişletme sınırına ulaştı. Bu kısmi bir kanıttır.",
+    "pathBranch": "Yol {{index}}",
+    "branched": "Koşullu dallar",
+    "reason_sensitive": "Hizmet portunu gözden geçir {{port}} (giriş veya arka uç)",
+    "reason_public-address": "Gözlemlenen herkese açık adres bağlaması",
+    "reason_wan-zone": "OpenWrt WAN kaynak bölgesi; güvenlik duvarı kabulü doğrulanmadı",
+    "reason_configured-public-tunnel": "Yapılandırılmış herkese açık tünel; dış erişilebilirlik test edilmedi",
+    "reason_internal-only": "Sadece dahili veya yerel bağlamalar gözlemlendi",
+    "reason_exposure-unknown": "Maruziyeti sınıflandırmak için yetersiz kanıt",
+    "reason_critical-asset": "Varlık kritik olarak işaretlendi",
+    "reason_manual": "Öncelik kullanıcı tarafından seçildi"
+  },
+  "companion": {
+    "toggle": "Asistan paneli"
+  },
+  "widget": {
+    "loading": "Yükleniyor...",
+    "empty": "Henüz görev yok",
+    "pending_one": "{{count}} plan onay bekliyor",
+    "pending_other": "{{count}} plan onay bekliyor",
+    "maxItems": "Gösterilecek görevler"
+  }
+}
