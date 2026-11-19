@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.6
+
+### Fixed
+
+- Pictures sent with a message show up in the transcript again: the live history dropped them even though they were saved and read by the model
+
 ## 1.6.5
 
 ### Fixed

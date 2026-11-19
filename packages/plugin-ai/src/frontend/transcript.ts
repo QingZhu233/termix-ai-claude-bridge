@@ -66,6 +66,7 @@ export function buildTimeline(
           key: `history-${index}`,
           role: entry.role,
           content: entry.content,
+          images: entry.images,
         },
   );
 
@@ -97,6 +98,7 @@ interface StoredRow {
   id: number;
   role: string;
   content: string;
+  images?: string[];
   toolCalls: string | null;
   reasoning?: string | null;
 }
@@ -281,6 +283,7 @@ export function storedHistory(rows: StoredRow[]): AssistantEntry[] {
         kind: "message",
         role: row.role === "user" ? "user" : "assistant",
         content: row.content,
+        images: row.images,
       });
     }
     for (const call of list) {
