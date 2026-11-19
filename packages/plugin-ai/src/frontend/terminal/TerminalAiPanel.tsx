@@ -513,7 +513,7 @@ export function TerminalAiPanel({
 
       <div
         ref={scrollRef}
-        className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3"
+        className="flex min-h-0 min-w-0 flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden p-3"
       >
         {timeline.length === 0 && !loading && (
           <div className="text-[13px] text-muted-foreground">
@@ -543,7 +543,7 @@ export function TerminalAiPanel({
         {timeline.map((item) => {
           if (item.kind === "message") {
             return (
-              <div key={item.key} className="flex flex-col gap-1">
+              <div key={item.key} className="flex min-w-0 flex-col gap-1">
                 {item.images && item.images.length > 0 && (
                   <div className="flex flex-wrap gap-1">
                     {item.images.map((src, index) => (

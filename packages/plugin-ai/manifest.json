@@ -1,15 +1,15 @@
 {
   "id": "ai",
   "name": "AI Assistant",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "description": "An AI assistant that reads your setup and proposes changes for you to approve.",
   "author": {
-    "name": "QingZhu",
-    "url": "https://github.com/QingZhu233/termix-ai-claude-bridge"
+    "name": "Termix"
   },
   "license": "Apache-2.0",
-  "repository": "https://github.com/QingZhu233/termix-ai-claude-bridge",
-  "docs": "https://github.com/QingZhu233/termix-ai-claude-bridge#readme",
+  "repository": "https://github.com/Termix-SSH/Plugin-AI",
+  "docs": "https://docs.termix.site/plugins/ai",
+  "video": "https://www.youtube.com/watch?v=YgdIrZuDUO4",
   "category": "Productivity",
   "icon": "Sparkles",
   "features": [
@@ -114,19 +114,13 @@
         "id": "ai",
         "titleKey": "nav.ai",
         "icon": "Sparkles",
-        "openFrom": [
-          "rail",
-          "palette"
-        ]
+        "openFrom": ["rail", "palette"]
       },
       {
         "id": "ai-agents",
         "titleKey": "agents.title",
         "icon": "Bot",
-        "openFrom": [
-          "host-context-menu",
-          "palette"
-        ]
+        "openFrom": ["host-context-menu", "palette"]
       }
     ],
     "actions": [
@@ -157,81 +151,61 @@
         "name": "use",
         "titleKey": "permissions.use.title",
         "descriptionKey": "permissions.use.description",
-        "defaultRoles": [
-          "user"
-        ]
+        "defaultRoles": ["user"]
       },
       {
         "name": "manage_providers",
         "titleKey": "permissions.manage_providers.title",
         "descriptionKey": "permissions.manage_providers.description",
-        "defaultRoles": [
-          "user"
-        ]
+        "defaultRoles": ["user"]
       },
       {
         "name": "apply_proposals",
         "titleKey": "permissions.apply_proposals.title",
         "descriptionKey": "permissions.apply_proposals.description",
-        "defaultRoles": [
-          "user"
-        ]
+        "defaultRoles": ["user"]
       },
       {
         "name": "services.use",
         "titleKey": "permissions.services.use.title",
         "descriptionKey": "permissions.services.use.description",
-        "defaultRoles": [
-          "user"
-        ]
+        "defaultRoles": ["user"]
       },
       {
         "name": "secrets.share",
         "titleKey": "permissions.secrets.share.title",
         "descriptionKey": "permissions.secrets.share.description",
-        "defaultRoles": [
-          "user"
-        ]
+        "defaultRoles": ["user"]
       },
       {
         "name": "agents",
         "titleKey": "agents.permissionTitle",
         "descriptionKey": "agents.permissionDescription",
-        "defaultRoles": [
-          "admin"
-        ]
+        "defaultRoles": ["admin"]
       },
       {
         "name": "ops.use",
         "titleKey": "permissions.ops.use.title",
         "descriptionKey": "permissions.ops.use.description",
-        "defaultRoles": [
-          "admin"
-        ]
+        "defaultRoles": ["admin"]
       },
       {
         "name": "usage.view_all",
         "titleKey": "permissions.usage.view_all.title",
         "descriptionKey": "permissions.usage.view_all.description",
-        "defaultRoles": [
-          "admin"
-        ]
+        "defaultRoles": ["admin"]
       },
       {
         "name": "assets.view",
         "titleKey": "permissions.assets.view.title",
         "descriptionKey": "permissions.assets.view.description",
-        "defaultRoles": [
-          "admin"
-        ]
+        "defaultRoles": ["admin"]
       },
       {
         "name": "assets.manage",
         "titleKey": "permissions.assets.manage.title",
         "descriptionKey": "permissions.assets.manage.description",
-        "defaultRoles": [
-          "admin"
-        ]
+        "defaultRoles": ["admin"]
       }
     ],
     "settings": {
@@ -408,14 +382,8 @@
           "requires": "enabled",
           "default": "builtin",
           "options": [
-            {
-              "value": "builtin",
-              "labelKey": "settings.user.engine.builtin"
-            },
-            {
-              "value": "claude",
-              "labelKey": "settings.user.engine.claude"
-            }
+            { "value": "builtin", "labelKey": "settings.user.engine.builtin" },
+            { "value": "claude", "labelKey": "settings.user.engine.claude" }
           ]
         },
         {
@@ -521,15 +489,9 @@
       "shell.rightEdge"
     ],
     "operations": {
-      "invokes": [
-        "*"
-      ]
+      "invokes": ["*"]
     }
   },
   "locales": "locales",
-  "platforms": [
-    "linux",
-    "win32",
-    "darwin"
-  ]
+  "platforms": ["linux", "win32", "darwin"]
 }

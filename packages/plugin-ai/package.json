@@ -1,7 +1,7 @@
 {
-  "name": "@qingzhu233/termix-ai-plugin",
+  "name": "@termix-plugin/ai",
   "private": true,
-  "version": "1.6.4",
+  "version": "1.6.5",
   "type": "module",
   "scripts": {
     "build": "termix-plugin build && node scripts/bundle-cli.mjs",
@@ -58,14 +58,5 @@
   "overrides": {
     "glob@12": "^14.0.4",
     "minimatch@10": "^11.0.5"
-  },
-  "description": "Termix AI assistant powered by the Claude Code CLI: approvals, threads, images, per-host sessions.",
-  "author": "QingZhu",
-  "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/QingZhu233/termix-ai-claude-bridge"
-  },
-  "homepage": "https://github.com/QingZhu233/termix-ai-claude-bridge#readme",
-  "originalAuthor": "Termix-SSH/Plugin-AI (Apache-2.0)"
+  }
 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.5
+
+### Fixed
+
+- Wide tables in a reply can now be scrolled to the right instead of being clipped: the table sits in a bounded box with a visible thin scrollbar, and the message bubble no longer stretches past the panel
+
 ## 1.6.4
 
 ### Added

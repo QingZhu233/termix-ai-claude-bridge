@@ -5,8 +5,8 @@ import remarkGfm from "remark-gfm";
 // `node` is react-markdown's hast node; keep it off the DOM.
 const components: Components = {
   table: ({ node: _node, ...props }) => (
-    <div className="my-2 max-w-full overflow-x-auto">
-      <table {...props} className="w-max border-collapse" />
+    <div className="my-2 w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">
+      <table {...props} className="w-max min-w-full border-collapse" />
     </div>
   ),
   th: ({ node: _node, ...props }) => (
